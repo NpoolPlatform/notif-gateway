@@ -3,6 +3,7 @@ package readstate
 import (
 	"context"
 	"fmt"
+
 	appcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
 	usercli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
@@ -95,7 +96,7 @@ func GetReadStates(ctx context.Context, appID string, userID *string, offset, li
 
 	for _, val := range rows {
 		appIDs = append(appIDs, val.AppID)
-		userIDs = append(appIDs, val.UserID)
+		userIDs = append(userIDs, val.UserID)
 	}
 	appInfos, _, err := appcli.GetManyApps(ctx, appIDs)
 	if err != nil {

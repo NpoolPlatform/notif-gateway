@@ -2,6 +2,7 @@ package notif
 
 import (
 	"context"
+
 	notif "github.com/NpoolPlatform/message/npool/notif/gw/v1/notif"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"

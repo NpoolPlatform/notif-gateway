@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+
 	"github.com/NpoolPlatform/notif-gateway/api/announcement"
 	"github.com/NpoolPlatform/notif-gateway/api/announcement/readstate"
 

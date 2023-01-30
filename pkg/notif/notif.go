@@ -2,6 +2,7 @@ package notif
 
 import (
 	"context"
+
 	appcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
 	usercli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
@@ -72,7 +73,7 @@ func GetNotifs(ctx context.Context, appID, userID string, offset, limit uint32) 
 
 	for _, val := range rows {
 		appIDs = append(appIDs, val.AppID)
-		userIDs = append(appIDs, val.UserID)
+		userIDs = append(userIDs, val.UserID)
 	}
 	appInfos, _, err := appcli.GetManyApps(ctx, appIDs)
 	if err != nil {

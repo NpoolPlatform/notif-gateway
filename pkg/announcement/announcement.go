@@ -3,6 +3,7 @@ package announcement
 import (
 	"context"
 	"fmt"
+
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 
@@ -18,7 +19,11 @@ import (
 	apppb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/app"
 )
 
-func CreateAnnouncement(ctx context.Context, appID, title, content string, channel []channelpb.NotifChannel) (*npool.Announcement, error) {
+func CreateAnnouncement(
+	ctx context.Context,
+	appID, title, content string,
+	channel []channelpb.NotifChannel,
+) (*npool.Announcement, error) {
 	info, err := mgrcli.CreateAnnouncement(ctx, &mgrpb.AnnouncementReq{
 		AppID:    &appID,
 		Title:    &title,
@@ -32,7 +37,15 @@ func CreateAnnouncement(ctx context.Context, appID, title, content string, chann
 	return expend(ctx, info)
 }
 
-func UpdateAnnouncement(ctx context.Context, id string, title, content *string, channel []channelpb.NotifChannel) (*npool.Announcement, error) {
+func UpdateAnnouncement(
+	ctx context.Context,
+	id string,
+	title, content *string,
+	channel []channelpb.NotifChannel,
+) (
+	*npool.Announcement,
+	error,
+) {
 	info, err := mgrcli.UpdateAnnouncement(ctx, &mgrpb.AnnouncementReq{
 		ID:       &id,
 		Title:    title,
@@ -46,7 +59,13 @@ func UpdateAnnouncement(ctx context.Context, id string, title, content *string, 
 	return expend(ctx, info)
 }
 
-func DeleteAnnouncement(ctx context.Context, id string) (*npool.Announcement, error) {
+func DeleteAnnouncement(
+	ctx context.Context,
+	id string,
+) (
+	*npool.Announcement,
+	error,
+) {
 	info, err := mgrcli.DeleteAnnouncement(ctx, id)
 	if err != nil {
 		return nil, err
@@ -55,7 +74,13 @@ func DeleteAnnouncement(ctx context.Context, id string) (*npool.Announcement, er
 	return expend(ctx, info)
 }
 
-func GetAnnouncement(ctx context.Context, id string) (*npool.Announcement, error) {
+func GetAnnouncement(
+	ctx context.Context,
+	id string,
+) (
+	*npool.Announcement,
+	error,
+) {
 	info, err := mgrcli.GetAnnouncement(ctx, id)
 	if err != nil {
 		return nil, err
@@ -68,7 +93,15 @@ func GetAnnouncement(ctx context.Context, id string) (*npool.Announcement, error
 	return expend(ctx, info)
 }
 
-func GetAnnouncements(ctx context.Context, appID string, offset, limit uint32) ([]*npool.Announcement, uint32, error) {
+func GetAnnouncements(
+	ctx context.Context,
+	appID string,
+	offset, limit uint32,
+) (
+	[]*npool.Announcement,
+	uint32,
+	error,
+) {
 	rows, total, err := mgrcli.GetAnnouncements(ctx, &mgrpb.Conds{
 		AppID: &npoolpb.StringVal{
 			Op:    cruder.EQ,
@@ -114,7 +147,13 @@ func GetAnnouncements(ctx context.Context, appID string, offset, limit uint32) (
 	return infos, total, nil
 }
 
-func expend(ctx context.Context, info *mgrpb.Announcement) (*npool.Announcement, error) {
+func expend(
+	ctx context.Context,
+	info *mgrpb.Announcement,
+) (
+	*npool.Announcement,
+	error,
+) {
 	appInfo, err := appcli.GetApp(ctx, info.AppID)
 	if err != nil {
 		return nil, err

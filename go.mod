@@ -3,7 +3,6 @@ module github.com/NpoolPlatform/notif-gateway
 go 1.17
 
 require (
-	bou.ke/monkey v1.0.2
 	github.com/NpoolPlatform/appuser-middleware v0.0.0-20230112023406-5d04c3c1c0d2
 	github.com/NpoolPlatform/basal-middleware v0.0.0-20221228013048-951da3e0461c
 	github.com/NpoolPlatform/go-service-framework v0.0.0-20221102072657-7fcc5e6f1012

@@ -1,7 +1,9 @@
+//nolint:dupl
 package announcement
 
 import (
 	"context"
+
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	npool "github.com/NpoolPlatform/message/npool/notif/gw/v1/announcement"
 	constant "github.com/NpoolPlatform/notif-gateway/pkg/message/const"

@@ -1,7 +1,9 @@
+//nolint:dupl
 package readstate
 
 import (
 	"context"
+
 	usercli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
 	mgrcli "github.com/NpoolPlatform/notif-manager/pkg/client/announcement"
 
@@ -22,7 +24,13 @@ import (
 	readstate1 "github.com/NpoolPlatform/notif-gateway/pkg/announcement/readstate"
 )
 
-func (s *Server) CreateReadState(ctx context.Context, in *npool.CreateReadStateRequest) (*npool.CreateReadStateResponse, error) {
+func (s *Server) CreateReadState(
+	ctx context.Context,
+	in *npool.CreateReadStateRequest,
+) (
+	*npool.CreateReadStateResponse,
+	error,
+) {
 	var err error
 
 	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "CreateReadState")
@@ -57,7 +65,15 @@ func (s *Server) CreateReadState(ctx context.Context, in *npool.CreateReadStateR
 		return &npool.CreateReadStateResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 	if user == nil {
-		logger.Sugar().Errorw("CreateReadState", "AppID", in.GetAppID(), "User", in.GetUserID(), "error", "app user not exist")
+		logger.Sugar().Errorw(
+			"CreateReadState",
+			"AppID",
+			in.GetAppID(),
+			"User",
+			in.GetUserID(),
+			"error",
+			"app user not exist",
+		)
 		return &npool.CreateReadStateResponse{}, status.Error(codes.InvalidArgument, "app user not exist")
 	}
 
@@ -68,11 +84,24 @@ func (s *Server) CreateReadState(ctx context.Context, in *npool.CreateReadStateR
 	}
 
 	if !exist {
-		logger.Sugar().Errorw("CreateReadState", "AppID", in.GetAppID(), "AnnouncementID", in.GetAnnouncementID(), "error", "announcement not exist")
+		logger.Sugar().Errorw(
+			"CreateReadState",
+			"AppID",
+			in.GetAppID(),
+			"AnnouncementID",
+			in.GetAnnouncementID(),
+			"error",
+			"announcement not exist",
+		)
 		return &npool.CreateReadStateResponse{}, status.Error(codes.InvalidArgument, "announcement not exist")
 	}
 
-	info, err := readstate1.CreateReadState(ctx, in.GetAppID(), in.GetUserID(), in.GetAnnouncementID())
+	info, err := readstate1.CreateReadState(
+		ctx,
+		in.GetAppID(),
+		in.GetUserID(),
+		in.GetAnnouncementID(),
+	)
 	if err != nil {
 		logger.Sugar().Errorw("CreateReadState", "error", err)
 		return &npool.CreateReadStateResponse{}, status.Error(codes.Internal, err.Error())
@@ -83,7 +112,13 @@ func (s *Server) CreateReadState(ctx context.Context, in *npool.CreateReadStateR
 	}, nil
 }
 
-func (s *Server) GetReadState(ctx context.Context, in *npool.GetReadStateRequest) (*npool.GetReadStateResponse, error) {
+func (s *Server) GetReadState(
+	ctx context.Context,
+	in *npool.GetReadStateRequest,
+) (
+	*npool.GetReadStateResponse,
+	error,
+) {
 	var err error
 
 	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "GetReadState")
@@ -125,7 +160,13 @@ func (s *Server) GetReadState(ctx context.Context, in *npool.GetReadStateRequest
 	}, nil
 }
 
-func (s *Server) GetReadStates(ctx context.Context, in *npool.GetReadStatesRequest) (*npool.GetReadStatesResponse, error) {
+func (s *Server) GetReadStates(
+	ctx context.Context,
+	in *npool.GetReadStatesRequest,
+) (
+	*npool.GetReadStatesResponse,
+	error,
+) {
 	var err error
 
 	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "GetReadStates")
@@ -161,7 +202,13 @@ func (s *Server) GetReadStates(ctx context.Context, in *npool.GetReadStatesReque
 	}, nil
 }
 
-func (s *Server) GetAppUserReadStates(ctx context.Context, in *npool.GetAppUserReadStatesRequest) (*npool.GetAppUserReadStatesResponse, error) {
+func (s *Server) GetAppUserReadStates(
+	ctx context.Context,
+	in *npool.GetAppUserReadStatesRequest,
+) (
+	*npool.GetAppUserReadStatesResponse,
+	error,
+) {
 	var err error
 
 	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "GetAppUserReadStates")
@@ -197,7 +244,13 @@ func (s *Server) GetAppUserReadStates(ctx context.Context, in *npool.GetAppUserR
 	}, nil
 }
 
-func (s *Server) GetAppReadStates(ctx context.Context, in *npool.GetAppReadStatesRequest) (*npool.GetAppReadStatesResponse, error) {
+func (s *Server) GetAppReadStates(
+	ctx context.Context,
+	in *npool.GetAppReadStatesRequest,
+) (
+	*npool.GetAppReadStatesResponse,
+	error,
+) {
 	var err error
 
 	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "GetAppReadStates")
@@ -228,7 +281,13 @@ func (s *Server) GetAppReadStates(ctx context.Context, in *npool.GetAppReadState
 	}, nil
 }
 
-func (s *Server) GetNAppReadStates(ctx context.Context, in *npool.GetNAppReadStatesRequest) (*npool.GetNAppReadStatesResponse, error) {
+func (s *Server) GetNAppReadStates(
+	ctx context.Context,
+	in *npool.GetNAppReadStatesRequest,
+) (
+	*npool.GetNAppReadStatesResponse,
+	error,
+) {
 	var err error
 
 	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "GetNAppReadStates")

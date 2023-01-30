@@ -2,6 +2,7 @@ package readstate
 
 import (
 	"context"
+
 	readstate "github.com/NpoolPlatform/message/npool/notif/gw/v1/announcement/readstate"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"

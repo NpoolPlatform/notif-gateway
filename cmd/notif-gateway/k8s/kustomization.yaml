@@ -1,0 +1,5 @@
+resources:
+  - 01-notif-gateway.viper.yaml
+  - 02-notif-gateway.yaml
+  - 03-strip-prefix.yaml
+  - 04-service-monitor.yaml

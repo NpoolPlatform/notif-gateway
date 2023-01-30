@@ -1,0 +1,11 @@
+---
+config:
+  hostname: "notif-gateway.npool.top"
+  http_port: 50700
+  grpc_port: 50701
+  healthz_port: 50702
+  prometheus_port: 50703
+  appid: "89089012783789789719823798127398"
+  serviceid: "04ff2327-9fb1-11ed-a975-e211a56f2a44"
+  logdir: "./"
+  apolloAccessKey: "0147fb70b815403790e8634b899fac07"

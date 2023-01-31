@@ -1,0 +1,105 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: notif-gateway-traefik-app-ingress
+  namespace: kube-system
+  annotations:
+    k8s.kuboard.cn/displayName: notif-gateway-traefik-app
+    k8s.kuboard.cn/workload: notif-gateway-traefik-app
+    kubernetes.io/ingress.class: "traefik-internet"
+    traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+    traefik.ingress.kubernetes.io/router.middlewares:
+      kube-system-strip-notif-gateway-prefix@kubernetescrd,
+      kube-system-common-headers@kubernetescrd,
+      kube-system-headers-appid-to-body@kubernetescrd,
+      kube-system-headers-userid-to-body@kubernetescrd,
+      kube-system-headers-app-login-token-to-body@kubernetescrd,
+      kube-system-app-rbac-auth@kubernetescrd
+
+spec:
+  rules:
+    - host: api.npool.top
+      http: &http_rules
+        paths:
+          - path: /api/notif/v1/version
+            backend:
+              serviceName: notif-gateway
+              servicePort: 50700
+    - host: api.procyon.vip
+      http: *http_rules
+    - host: api.xpool.top
+      http: *http_rules
+    - host: api.ohhash.com
+      http: *http_rules
+    - host: api.development.npool.top
+      http: *http_rules
+    - host: api.procyon.xpool.top
+      http: *http_rules
+    - host: api.jh-testing.npool.top
+      http: *http_rules
+    - host: api.japan-procyon-production.npool.top
+      http: *http_rules
+    - host: api.lpsecretbase.com
+      http: *http_rules
+
+---
+
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: notif-gateway-traefik-app-user-ingress
+  namespace: kube-system
+  annotations:
+    k8s.kuboard.cn/displayName: notif-gateway-traefik-app-user
+    k8s.kuboard.cn/workload: notif-gateway-traefik-app-user
+    kubernetes.io/ingress.class: "traefik-internet"
+    traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+    traefik.ingress.kubernetes.io/router.middlewares:
+      kube-system-strip-notif-gateway-prefix@kubernetescrd,
+      kube-system-common-headers@kubernetescrd,
+      kube-system-headers-appid-to-body@kubernetescrd,
+      kube-system-headers-userid-to-body@kubernetescrd,
+      kube-system-headers-app-login-token-to-body@kubernetescrd,
+      kube-system-app-user-role-rbac-auth@kubernetescrd
+
+spec:
+  rules:
+    - host: api.npool.top
+      http: &http_rules
+        paths:
+          - path: /api/notif/v1/create
+            backend:
+              serviceName: notif-gateway
+              servicePort: 50700
+          - path: /api/notif/v1/create
+            backend:
+              serviceName: notif-gateway
+              servicePort: 50700
+          - path: /api/notif/v1/update
+            backend:
+              serviceName: notif-gateway
+              servicePort: 50700
+          - path: /api/notif/v1/delete
+            backend:
+              serviceName: notif-gateway
+              servicePort: 50700
+          - path: /api/notif/v1/get
+            backend:
+              serviceName: notif-gateway
+              servicePort: 50700
+    - host: api.procyon.vip
+      http: *http_rules
+    - host: api.xpool.top
+      http: *http_rules
+    - host: api.ohhash.com
+      http: *http_rules
+    - host: api.development.npool.top
+      http: *http_rules
+    - host: api.procyon.xpool.top
+      http: *http_rules
+    - host: api.jh-testing.npool.top
+      http: *http_rules
+    - host: api.japan-procyon-production.npool.top
+      http: *http_rules
+    - host: api.lpsecretbase.com
+      http: *http_rules

@@ -2,6 +2,7 @@ package notif
 
 import (
 	"context"
+	"fmt"
 
 	appcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
 	usercli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
@@ -27,9 +28,17 @@ func GetNotif(ctx context.Context, id string) (*npool.Notif, error) {
 		return nil, err
 	}
 
+	if appInfo == nil {
+		return nil, fmt.Errorf("app %s not found", info.AppID)
+	}
+
 	userInfo, err := usercli.GetUser(ctx, info.AppID, info.UserID)
 	if err != nil {
 		return nil, err
+	}
+
+	if userInfo == nil {
+		return nil, fmt.Errorf("user %s not found", info.UserID)
 	}
 
 	return &npool.Notif{

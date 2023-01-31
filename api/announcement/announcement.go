@@ -3,7 +3,7 @@ package announcement
 
 import (
 	"context"
-
+	appcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	npool "github.com/NpoolPlatform/message/npool/notif/gw/v1/announcement"
 	constant "github.com/NpoolPlatform/notif-gateway/pkg/message/const"
@@ -48,6 +48,22 @@ func (s *Server) CreateAnnouncement(ctx context.Context, in *npool.CreateAnnounc
 	if len(in.GetChannels()) == 0 {
 		logger.Sugar().Errorw("CreateAnnouncement", "Channels", in.GetChannels(), "error", err)
 		return &npool.CreateAnnouncementResponse{}, status.Error(codes.InvalidArgument, "Channels is empty")
+	}
+
+	user, err := appcli.GetApp(ctx, in.GetAppID())
+	if err != nil {
+		logger.Sugar().Errorw("CreateReadState", "error", err)
+		return &npool.CreateAnnouncementResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+	if user == nil {
+		logger.Sugar().Errorw(
+			"CreateReadState",
+			"AppID",
+			in.GetAppID(),
+			"error",
+			"app user not exist",
+		)
+		return &npool.CreateAnnouncementResponse{}, status.Error(codes.InvalidArgument, "app not exist")
 	}
 
 	info, err := announcement1.CreateAnnouncement(ctx, in.GetAppID(), in.GetTitle(), in.GetContent(), in.GetChannels())

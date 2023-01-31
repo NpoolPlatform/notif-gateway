@@ -49,9 +49,17 @@ func GetReadState(ctx context.Context, appID, userID, announcementID string) (*n
 		return nil, err
 	}
 
+	if appInfo == nil {
+		return nil, fmt.Errorf("user not exist")
+	}
+
 	userInfo, err := usercli.GetUser(ctx, appID, userID)
 	if err != nil {
 		return nil, err
+	}
+
+	if userInfo == nil {
+		return nil, fmt.Errorf("user not exist")
 	}
 
 	return &npool.ReadState{
@@ -96,7 +104,9 @@ func GetReadStates(ctx context.Context, appID string, userID *string, offset, li
 
 	for _, val := range rows {
 		appIDs = append(appIDs, val.AppID)
-		userIDs = append(userIDs, val.UserID)
+		if val.UserID != "" {
+			userIDs = append(userIDs, val.UserID)
+		}
 	}
 	appInfos, _, err := appcli.GetManyApps(ctx, appIDs)
 	if err != nil {
@@ -106,7 +116,6 @@ func GetReadStates(ctx context.Context, appID string, userID *string, offset, li
 	for _, val := range appInfos {
 		appMap[val.ID] = val
 	}
-
 	userInfos, _, err := usercli.GetManyUsers(ctx, userIDs)
 	if err != nil {
 		return nil, 0, err

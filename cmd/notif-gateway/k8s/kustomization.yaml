@@ -2,4 +2,6 @@ resources:
   - 01-notif-gateway.viper.yaml
   - 02-notif-gateway.yaml
   - 03-strip-prefix.yaml
-  - 04-service-monitor.yaml
+  - 04-traefik-ingress.yaml
+  - 05-traefik-vpn-ingress.yaml
+  - 06-service-monitor.yaml

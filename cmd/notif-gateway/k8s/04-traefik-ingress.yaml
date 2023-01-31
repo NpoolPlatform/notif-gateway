@@ -71,10 +71,6 @@ spec:
             backend:
               serviceName: notif-gateway
               servicePort: 50700
-          - path: /api/notif/v1/create
-            backend:
-              serviceName: notif-gateway
-              servicePort: 50700
           - path: /api/notif/v1/update
             backend:
               serviceName: notif-gateway

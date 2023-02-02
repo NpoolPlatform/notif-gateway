@@ -64,7 +64,7 @@ func (s *Server) GetSendStates(
 	infos, total, err := sendstate1.GetSendStates(
 		ctx,
 		in.GetAppID(),
-		&in.UserID,
+		in.GetUserID(),
 		in.GetOffset(),
 		in.GetLimit(),
 		in.Channel,
@@ -123,7 +123,7 @@ func (s *Server) GetAppUserSendStates(
 	infos, total, err := sendstate1.GetSendStates(
 		ctx,
 		in.GetTargetAppID(),
-		&in.TargetUserID,
+		in.GetTargetUserID(),
 		in.GetOffset(),
 		in.GetLimit(),
 		in.Channel,
@@ -174,7 +174,13 @@ func (s *Server) GetAppSendStates(
 		}
 	}
 
-	infos, total, err := sendstate1.GetSendStates(ctx, in.GetAppID(), nil, in.GetOffset(), in.GetLimit(), in.Channel)
+	infos, total, err := sendstate1.GetAppSendStates(
+		ctx,
+		in.GetAppID(),
+		in.GetOffset(),
+		in.GetLimit(),
+		in.Channel,
+	)
 	if err != nil {
 		logger.Sugar().Errorw("GetAppSendStates", "error", err)
 		return &npool.GetAppSendStatesResponse{}, status.Error(codes.Internal, err.Error())
@@ -221,10 +227,9 @@ func (s *Server) GetNAppSendStates(
 		}
 	}
 
-	infos, total, err := sendstate1.GetSendStates(
+	infos, total, err := sendstate1.GetAppSendStates(
 		ctx,
 		in.GetTargetAppID(),
-		nil,
 		in.GetOffset(),
 		in.GetLimit(),
 		in.Channel,

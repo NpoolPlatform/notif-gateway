@@ -23,12 +23,14 @@ func CreateAnnouncement(
 	ctx context.Context,
 	appID, title, content string,
 	channel []channelpb.NotifChannel,
+	endAt uint32,
 ) (*npool.Announcement, error) {
 	info, err := mgrcli.CreateAnnouncement(ctx, &mgrpb.AnnouncementReq{
 		AppID:    &appID,
 		Title:    &title,
 		Content:  &content,
 		Channels: channel,
+		EndAt:    &endAt,
 	})
 	if err != nil {
 		return nil, err
@@ -42,6 +44,7 @@ func UpdateAnnouncement(
 	id string,
 	title, content *string,
 	channel []channelpb.NotifChannel,
+	endAt *uint32,
 ) (
 	*npool.Announcement,
 	error,
@@ -51,6 +54,7 @@ func UpdateAnnouncement(
 		Title:    title,
 		Content:  content,
 		Channels: channel,
+		EndAt:    endAt,
 	})
 	if err != nil {
 		return nil, err
@@ -66,6 +70,10 @@ func DeleteAnnouncement(
 	*npool.Announcement,
 	error,
 ) {
+	_, err := GetAnnouncement(ctx, id)
+	if err != nil {
+		return nil, err
+	}
 	info, err := mgrcli.DeleteAnnouncement(ctx, id)
 	if err != nil {
 		return nil, err
@@ -135,12 +143,11 @@ func GetAnnouncements(
 			continue
 		}
 		infos = append(infos, &npool.Announcement{
-			ID:       r.ID,
-			AppID:    r.AppID,
-			AppName:  app.Name,
-			Title:    r.Title,
-			Content:  r.Content,
-			Channels: r.Channels,
+			ID:      r.ID,
+			AppID:   r.AppID,
+			AppName: app.Name,
+			Title:   r.Title,
+			Content: r.Content,
 		})
 	}
 
@@ -160,11 +167,10 @@ func expend(
 	}
 
 	return &npool.Announcement{
-		ID:       info.ID,
-		AppID:    info.AppID,
-		AppName:  appInfo.Name,
-		Title:    info.Title,
-		Content:  info.Content,
-		Channels: info.Channels,
+		ID:      info.ID,
+		AppID:   info.AppID,
+		AppName: appInfo.Name,
+		Title:   info.Title,
+		Content: info.Content,
 	}, nil
 }

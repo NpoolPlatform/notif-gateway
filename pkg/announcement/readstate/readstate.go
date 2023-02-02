@@ -19,6 +19,27 @@ import (
 )
 
 func CreateReadState(ctx context.Context, appID, userID, announcementID string) (*npool.ReadState, error) {
+	exist, err := mgrcli.ExistReadStateConds(ctx, &mgrpb.Conds{
+		AppID: &npoolpb.StringVal{
+			Op:    cruder.EQ,
+			Value: appID,
+		},
+		UserID: &npoolpb.StringVal{
+			Op:    cruder.EQ,
+			Value: userID,
+		},
+		AnnouncementID: &npoolpb.StringVal{
+			Op:    cruder.EQ,
+			Value: announcementID,
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	if exist {
+		return GetReadState(ctx, appID, userID, announcementID)
+	}
+
 	info, err := mgrcli.CreateReadState(ctx, &mgrpb.ReadStateReq{
 		AppID:          &appID,
 		UserID:         &userID,

@@ -4,6 +4,8 @@ package announcement
 import (
 	"context"
 
+	"github.com/NpoolPlatform/message/npool/notif/mgr/v1/channel"
+
 	appcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	npool "github.com/NpoolPlatform/message/npool/notif/gw/v1/announcement"
@@ -51,6 +53,21 @@ func (s *Server) CreateAnnouncement(ctx context.Context, in *npool.CreateAnnounc
 		return &npool.CreateAnnouncementResponse{}, status.Error(codes.InvalidArgument, "Channels is empty")
 	}
 
+	for _, val := range in.GetChannels() {
+		switch val {
+		case channel.NotifChannel_ChannelEmail:
+		case channel.NotifChannel_ChannelSMS:
+		default:
+			logger.Sugar().Errorw("CreateAnnouncement", "Channel", in.GetChannels(), "error", err)
+			return &npool.CreateAnnouncementResponse{}, status.Error(codes.InvalidArgument, "Channel is invalid")
+		}
+	}
+
+	if in.GetEndAt() == 0 {
+		logger.Sugar().Errorw("CreateAnnouncement", "EndAt", in.GetEndAt(), "error", err)
+		return &npool.CreateAnnouncementResponse{}, status.Error(codes.InvalidArgument, "EndAt is empty")
+	}
+
 	user, err := appcli.GetApp(ctx, in.GetAppID())
 	if err != nil {
 		logger.Sugar().Errorw("CreateReadState", "error", err)
@@ -67,7 +84,14 @@ func (s *Server) CreateAnnouncement(ctx context.Context, in *npool.CreateAnnounc
 		return &npool.CreateAnnouncementResponse{}, status.Error(codes.InvalidArgument, "app not exist")
 	}
 
-	info, err := announcement1.CreateAnnouncement(ctx, in.GetAppID(), in.GetTitle(), in.GetContent(), in.GetChannels())
+	info, err := announcement1.CreateAnnouncement(
+		ctx,
+		in.GetAppID(),
+		in.GetTitle(),
+		in.GetContent(),
+		in.GetChannels(),
+		in.GetEndAt(),
+	)
 	if err != nil {
 		logger.Sugar().Errorw("CreateAnnouncement", "error", err)
 		return &npool.CreateAnnouncementResponse{}, status.Error(codes.Internal, err.Error())
@@ -111,7 +135,29 @@ func (s *Server) UpdateAnnouncement(ctx context.Context, in *npool.UpdateAnnounc
 		return &npool.UpdateAnnouncementResponse{}, status.Error(codes.InvalidArgument, "Channels is empty")
 	}
 
-	info, err := announcement1.UpdateAnnouncement(ctx, in.GetID(), in.Title, in.Content, in.GetChannels())
+	for _, val := range in.GetChannels() {
+		switch val {
+		case channel.NotifChannel_ChannelEmail:
+		case channel.NotifChannel_ChannelSMS:
+		default:
+			logger.Sugar().Errorw("CreateAnnouncement", "Channel", in.GetChannels(), "error", err)
+			return &npool.UpdateAnnouncementResponse{}, status.Error(codes.InvalidArgument, "Channel is invalid")
+		}
+	}
+
+	if in.GetEndAt() == 0 && in.EndAt == nil {
+		logger.Sugar().Errorw("UpdateAnnouncement", "EndAt", in.GetEndAt(), "error", err)
+		return &npool.UpdateAnnouncementResponse{}, status.Error(codes.InvalidArgument, "EndAt is empty")
+	}
+
+	info, err := announcement1.UpdateAnnouncement(
+		ctx,
+		in.GetID(),
+		in.Title,
+		in.Content,
+		in.GetChannels(),
+		in.EndAt,
+	)
 	if err != nil {
 		logger.Sugar().Errorw("UpdateAnnouncement", "error", err)
 		return &npool.UpdateAnnouncementResponse{}, status.Error(codes.Internal, err.Error())

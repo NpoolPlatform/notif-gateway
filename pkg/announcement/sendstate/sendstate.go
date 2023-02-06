@@ -111,6 +111,9 @@ func GetAppSendStates(
 	uint32,
 	error,
 ) {
+	if limit == 0 {
+		limit = 100
+	}
 	conds := &mgrpb.Conds{
 		AppID: &npoolpb.StringVal{
 			Op:    cruder.EQ,

@@ -68,18 +68,18 @@ func (s *Server) CreateAnnouncement(ctx context.Context, in *npool.CreateAnnounc
 		return &npool.CreateAnnouncementResponse{}, status.Error(codes.InvalidArgument, "EndAt is empty")
 	}
 
-	user, err := appcli.GetApp(ctx, in.GetAppID())
+	app, err := appcli.GetApp(ctx, in.GetAppID())
 	if err != nil {
 		logger.Sugar().Errorw("CreateReadState", "error", err)
 		return &npool.CreateAnnouncementResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
-	if user == nil {
+	if app == nil {
 		logger.Sugar().Errorw(
 			"CreateReadState",
 			"AppID",
 			in.GetAppID(),
 			"error",
-			"app user not exist",
+			"app not exist",
 		)
 		return &npool.CreateAnnouncementResponse{}, status.Error(codes.InvalidArgument, "app not exist")
 	}
@@ -120,12 +120,12 @@ func (s *Server) UpdateAnnouncement(ctx context.Context, in *npool.UpdateAnnounc
 		return &npool.UpdateAnnouncementResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	if in.GetTitle() == "" && in.Title == nil {
+	if in.GetTitle() == "" && in.Title != nil {
 		logger.Sugar().Errorw("UpdateAnnouncement", "Title", in.GetTitle(), "error", err)
 		return &npool.UpdateAnnouncementResponse{}, status.Error(codes.InvalidArgument, "Title is empty")
 	}
 
-	if in.GetContent() == "" && in.Content == nil {
+	if in.GetContent() == "" && in.Content != nil {
 		logger.Sugar().Errorw("UpdateAnnouncement", "Content", in.GetContent(), "error", err)
 		return &npool.UpdateAnnouncementResponse{}, status.Error(codes.InvalidArgument, "Content is empty")
 	}

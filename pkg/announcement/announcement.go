@@ -110,6 +110,9 @@ func GetAnnouncements(
 	uint32,
 	error,
 ) {
+	if limit == 0 {
+		limit = 100
+	}
 	rows, total, err := mgrcli.GetAnnouncements(ctx, &mgrpb.Conds{
 		AppID: &npoolpb.StringVal{
 			Op:    cruder.EQ,

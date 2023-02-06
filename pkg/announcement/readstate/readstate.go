@@ -99,6 +99,9 @@ func GetReadState(ctx context.Context, appID, userID, announcementID string) (*n
 }
 
 func GetReadStates(ctx context.Context, appID string, userID *string, offset, limit uint32) ([]*npool.ReadState, uint32, error) {
+	if limit == 0 {
+		limit = 100
+	}
 	conds := &mgrpb.Conds{
 		AppID: &npoolpb.StringVal{
 			Op:    cruder.EQ,

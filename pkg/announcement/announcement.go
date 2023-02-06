@@ -148,6 +148,7 @@ func GetAnnouncements(
 			AppName: app.Name,
 			Title:   r.Title,
 			Content: r.Content,
+			EndAt:   r.EndAt,
 		})
 	}
 

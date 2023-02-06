@@ -137,13 +137,17 @@ func GetReadStates(ctx context.Context, appID string, userID *string, offset, li
 	for _, val := range appInfos {
 		appMap[val.ID] = val
 	}
-	userInfos, _, err := usercli.GetManyUsers(ctx, userIDs)
-	if err != nil {
-		return nil, 0, err
-	}
+
 	userMap := map[string]*userpb.User{}
-	for _, val := range userInfos {
-		userMap[val.ID] = val
+	if len(userIDs) > 0 {
+		userInfos, _, err := usercli.GetManyUsers(ctx, userIDs)
+		if err != nil {
+			return nil, 0, err
+		}
+
+		for _, val := range userInfos {
+			userMap[val.ID] = val
+		}
 	}
 
 	infos := []*npool.ReadState{}

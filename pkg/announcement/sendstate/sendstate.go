@@ -48,7 +48,12 @@ func GetSendStates(
 			Value: userID,
 		},
 	}
-
+	if channel != nil {
+		conds.Channel = &npoolpb.Uint32Val{
+			Op:    cruder.EQ,
+			Value: uint32(channel.Number()),
+		}
+	}
 	rows, total, err := mwcli.GetSendStates(ctx, conds, int32(offset), int32(limit))
 	if err != nil {
 		return nil, 0, err

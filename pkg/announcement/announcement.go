@@ -172,5 +172,6 @@ func expend(
 		AppName: appInfo.Name,
 		Title:   info.Title,
 		Content: info.Content,
+		EndAt:   info.EndAt,
 	}, nil
 }

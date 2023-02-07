@@ -14,7 +14,7 @@ import (
 
 	npoolpb "github.com/NpoolPlatform/message/npool"
 
-	mgrpb "github.com/NpoolPlatform/message/npool/notif/mgr/v1/announcement/sendstate"
+	mwpb "github.com/NpoolPlatform/message/npool/notif/mw/v1/announcement/sendstate"
 	mwcli "github.com/NpoolPlatform/notif-middleware/pkg/client/announcement/sendstate"
 )
 
@@ -38,7 +38,7 @@ func GetSendStates(
 		return nil, 0, fmt.Errorf("user %v not found", userID)
 	}
 
-	conds := &mgrpb.Conds{
+	conds := &mwpb.Conds{
 		AppID: &npoolpb.StringVal{
 			Op:    cruder.EQ,
 			Value: appID,
@@ -114,7 +114,7 @@ func GetAppSendStates(
 	if limit == 0 {
 		limit = 100
 	}
-	conds := &mgrpb.Conds{
+	conds := &mwpb.Conds{
 		AppID: &npoolpb.StringVal{
 			Op:    cruder.EQ,
 			Value: appID,

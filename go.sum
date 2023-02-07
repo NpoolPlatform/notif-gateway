@@ -49,8 +49,8 @@ github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym
 github.com/DATA-DOG/go-sqlmock v1.5.0 h1:Shsta01QNfFxHCfpW6YH2STWB0MudeXXEWMr20OEh60=
 github.com/DataDog/datadog-go v3.2.0+incompatible/go.mod h1:LButxg5PwREeZtORoXG3tL4fMGNddJ+vMq1mwgfaqoQ=
 github.com/NpoolPlatform/appuser-manager v0.0.0-20230111060622-e3a10cc791c1 h1:T8fssZU6u2ne3O9zi0r0nnzgUZEr8WyyI92vEnlNxUQ=
-github.com/NpoolPlatform/appuser-middleware v0.0.0-20230112023406-5d04c3c1c0d2 h1:WCMY0IQpv9vEN7f98BGnjsbkS07nHvsUbfQwMjVpGiY=
-github.com/NpoolPlatform/appuser-middleware v0.0.0-20230112023406-5d04c3c1c0d2/go.mod h1:3a4Rb9Fht2gIQKLXwhz5vngF21X7WIQSuxI2vWxrzFY=
+github.com/NpoolPlatform/appuser-middleware v0.0.0-20230206082317-4914255f4275 h1:KvNtrQpY0LMn2XjDiusbfASYKF6b5HQMeOjWVJSUFzs=
+github.com/NpoolPlatform/appuser-middleware v0.0.0-20230206082317-4914255f4275/go.mod h1:tt+KRHYJZ71px+zZMCFqPUI5axvSeDKBlQY/5P53Gxg=
 github.com/NpoolPlatform/basal-middleware v0.0.0-20221228013048-951da3e0461c h1:W3EFJZAVasYnc+mqoUn4YjX5QQW+T+6kJh1ujJ2KAiQ=
 github.com/NpoolPlatform/basal-middleware v0.0.0-20221228013048-951da3e0461c/go.mod h1:2ve2qsnYtLc5YOuMUQDt3pzYUAokI9bWaK2fjJSNjmY=
 github.com/NpoolPlatform/go-service-framework v0.0.0-20221102072657-7fcc5e6f1012 h1:agWdYMDo1nBXR0w/PQz9Kze5IZsROOwSL8WcQFTMT4Q=
@@ -61,8 +61,8 @@ github.com/NpoolPlatform/message v0.0.0-20230206122134-915ffa0898aa h1:iurqdkZKo
 github.com/NpoolPlatform/message v0.0.0-20230206122134-915ffa0898aa/go.mod h1:G4b3QmQYYHn2okxu8KfD6INUALqno3369SLciqevhtQ=
 github.com/NpoolPlatform/notif-manager v0.0.0-20230201084215-c8c4fa48042a h1:8C1yl612EZeYug2EMviU9h/Crkp7u5KWABsUffGtpa0=
 github.com/NpoolPlatform/notif-manager v0.0.0-20230201084215-c8c4fa48042a/go.mod h1:/xrgNUAmviFSvkBKcW2zeBh/KOff2ESzcrlEGx9/a/g=
-github.com/NpoolPlatform/notif-middleware v0.0.0-20230202025240-80cebf1e66ae h1:s0V65cdnnIFz+n6si6x4KeHsUlh3G9tdAYrEkeBExa8=
-github.com/NpoolPlatform/notif-middleware v0.0.0-20230202025240-80cebf1e66ae/go.mod h1:6jFQJojwuxoHd+D6msY856eypJvmsbwQTUL3Sm9/HCI=
+github.com/NpoolPlatform/notif-middleware v0.0.0-20230206120526-ac22f00aedca h1:OjdHCeObT8te+/Qfij9R2NKqtfRUPEN1EpovrnMI5nQ=
+github.com/NpoolPlatform/notif-middleware v0.0.0-20230206120526-ac22f00aedca/go.mod h1:3FJQ/jExhy0chjj34G/VhGwHBQPwaqH+/4poDYLNF+A=
 github.com/OneOfOne/xxhash v1.2.2 h1:KMrpdQIwFcEqXDklaen+P1axHaj9BSKzvpUUfnHldSE=
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
 github.com/Shonminh/apollo-client v0.4.0 h1:AXGp4wOahrEKjheMXehgsG9B8dEfLQHttRLHeEefvus=

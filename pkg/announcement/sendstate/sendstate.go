@@ -98,6 +98,7 @@ func GetSendStates(
 			Title:          val.Title,
 			Content:        val.Content,
 			Channel:        val.Channel,
+			CreateAt:       val.CreatedAt,
 		})
 	}
 	return infos, total, nil
@@ -192,6 +193,7 @@ func GetAppSendStates(
 			Title:          val.Title,
 			Content:        val.Content,
 			Channel:        val.Channel,
+			CreateAt:       val.CreatedAt,
 		})
 	}
 	return infos, total, nil

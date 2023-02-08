@@ -93,6 +93,7 @@ func GetReadState(ctx context.Context, appID, userID, announcementID string) (*n
 		Username:       userInfo.Username,
 		Title:          info.Title,
 		Content:        info.Content,
+		CreatedAt:      info.CreatedAt,
 	}, nil
 }
 
@@ -171,6 +172,7 @@ func GetReadStates(ctx context.Context, appID string, userID *string, offset, li
 			Username:       user.Username,
 			Title:          val.Title,
 			Content:        val.Content,
+			CreatedAt:      val.CreatedAt,
 		})
 	}
 	return infos, total, nil

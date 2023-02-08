@@ -50,6 +50,37 @@ func (s *Server) GetNotif(ctx context.Context, in *npool.GetNotifRequest) (*npoo
 		Info: info,
 	}, nil
 }
+func (s *Server) UpdateNotifs(ctx context.Context, in *npool.UpdateNotifsRequest) (*npool.UpdateNotifsResponse, error) {
+	var err error
+
+	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "GetNotif")
+	defer span.End()
+
+	defer func() {
+		if err != nil {
+			span.SetStatus(scodes.Error, err.Error())
+			span.RecordError(err)
+		}
+	}()
+
+	for _, id := range in.GetIDs() {
+		_, err = uuid.Parse(id)
+		if err != nil {
+			logger.Sugar().Errorw("GetNotif", "ID", id, "error", err)
+			return &npool.UpdateNotifsResponse{}, status.Error(codes.InvalidArgument, err.Error())
+		}
+	}
+
+	infos, err := notif1.UpdateNotifs(ctx, in.GetIDs(), in.GetAlreadyRead())
+	if err != nil {
+		logger.Sugar().Errorw("GetNotif", "error", err)
+		return &npool.UpdateNotifsResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	return &npool.UpdateNotifsResponse{
+		Infos: infos,
+	}, nil
+}
 
 func (s *Server) GetNotifs(ctx context.Context, in *npool.GetNotifsRequest) (*npool.GetNotifsResponse, error) {
 	var err error

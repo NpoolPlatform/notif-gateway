@@ -245,13 +245,93 @@ func (s *Server) GetAnnouncements(ctx context.Context, in *npool.GetAnnouncement
 		return &npool.GetAnnouncementsResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	infos, total, err := announcement1.GetAnnouncements(ctx, in.GetAppID(), in.GetOffset(), in.GetLimit())
+	_, err = uuid.Parse(in.GetUserID())
+	if err != nil {
+		logger.Sugar().Errorw("GetAnnouncements", "UserID", in.GetUserID(), "error", err)
+		return &npool.GetAnnouncementsResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	infos, total, err := announcement1.GetAnnouncements(ctx, in.GetAppID(), in.GetUserID(), in.GetOffset(), in.GetLimit())
 	if err != nil {
 		logger.Sugar().Errorw("GetAnnouncements", "error", err)
 		return &npool.GetAnnouncementsResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
 	return &npool.GetAnnouncementsResponse{
+		Infos: infos,
+		Total: total,
+	}, nil
+}
+
+func (s *Server) GetAppAnnouncements(
+	ctx context.Context,
+	in *npool.GetAppAnnouncementsRequest,
+) (
+	*npool.GetAppAnnouncementsResponse,
+	error,
+) {
+	var err error
+
+	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "GetAnnouncements")
+	defer span.End()
+
+	defer func() {
+		if err != nil {
+			span.SetStatus(scodes.Error, err.Error())
+			span.RecordError(err)
+		}
+	}()
+
+	_, err = uuid.Parse(in.GetAppID())
+	if err != nil {
+		logger.Sugar().Errorw("GetAnnouncements", "AppID", in.GetAppID(), "error", err)
+		return &npool.GetAppAnnouncementsResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	infos, total, err := announcement1.GetAppAnnouncements(ctx, in.GetAppID(), in.GetOffset(), in.GetLimit())
+	if err != nil {
+		logger.Sugar().Errorw("GetAnnouncements", "error", err)
+		return &npool.GetAppAnnouncementsResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	return &npool.GetAppAnnouncementsResponse{
+		Infos: infos,
+		Total: total,
+	}, nil
+}
+
+func (s *Server) GetNAppAnnouncements(
+	ctx context.Context,
+	in *npool.GetNAppAnnouncementsRequest,
+) (
+	*npool.GetNAppAnnouncementsResponse,
+	error,
+) {
+	var err error
+
+	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "GetAnnouncements")
+	defer span.End()
+
+	defer func() {
+		if err != nil {
+			span.SetStatus(scodes.Error, err.Error())
+			span.RecordError(err)
+		}
+	}()
+
+	_, err = uuid.Parse(in.GetTargetAppID())
+	if err != nil {
+		logger.Sugar().Errorw("GetAnnouncements", "TargetAppID", in.GetTargetAppID(), "error", err)
+		return &npool.GetNAppAnnouncementsResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	infos, total, err := announcement1.GetAppAnnouncements(ctx, in.GetTargetAppID(), in.GetOffset(), in.GetLimit())
+	if err != nil {
+		logger.Sugar().Errorw("GetAnnouncements", "error", err)
+		return &npool.GetNAppAnnouncementsResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	return &npool.GetNAppAnnouncementsResponse{
 		Infos: infos,
 		Total: total,
 	}, nil

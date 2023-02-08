@@ -1,3 +1,4 @@
+//nolint:dupl
 package notif
 
 import (
@@ -13,6 +14,8 @@ import (
 
 	mgrpb "github.com/NpoolPlatform/message/npool/notif/mgr/v1/notif"
 	mgrcli "github.com/NpoolPlatform/notif-manager/pkg/client/notif"
+
+	mwcli "github.com/NpoolPlatform/notif-middleware/pkg/client/notif"
 
 	npool "github.com/NpoolPlatform/message/npool/notif/gw/v1/notif"
 )
@@ -56,6 +59,71 @@ func GetNotif(ctx context.Context, id string) (*npool.Notif, error) {
 		Channels:     info.Channels,
 		AlreadyRead:  info.AlreadyRead,
 	}, nil
+}
+
+func UpdateNotifs(ctx context.Context, ids []string, alreadyRead bool) ([]*npool.Notif, error) {
+	rows, err := mwcli.UpdateNotifs(ctx, ids, nil, &alreadyRead)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(rows) == 0 {
+		return nil, nil
+	}
+
+	appIDs := []string{}
+	userIDs := []string{}
+
+	for _, val := range rows {
+		appIDs = append(appIDs, val.AppID)
+		userIDs = append(userIDs, val.UserID)
+	}
+	appInfos, _, err := appcli.GetManyApps(ctx, appIDs)
+	if err != nil {
+		return nil, err
+	}
+	appMap := map[string]*apppb.App{}
+	for _, val := range appInfos {
+		appMap[val.ID] = val
+	}
+
+	userInfos, _, err := usercli.GetManyUsers(ctx, userIDs)
+	if err != nil {
+		return nil, err
+	}
+	userMap := map[string]*userpb.User{}
+	for _, val := range userInfos {
+		userMap[val.ID] = val
+	}
+
+	infos := []*npool.Notif{}
+	for _, val := range rows {
+		app, ok := appMap[val.AppID]
+		if !ok {
+			continue
+		}
+		user, ok := userMap[val.UserID]
+		if !ok {
+			continue
+		}
+
+		infos = append(infos, &npool.Notif{
+			ID:           val.ID,
+			AppID:        val.AppID,
+			AppName:      app.Name,
+			UserID:       val.UserID,
+			EmailAddress: user.EmailAddress,
+			PhoneNO:      user.PhoneNO,
+			Username:     user.Username,
+			EventType:    val.EventType,
+			UseTemplate:  val.UseTemplate,
+			Title:        val.Title,
+			Content:      val.Content,
+			Channels:     val.Channels,
+			AlreadyRead:  val.AlreadyRead,
+		})
+	}
+	return infos, nil
 }
 
 func GetNotifs(ctx context.Context, appID, userID string, offset, limit uint32) ([]*npool.Notif, uint32, error) {

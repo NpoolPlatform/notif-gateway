@@ -29,6 +29,9 @@ func GetSendStates(
 	uint32,
 	error,
 ) {
+	if limit == 0 {
+		limit = 100
+	}
 	userInfo, err := usercli.GetUser(ctx, appID, userID)
 	if err != nil {
 		return nil, 0, err
@@ -95,7 +98,6 @@ func GetSendStates(
 			Title:          val.Title,
 			Content:        val.Content,
 			Channel:        val.Channel,
-			AlreadySend:    val.AlreadySend,
 		})
 	}
 	return infos, total, nil
@@ -190,7 +192,6 @@ func GetAppSendStates(
 			Title:          val.Title,
 			Content:        val.Content,
 			Channel:        val.Channel,
-			AlreadySend:    val.AlreadySend,
 		})
 	}
 	return infos, total, nil

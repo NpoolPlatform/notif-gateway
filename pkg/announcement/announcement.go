@@ -176,7 +176,7 @@ func GetAnnouncements(
 	if limit == 0 {
 		limit = 100
 	}
-	rows, total, err := mwcli.GetAnnouncements(ctx, &mwpb.Conds{
+	rows, total, err := mwcli.GetAnnouncementStates(ctx, &mwpb.Conds{
 		AppID: &npoolpb.StringVal{
 			Op:    cruder.EQ,
 			Value: appID,

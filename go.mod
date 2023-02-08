@@ -7,7 +7,7 @@ require (
 	github.com/NpoolPlatform/basal-middleware v0.0.0-20221228013048-951da3e0461c
 	github.com/NpoolPlatform/go-service-framework v0.0.0-20221102072657-7fcc5e6f1012
 	github.com/NpoolPlatform/libent-cruder v0.0.0-20221109023947-366125b690fb
-	github.com/NpoolPlatform/message v0.0.0-20230208072135-cbce2fc31cf2
+	github.com/NpoolPlatform/message v0.0.0-20230208082240-d860e643050c
 	github.com/NpoolPlatform/notif-manager v0.0.0-20230207095135-f63d1504a415
 	github.com/NpoolPlatform/notif-middleware v0.0.0-20230208052003-a3a311f354ce
 	github.com/go-resty/resty/v2 v2.7.0

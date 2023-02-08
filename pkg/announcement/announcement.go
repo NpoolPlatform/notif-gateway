@@ -251,12 +251,14 @@ func expend(
 	}
 
 	return &npool.Announcement{
-		ID:       info.ID,
-		AppID:    info.AppID,
-		AppName:  appInfo.Name,
-		Title:    info.Title,
-		Content:  info.Content,
-		EndAt:    info.EndAt,
-		Channels: info.Channels,
+		ID:        info.ID,
+		AppID:     info.AppID,
+		AppName:   appInfo.Name,
+		Title:     info.Title,
+		Content:   info.Content,
+		CreatedAt: info.CreatedAt,
+		UpdatedAt: info.UpdatedAt,
+		EndAt:     info.EndAt,
+		Channels:  info.Channels,
 	}, nil
 }

@@ -3,6 +3,8 @@ package api
 import (
 	"context"
 
+	"github.com/NpoolPlatform/notif-gateway/api/announcement/user"
+
 	"github.com/NpoolPlatform/notif-gateway/api/announcement"
 	"github.com/NpoolPlatform/notif-gateway/api/announcement/readstate"
 	"github.com/NpoolPlatform/notif-gateway/api/announcement/sendstate"
@@ -25,6 +27,7 @@ func Register(server grpc.ServiceRegistrar) {
 	readstate.Register(server)
 	sendstate.Register(server)
 	notif.Register(server)
+	user.Register(server)
 }
 
 func RegisterGateway(mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) error {
@@ -41,6 +44,9 @@ func RegisterGateway(mux *runtime.ServeMux, endpoint string, opts []grpc.DialOpt
 		return err
 	}
 	if err := notif.RegisterGateway(mux, endpoint, opts); err != nil {
+		return err
+	}
+	if err := user.RegisterGateway(mux, endpoint, opts); err != nil {
 		return err
 	}
 	return nil

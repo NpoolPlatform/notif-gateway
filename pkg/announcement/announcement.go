@@ -29,13 +29,15 @@ func CreateAnnouncement(
 	appID, title, content string,
 	channel []channelpb.NotifChannel,
 	endAt uint32,
+	announcementType mgrpb.AnnouncementType,
 ) (*npool.Announcement, error) {
 	info, err := mgrcli.CreateAnnouncement(ctx, &mgrpb.AnnouncementReq{
-		AppID:    &appID,
-		Title:    &title,
-		Content:  &content,
-		Channels: channel,
-		EndAt:    &endAt,
+		AppID:            &appID,
+		Title:            &title,
+		Content:          &content,
+		Channels:         channel,
+		EndAt:            &endAt,
+		AnnouncementType: &announcementType,
 	})
 	if err != nil {
 		return nil, err
@@ -50,16 +52,18 @@ func UpdateAnnouncement(
 	title, content *string,
 	channel []channelpb.NotifChannel,
 	endAt *uint32,
+	announcementType *mgrpb.AnnouncementType,
 ) (
 	*npool.Announcement,
 	error,
 ) {
 	info, err := mgrcli.UpdateAnnouncement(ctx, &mgrpb.AnnouncementReq{
-		ID:       &id,
-		Title:    title,
-		Content:  content,
-		Channels: channel,
-		EndAt:    endAt,
+		ID:               &id,
+		Title:            title,
+		Content:          content,
+		Channels:         channel,
+		EndAt:            endAt,
+		AnnouncementType: announcementType,
 	})
 	if err != nil {
 		return nil, err
@@ -151,15 +155,16 @@ func GetAppAnnouncements(
 			continue
 		}
 		infos = append(infos, &npool.Announcement{
-			ID:        r.ID,
-			AppID:     r.AppID,
-			AppName:   app.Name,
-			Title:     r.Title,
-			Content:   r.Content,
-			CreatedAt: r.CreatedAt,
-			UpdatedAt: r.UpdatedAt,
-			EndAt:     r.EndAt,
-			Channels:  r.Channels,
+			ID:               r.ID,
+			AppID:            r.AppID,
+			AppName:          app.Name,
+			Title:            r.Title,
+			Content:          r.Content,
+			CreatedAt:        r.CreatedAt,
+			UpdatedAt:        r.UpdatedAt,
+			EndAt:            r.EndAt,
+			Channels:         r.Channels,
+			AnnouncementType: r.AnnouncementType,
 		})
 	}
 
@@ -234,10 +239,8 @@ func GetAnnouncements(
 			Title:        r.Title,
 			Content:      r.Content,
 			AlreadyRead:  r.AlreadyRead,
-			AlreadySend:  r.AlreadySend,
 			CreatedAt:    r.CreatedAt,
 			UpdatedAt:    r.UpdatedAt,
-			SendChannel:  r.Channel,
 			EndAt:        r.EndAt,
 		})
 	}
@@ -262,14 +265,15 @@ func expend(
 		appName = appInfo.Name
 	}
 	return &npool.Announcement{
-		ID:        info.ID,
-		AppID:     info.AppID,
-		AppName:   appName,
-		Title:     info.Title,
-		Content:   info.Content,
-		CreatedAt: info.CreatedAt,
-		UpdatedAt: info.UpdatedAt,
-		EndAt:     info.EndAt,
-		Channels:  info.Channels,
+		ID:               info.ID,
+		AppID:            info.AppID,
+		AppName:          appName,
+		Title:            info.Title,
+		Content:          info.Content,
+		CreatedAt:        info.CreatedAt,
+		UpdatedAt:        info.UpdatedAt,
+		EndAt:            info.EndAt,
+		Channels:         info.Channels,
+		AnnouncementType: info.AnnouncementType,
 	}, nil
 }

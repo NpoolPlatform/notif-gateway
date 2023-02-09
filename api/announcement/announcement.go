@@ -4,6 +4,8 @@ package announcement
 import (
 	"context"
 
+	mgrpb "github.com/NpoolPlatform/message/npool/notif/mgr/v1/announcement"
+
 	"github.com/NpoolPlatform/message/npool/notif/mgr/v1/channel"
 
 	appcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
@@ -19,6 +21,7 @@ import (
 	announcement1 "github.com/NpoolPlatform/notif-gateway/pkg/announcement"
 )
 
+//nolint:funlen,gocyclo
 func (s *Server) CreateAnnouncement(ctx context.Context, in *npool.CreateAnnouncementRequest) (*npool.CreateAnnouncementResponse, error) {
 	var err error
 
@@ -68,6 +71,22 @@ func (s *Server) CreateAnnouncement(ctx context.Context, in *npool.CreateAnnounc
 		return &npool.CreateAnnouncementResponse{}, status.Error(codes.InvalidArgument, "EndAt is empty")
 	}
 
+	switch in.AnnouncementType {
+	case mgrpb.AnnouncementType_AppointUsers:
+	case mgrpb.AnnouncementType_AllUsers:
+	default:
+		logger.Sugar().Errorw("CreateAnnouncement", "AnnouncementType", in.GetAnnouncementType(), "error", err)
+		return &npool.CreateAnnouncementResponse{}, status.Error(codes.InvalidArgument, "AnnouncementType is invalid")
+	}
+
+	switch in.GetAnnouncementType() {
+	case mgrpb.AnnouncementType_AllUsers:
+	case mgrpb.AnnouncementType_AppointUsers:
+	default:
+		logger.Sugar().Errorw("CreateAnnouncement", "AnnouncementType", in.GetAnnouncementType(), "error", err)
+		return &npool.CreateAnnouncementResponse{}, status.Error(codes.InvalidArgument, "AnnouncementType is invalid")
+	}
+
 	app, err := appcli.GetApp(ctx, in.GetAppID())
 	if err != nil {
 		logger.Sugar().Errorw("CreateReadState", "error", err)
@@ -91,6 +110,7 @@ func (s *Server) CreateAnnouncement(ctx context.Context, in *npool.CreateAnnounc
 		in.GetContent(),
 		in.GetChannels(),
 		in.GetEndAt(),
+		in.GetAnnouncementType(),
 	)
 	if err != nil {
 		logger.Sugar().Errorw("CreateAnnouncement", "error", err)
@@ -101,6 +121,7 @@ func (s *Server) CreateAnnouncement(ctx context.Context, in *npool.CreateAnnounc
 	}, nil
 }
 
+//nolint:gocyclo
 func (s *Server) UpdateAnnouncement(ctx context.Context, in *npool.UpdateAnnouncementRequest) (*npool.UpdateAnnouncementResponse, error) {
 	var err error
 
@@ -145,9 +166,19 @@ func (s *Server) UpdateAnnouncement(ctx context.Context, in *npool.UpdateAnnounc
 		}
 	}
 
-	if in.GetEndAt() == 0 && in.EndAt == nil {
+	if in.GetEndAt() == 0 && in.EndAt != nil {
 		logger.Sugar().Errorw("UpdateAnnouncement", "EndAt", in.GetEndAt(), "error", err)
 		return &npool.UpdateAnnouncementResponse{}, status.Error(codes.InvalidArgument, "EndAt is empty")
+	}
+
+	if in.AnnouncementType != nil {
+		switch in.GetAnnouncementType() {
+		case mgrpb.AnnouncementType_AllUsers:
+		case mgrpb.AnnouncementType_AppointUsers:
+		default:
+			logger.Sugar().Errorw("CreateAnnouncement", "AnnouncementType", in.GetAnnouncementType(), "error", err)
+			return &npool.UpdateAnnouncementResponse{}, status.Error(codes.InvalidArgument, "AnnouncementType is invalid")
+		}
 	}
 
 	info, err := announcement1.UpdateAnnouncement(
@@ -157,6 +188,7 @@ func (s *Server) UpdateAnnouncement(ctx context.Context, in *npool.UpdateAnnounc
 		in.Content,
 		in.GetChannels(),
 		in.EndAt,
+		in.AnnouncementType,
 	)
 	if err != nil {
 		logger.Sugar().Errorw("UpdateAnnouncement", "error", err)

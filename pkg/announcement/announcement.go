@@ -157,7 +157,9 @@ func GetAppAnnouncements(
 			Title:     r.Title,
 			Content:   r.Content,
 			CreatedAt: r.CreatedAt,
+			UpdatedAt: r.UpdatedAt,
 			EndAt:     r.EndAt,
+			Channels:  r.Channels,
 		})
 	}
 
@@ -217,6 +219,7 @@ func GetAnnouncements(
 		if !ok {
 			continue
 		}
+
 		infos = append(infos, &npool.Announcement{
 			ID:           r.AnnouncementID,
 			AppID:        r.AppID,
@@ -230,6 +233,7 @@ func GetAnnouncements(
 			AlreadyRead:  r.AlreadyRead,
 			AlreadySend:  r.AlreadySend,
 			CreatedAt:    r.CreatedAt,
+			UpdatedAt:    r.UpdatedAt,
 			SendChannel:  r.Channel,
 			EndAt:        r.EndAt,
 		})

@@ -58,6 +58,8 @@ func GetNotif(ctx context.Context, id string) (*npool.Notif, error) {
 		Content:      info.Content,
 		Channels:     info.Channels,
 		AlreadyRead:  info.AlreadyRead,
+		CreatedAt:    info.CreatedAt,
+		UpdatedAt:    info.UpdatedAt,
 	}, nil
 }
 

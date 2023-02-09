@@ -212,6 +212,9 @@ func GetAnnouncements(
 	if err != nil {
 		return nil, 0, err
 	}
+	if userInfo == nil {
+		return nil, 0, nil
+	}
 
 	infos := []*npool.Announcement{}
 	for _, r := range rows {

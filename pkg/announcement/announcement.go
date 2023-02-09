@@ -254,10 +254,14 @@ func expend(
 		return nil, err
 	}
 
+	appName := ""
+	if appInfo == nil {
+		appName = appInfo.Name
+	}
 	return &npool.Announcement{
 		ID:        info.ID,
 		AppID:     info.AppID,
-		AppName:   appInfo.Name,
+		AppName:   appName,
 		Title:     info.Title,
 		Content:   info.Content,
 		CreatedAt: info.CreatedAt,

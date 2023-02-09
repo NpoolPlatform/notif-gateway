@@ -26,13 +26,14 @@ import (
 
 func CreateAnnouncement(
 	ctx context.Context,
-	appID, title, content string,
+	appID, langID, title, content string,
 	channel []channelpb.NotifChannel,
 	endAt uint32,
 	announcementType mgrpb.AnnouncementType,
 ) (*npool.Announcement, error) {
 	info, err := mgrcli.CreateAnnouncement(ctx, &mgrpb.AnnouncementReq{
 		AppID:            &appID,
+		LangID:           &langID,
 		Title:            &title,
 		Content:          &content,
 		Channels:         channel,
@@ -173,7 +174,7 @@ func GetAppAnnouncements(
 
 func GetAnnouncements(
 	ctx context.Context,
-	appID, userID string,
+	appID, userID, langID string,
 	offset, limit uint32,
 ) (
 	[]*npool.Announcement,
@@ -192,12 +193,17 @@ func GetAnnouncements(
 			Op:    cruder.EQ,
 			Value: userID,
 		},
+		LangID: &npoolpb.StringVal{
+			Op:    cruder.EQ,
+			Value: langID,
+		},
 	}, int32(offset), int32(limit))
 	if err != nil {
 		return nil, 0, err
 	}
+
 	if len(rows) == 0 {
-		return nil, 0, nil
+		return nil, total, nil
 	}
 	appIDs := []string{}
 	for _, r := range rows {

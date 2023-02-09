@@ -130,7 +130,7 @@ func UpdateNotifs(ctx context.Context, ids []string, alreadyRead bool) ([]*npool
 	return infos, nil
 }
 
-func GetNotifs(ctx context.Context, appID, userID string, offset, limit uint32) ([]*npool.Notif, uint32, error) {
+func GetNotifs(ctx context.Context, appID, userID, langID string, offset, limit uint32) ([]*npool.Notif, uint32, error) {
 	rows, total, err := mgrcli.GetNotifs(ctx, &mgrpb.Conds{
 		AppID: &npoolpb.StringVal{
 			Op:    cruder.EQ,
@@ -139,6 +139,10 @@ func GetNotifs(ctx context.Context, appID, userID string, offset, limit uint32) 
 		UserID: &npoolpb.StringVal{
 			Op:    cruder.EQ,
 			Value: userID,
+		},
+		LangID: &npoolpb.StringVal{
+			Op:    cruder.EQ,
+			Value: langID,
 		},
 	}, int32(offset), int32(limit))
 	if err != nil {

@@ -41,6 +41,12 @@ func (s *Server) CreateAnnouncement(ctx context.Context, in *npool.CreateAnnounc
 		return &npool.CreateAnnouncementResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
+	_, err = uuid.Parse(in.GetLangID())
+	if err != nil {
+		logger.Sugar().Errorw("CreateAnnouncement", "LangID", in.GetLangID(), "error", err)
+		return &npool.CreateAnnouncementResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+
 	if in.GetTitle() == "" {
 		logger.Sugar().Errorw("CreateAnnouncement", "Title", in.GetTitle(), "error", err)
 		return &npool.CreateAnnouncementResponse{}, status.Error(codes.InvalidArgument, "Title is empty")
@@ -106,6 +112,7 @@ func (s *Server) CreateAnnouncement(ctx context.Context, in *npool.CreateAnnounc
 	info, err := announcement1.CreateAnnouncement(
 		ctx,
 		in.GetAppID(),
+		in.GetLangID(),
 		in.GetTitle(),
 		in.GetContent(),
 		in.GetChannels(),
@@ -282,8 +289,25 @@ func (s *Server) GetAnnouncements(ctx context.Context, in *npool.GetAnnouncement
 		logger.Sugar().Errorw("GetAnnouncements", "UserID", in.GetUserID(), "error", err)
 		return &npool.GetAnnouncementsResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
+	_, err = uuid.Parse(in.GetUserID())
+	if err != nil {
+		logger.Sugar().Errorw("GetAnnouncements", "UserID", in.GetUserID(), "error", err)
+		return &npool.GetAnnouncementsResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+	_, err = uuid.Parse(in.GetLangID())
+	if err != nil {
+		logger.Sugar().Errorw("GetAnnouncements", "LangID", in.GetLangID(), "error", err)
+		return &npool.GetAnnouncementsResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
 
-	infos, total, err := announcement1.GetAnnouncements(ctx, in.GetAppID(), in.GetUserID(), in.GetOffset(), in.GetLimit())
+	infos, total, err := announcement1.GetAnnouncements(
+		ctx,
+		in.GetAppID(),
+		in.GetUserID(),
+		in.GetLangID(),
+		in.GetOffset(),
+		in.GetLimit(),
+	)
 	if err != nil {
 		logger.Sugar().Errorw("GetAnnouncements", "error", err)
 		return &npool.GetAnnouncementsResponse{}, status.Error(codes.Internal, err.Error())

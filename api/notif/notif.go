@@ -107,7 +107,19 @@ func (s *Server) GetNotifs(ctx context.Context, in *npool.GetNotifsRequest) (*np
 		return &npool.GetNotifsResponse{}, status.Error(codes.Internal, "userID is invalid")
 	}
 
-	rows, total, err := notif1.GetNotifs(ctx, in.GetAppID(), in.GetUserID(), in.GetOffset(), in.GetLimit())
+	if _, err := uuid.Parse(in.GetLangID()); err != nil {
+		logger.Sugar().Errorw("validate", "LangID", in.GetLangID(), "error", err)
+		return &npool.GetNotifsResponse{}, status.Error(codes.Internal, "userID is invalid")
+	}
+
+	rows, total, err := notif1.GetNotifs(
+		ctx,
+		in.GetAppID(),
+		in.GetUserID(),
+		in.GetLangID(),
+		in.GetOffset(),
+		in.GetLimit(),
+	)
 	if err != nil {
 		logger.Sugar().Errorw("GetNotifs", "error", err)
 		return &npool.GetNotifsResponse{}, status.Error(codes.Internal, err.Error())
@@ -144,7 +156,7 @@ func (s *Server) GetAppUserNotifs(ctx context.Context, in *npool.GetAppUserNotif
 		return &npool.GetAppUserNotifsResponse{}, status.Error(codes.Internal, "userID is invalid")
 	}
 
-	rows, total, err := notif1.GetNotifs(ctx, in.GetTargetAppID(), in.GetTargetUserID(), in.GetOffset(), in.GetLimit())
+	rows, total, err := notif1.GetNotifs(ctx, in.GetTargetAppID(), in.GetTargetUserID(), in.GetTargetLangID(), in.GetOffset(), in.GetLimit())
 	if err != nil {
 		logger.Sugar().Errorw("GetAppUserNotifs", "error", err)
 		return &npool.GetAppUserNotifsResponse{}, status.Error(codes.Internal, err.Error())

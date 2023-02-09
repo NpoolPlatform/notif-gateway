@@ -3,6 +3,7 @@ package user
 
 import (
 	"context"
+	mgrcli "github.com/NpoolPlatform/notif-manager/pkg/client/announcement/user"
 
 	constant "github.com/NpoolPlatform/notif-gateway/pkg/message/const"
 
@@ -57,8 +58,7 @@ func (s *Server) CreateAnnouncementUsers(
 		logger.Sugar().Errorw("CreateAnnouncementUser", "AnnouncementID", in.GetAnnouncementID(), "error", err)
 		return &npool.CreateAnnouncementUsersResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
-
-	infos, _, err := user1.CreateAnnouncementUsers(
+	err = user1.CreateAnnouncementUsers(
 		ctx,
 		in.GetAppID(),
 		in.GetUserIDs(),
@@ -69,9 +69,61 @@ func (s *Server) CreateAnnouncementUsers(
 		return &npool.CreateAnnouncementUsersResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
-	return &npool.CreateAnnouncementUsersResponse{
-		Infos: infos,
-	}, nil
+	return &npool.CreateAnnouncementUsersResponse{}, nil
+}
+
+func (s *Server) DeleteAnnouncementUser(
+	ctx context.Context,
+	in *npool.DeleteAnnouncementUserRequest,
+) (
+	*npool.DeleteAnnouncementUserResponse,
+	error,
+) {
+	var err error
+
+	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "CreateAnnouncementUser")
+	defer span.End()
+
+	defer func() {
+		if err != nil {
+			span.SetStatus(scodes.Error, err.Error())
+			span.RecordError(err)
+		}
+	}()
+
+	_, err = uuid.Parse(in.GetID())
+	if err != nil {
+		logger.Sugar().Errorw("CreateAnnouncementUser", "ID", in.GetID(), "error", err)
+		return &npool.DeleteAnnouncementUserResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	_, err = uuid.Parse(in.GetAppID())
+	if err != nil {
+		logger.Sugar().Errorw("CreateAnnouncementUser", "AppID", in.GetAppID(), "error", err)
+		return &npool.DeleteAnnouncementUserResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	info, err := mgrcli.GetUser(ctx, in.GetID())
+	if err != nil {
+		logger.Sugar().Errorw("CreateAnnouncementUser", "ID", in.GetID(), "error", err)
+		return &npool.DeleteAnnouncementUserResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	if info.AppID != in.GetAppID() {
+		logger.Sugar().Errorw("CreateAnnouncementUser", "AppID", info.AppID, "error", err)
+		return &npool.DeleteAnnouncementUserResponse{}, status.Error(codes.PermissionDenied, "permission denied")
+	}
+
+	err = user1.DeleteAnnouncementUser(
+		ctx,
+		in.GetID(),
+	)
+	if err != nil {
+		logger.Sugar().Errorw("CreateAnnouncementUser", "error", err)
+		return &npool.DeleteAnnouncementUserResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	return &npool.DeleteAnnouncementUserResponse{}, nil
 }
 
 func (s *Server) GetAnnouncementUsers(

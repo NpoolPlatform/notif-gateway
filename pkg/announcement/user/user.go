@@ -2,7 +2,6 @@ package user
 
 import (
 	"context"
-
 	appcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
 	usercli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
@@ -22,7 +21,7 @@ func CreateAnnouncementUsers(
 	appID string,
 	userIDs []string,
 	announcementID string,
-) ([]*npool.AnnouncementUser, uint32, error) {
+) error {
 	req := []*mgrpb.UserReq{}
 	for key := range userIDs {
 		req = append(req, &mgrpb.UserReq{
@@ -33,10 +32,22 @@ func CreateAnnouncementUsers(
 	}
 	_, err := mgrcli.CreateUsers(ctx, req)
 	if err != nil {
-		return nil, 0, err
+		return err
 	}
 
-	return GetAnnouncementUsers(ctx, appID, &announcementID, 0, uint32(len(userIDs)))
+	return nil
+}
+
+func DeleteAnnouncementUser(
+	ctx context.Context,
+	id string,
+) error {
+	_, err := mgrcli.DeleteUser(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func GetAnnouncementUsers(

@@ -123,6 +123,8 @@ func UpdateNotifs(ctx context.Context, ids []string, alreadyRead bool) ([]*npool
 			Content:      val.Content,
 			Channels:     val.Channels,
 			AlreadyRead:  val.AlreadyRead,
+			CreatedAt:    val.CreatedAt,
+			UpdatedAt:    val.UpdatedAt,
 		})
 	}
 	return infos, nil
@@ -197,6 +199,8 @@ func GetNotifs(ctx context.Context, appID, userID string, offset, limit uint32) 
 			Content:      val.Content,
 			Channels:     val.Channels,
 			AlreadyRead:  val.AlreadyRead,
+			CreatedAt:    val.CreatedAt,
+			UpdatedAt:    val.UpdatedAt,
 		})
 	}
 	return infos, total, nil

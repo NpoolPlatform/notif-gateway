@@ -3,12 +3,17 @@ package announcement
 
 import (
 	"context"
+	appcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
+	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
+	npoolpb "github.com/NpoolPlatform/message/npool"
+
+	g11ncli "github.com/NpoolPlatform/g11n-middleware/pkg/client/applang"
+	g11npb "github.com/NpoolPlatform/message/npool/g11n/mgr/v1/applang"
 
 	mgrpb "github.com/NpoolPlatform/message/npool/notif/mgr/v1/announcement"
 
 	"github.com/NpoolPlatform/message/npool/notif/mgr/v1/channel"
 
-	appcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	npool "github.com/NpoolPlatform/message/npool/notif/gw/v1/announcement"
 	constant "github.com/NpoolPlatform/notif-gateway/pkg/message/const"
@@ -107,6 +112,31 @@ func (s *Server) CreateAnnouncement(ctx context.Context, in *npool.CreateAnnounc
 			"app not exist",
 		)
 		return &npool.CreateAnnouncementResponse{}, status.Error(codes.InvalidArgument, "app not exist")
+	}
+
+	appLang, err := g11ncli.GetLangOnly(ctx, &g11npb.Conds{
+		AppID: &npoolpb.StringVal{
+			Op:    cruder.EQ,
+			Value: in.GetAppID(),
+		},
+		LangID: &npoolpb.StringVal{
+			Op:    cruder.EQ,
+			Value: in.GetLangID(),
+		},
+	})
+	if err != nil {
+		logger.Sugar().Errorw("CreateReadState", "error", err)
+		return &npool.CreateAnnouncementResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+	if appLang == nil {
+		logger.Sugar().Errorw(
+			"CreateReadState",
+			"AppID",
+			in.GetAppID(),
+			"error",
+			"app lang not exist",
+		)
+		return &npool.CreateAnnouncementResponse{}, status.Error(codes.InvalidArgument, "app lang not exist")
 	}
 
 	info, err := announcement1.CreateAnnouncement(

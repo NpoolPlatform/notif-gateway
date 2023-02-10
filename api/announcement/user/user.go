@@ -3,6 +3,8 @@ package user
 
 import (
 	"context"
+	appcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
+	usercli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
 
 	mgrcli "github.com/NpoolPlatform/notif-manager/pkg/client/announcement/user"
 
@@ -19,10 +21,13 @@ import (
 	"github.com/google/uuid"
 
 	user1 "github.com/NpoolPlatform/notif-gateway/pkg/announcement/user"
+
+	announcementmgrcli "github.com/NpoolPlatform/notif-manager/pkg/client/announcement"
 )
 
 const Limit = 1000
 
+//nolint
 func (s *Server) CreateAnnouncementUsers(
 	ctx context.Context,
 	in *npool.CreateAnnouncementUsersRequest,
@@ -58,12 +63,20 @@ func (s *Server) CreateAnnouncementUsers(
 		return &npool.CreateAnnouncementUsersResponse{}, status.Error(codes.InvalidArgument, "UserIDs is too many")
 	}
 
+	idMap := map[string]struct{}{}
 	for _, id := range in.GetUserIDs() {
+		if _, ok := idMap[id]; ok {
+			logger.Sugar().Errorw("CreateAnnouncementUser", "UserID", id, "error", "userID repeat")
+			return &npool.CreateAnnouncementUsersResponse{}, status.Error(codes.InvalidArgument, "userID repeat")
+		}
+		idMap[id] = struct{}{}
+
 		_, err = uuid.Parse(id)
 		if err != nil {
 			logger.Sugar().Errorw("CreateAnnouncementUser", "UserID", id, "error", err)
 			return &npool.CreateAnnouncementUsersResponse{}, status.Error(codes.InvalidArgument, err.Error())
 		}
+
 	}
 
 	_, err = uuid.Parse(in.GetAnnouncementID())
@@ -71,6 +84,40 @@ func (s *Server) CreateAnnouncementUsers(
 		logger.Sugar().Errorw("CreateAnnouncementUser", "AnnouncementID", in.GetAnnouncementID(), "error", err)
 		return &npool.CreateAnnouncementUsersResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
+
+	exist, err := announcementmgrcli.ExistAnnouncement(ctx, in.GetAnnouncementID())
+	if err != nil {
+		logger.Sugar().Errorw("CreateAnnouncementUser", "AnnouncementID", in.GetAnnouncementID(), "error", err)
+		return &npool.CreateAnnouncementUsersResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+	if !exist {
+		logger.Sugar().Errorw("CreateAnnouncementUser", "AnnouncementID", in.GetAnnouncementID(), "error", "Announcement not exist")
+		return &npool.CreateAnnouncementUsersResponse{}, status.Error(codes.InvalidArgument, "Announcement not exist")
+	}
+
+	userInfos, _, err := usercli.GetManyUsers(ctx, in.GetUserIDs())
+	if err != nil {
+		logger.Sugar().Errorw("CreateAnnouncementUser", "AnnouncementID", in.GetAnnouncementID(), "error", err)
+		return &npool.CreateAnnouncementUsersResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+	if len(userInfos) != len(in.GetUserIDs()) {
+		logger.Sugar().Errorw("CreateAnnouncementUser", "AnnouncementID", in.GetAnnouncementID(), "error", "User not exist")
+		return &npool.CreateAnnouncementUsersResponse{}, status.Error(codes.InvalidArgument, "User not exist")
+	}
+
+	appInfo, err := appcli.GetApp(ctx, in.GetAppID())
+	if err != nil {
+		return nil, err
+	}
+	if err != nil {
+		logger.Sugar().Errorw("CreateAnnouncementUser", "AnnouncementID", in.GetAnnouncementID(), "error", err)
+		return &npool.CreateAnnouncementUsersResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+	if appInfo == nil {
+		logger.Sugar().Errorw("CreateAnnouncementUser", "AnnouncementID", in.GetAnnouncementID(), "error", "Announcement not exist")
+		return &npool.CreateAnnouncementUsersResponse{}, status.Error(codes.InvalidArgument, "App not exist")
+	}
+
 	infos, _, err := user1.CreateAnnouncementUsers(
 		ctx,
 		in.GetAppID(),

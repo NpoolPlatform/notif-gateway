@@ -2,6 +2,11 @@ package notif
 
 import (
 	"context"
+	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
+	npoolpb "github.com/NpoolPlatform/message/npool"
+
+	mgrpb "github.com/NpoolPlatform/message/npool/notif/mgr/v1/notif"
+	mgrcli "github.com/NpoolPlatform/notif-manager/pkg/client/notif"
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 
@@ -70,6 +75,36 @@ func (s *Server) UpdateNotifs(ctx context.Context, in *npool.UpdateNotifsRequest
 		}
 	}
 
+	_, err = uuid.Parse(in.GetAppID())
+	if err != nil {
+		logger.Sugar().Errorw("GetNotif", "AppID", in.GetAppID(), "error", err)
+		return &npool.UpdateNotifsResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	_, err = uuid.Parse(in.GetUserID())
+	if err != nil {
+		logger.Sugar().Errorw("GetNotif", "AppID", in.GetAppID(), "error", err)
+		return &npool.UpdateNotifsResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	rows, _, err := mgrcli.GetNotifs(ctx, &mgrpb.Conds{
+		IDs: &npoolpb.StringSliceVal{
+			Op:    cruder.EQ,
+			Value: in.GetIDs(),
+		},
+	}, 0, int32(len(in.GetIDs())))
+	if err != nil {
+		logger.Sugar().Errorw("GetNotif", "error", err)
+		return &npool.UpdateNotifsResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	for _, val := range rows {
+		if val.AppID != in.GetAppID() || val.UserID != in.GetUserID() {
+			logger.Sugar().Errorw("GetNotif", "error", err)
+			return &npool.UpdateNotifsResponse{}, status.Error(codes.PermissionDenied, "permission denied")
+		}
+	}
+
 	infos, err := notif1.UpdateNotifs(ctx, in.GetIDs(), in.GetAlreadyRead())
 	if err != nil {
 		logger.Sugar().Errorw("GetNotif", "error", err)
@@ -108,7 +143,7 @@ func (s *Server) GetNotifs(ctx context.Context, in *npool.GetNotifsRequest) (*np
 
 	if _, err := uuid.Parse(in.GetLangID()); err != nil {
 		logger.Sugar().Errorw("validate", "LangID", in.GetLangID(), "error", err)
-		return &npool.GetNotifsResponse{}, status.Error(codes.Internal, "userID is invalid")
+		return &npool.GetNotifsResponse{}, status.Error(codes.Internal, "langID is invalid")
 	}
 
 	rows, total, err := notif1.GetNotifs(

@@ -84,17 +84,18 @@ func GetReadState(ctx context.Context, appID, userID, announcementID string) (*n
 	}
 
 	return &npool.ReadState{
-		AnnouncementID: info.AnnouncementID,
-		AppID:          info.AppID,
-		AppName:        appInfo.Name,
-		UserID:         info.UserID,
-		EmailAddress:   userInfo.EmailAddress,
-		PhoneNO:        userInfo.PhoneNO,
-		Username:       userInfo.Username,
-		Title:          info.Title,
-		Content:        info.Content,
-		CreatedAt:      info.CreatedAt,
-		UpdatedAt:      info.UpdatedAt,
+		AnnouncementID:   info.AnnouncementID,
+		AppID:            info.AppID,
+		AppName:          appInfo.Name,
+		UserID:           info.UserID,
+		EmailAddress:     userInfo.EmailAddress,
+		PhoneNO:          userInfo.PhoneNO,
+		Username:         userInfo.Username,
+		Title:            info.Title,
+		Content:          info.Content,
+		AnnouncementType: info.AnnouncementType,
+		CreatedAt:        info.CreatedAt,
+		UpdatedAt:        info.UpdatedAt,
 	}, nil
 }
 
@@ -164,17 +165,18 @@ func GetReadStates(ctx context.Context, appID string, userID *string, offset, li
 			continue
 		}
 		infos = append(infos, &npool.ReadState{
-			AnnouncementID: val.AnnouncementID,
-			AppID:          val.AppID,
-			AppName:        app.Name,
-			UserID:         val.UserID,
-			EmailAddress:   user.EmailAddress,
-			PhoneNO:        user.PhoneNO,
-			Username:       user.Username,
-			Title:          val.Title,
-			Content:        val.Content,
-			CreatedAt:      val.CreatedAt,
-			UpdatedAt:      val.UpdatedAt,
+			AnnouncementID:   val.AnnouncementID,
+			AppID:            val.AppID,
+			AppName:          app.Name,
+			UserID:           val.UserID,
+			EmailAddress:     user.EmailAddress,
+			PhoneNO:          user.PhoneNO,
+			Username:         user.Username,
+			Title:            val.Title,
+			Content:          val.Content,
+			AnnouncementType: val.AnnouncementType,
+			CreatedAt:        val.CreatedAt,
+			UpdatedAt:        val.UpdatedAt,
 		})
 	}
 	return infos, total, nil

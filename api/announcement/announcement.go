@@ -46,9 +46,9 @@ func (s *Server) CreateAnnouncement(ctx context.Context, in *npool.CreateAnnounc
 		return &npool.CreateAnnouncementResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	_, err = uuid.Parse(in.GetLangID())
+	_, err = uuid.Parse(in.GetTargetLangID())
 	if err != nil {
-		logger.Sugar().Errorw("CreateAnnouncement", "LangID", in.GetLangID(), "error", err)
+		logger.Sugar().Errorw("CreateAnnouncement", "TargetLangID", in.GetTargetLangID(), "error", err)
 		return &npool.CreateAnnouncementResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
@@ -121,7 +121,7 @@ func (s *Server) CreateAnnouncement(ctx context.Context, in *npool.CreateAnnounc
 		},
 		LangID: &npoolpb.StringVal{
 			Op:    cruder.EQ,
-			Value: in.GetLangID(),
+			Value: in.GetTargetLangID(),
 		},
 	})
 	if err != nil {
@@ -142,7 +142,7 @@ func (s *Server) CreateAnnouncement(ctx context.Context, in *npool.CreateAnnounc
 	info, err := announcement1.CreateAnnouncement(
 		ctx,
 		in.GetAppID(),
-		in.GetLangID(),
+		in.GetTargetLangID(),
 		in.GetTitle(),
 		in.GetContent(),
 		in.GetChannels(),

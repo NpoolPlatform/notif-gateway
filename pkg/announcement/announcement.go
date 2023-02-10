@@ -158,6 +158,7 @@ func GetAppAnnouncements(
 		infos = append(infos, &npool.Announcement{
 			ID:               r.ID,
 			AppID:            r.AppID,
+			LangID:           r.LangID,
 			AppName:          app.Name,
 			Title:            r.Title,
 			Content:          r.Content,
@@ -274,6 +275,7 @@ func expend(
 		ID:               info.ID,
 		AppID:            info.AppID,
 		AppName:          appName,
+		LangID:           info.LangID,
 		Title:            info.Title,
 		Content:          info.Content,
 		CreatedAt:        info.CreatedAt,

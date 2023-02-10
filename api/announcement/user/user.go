@@ -3,6 +3,7 @@ package user
 
 import (
 	"context"
+
 	appcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
 	usercli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
 

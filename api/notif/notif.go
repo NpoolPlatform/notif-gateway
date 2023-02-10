@@ -90,7 +90,7 @@ func (s *Server) UpdateNotifs(ctx context.Context, in *npool.UpdateNotifsRequest
 
 	rows, _, err := mgrcli.GetNotifs(ctx, &mgrpb.Conds{
 		IDs: &npoolpb.StringSliceVal{
-			Op:    cruder.EQ,
+			Op:    cruder.IN,
 			Value: in.GetIDs(),
 		},
 	}, 0, int32(len(in.GetIDs())))

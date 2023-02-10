@@ -8,8 +8,8 @@ require (
 	github.com/NpoolPlatform/g11n-middleware v0.0.0-20230112023858-4ed161248e8f
 	github.com/NpoolPlatform/go-service-framework v0.0.0-20221102072657-7fcc5e6f1012
 	github.com/NpoolPlatform/libent-cruder v0.0.0-20221109023947-366125b690fb
-	github.com/NpoolPlatform/message v0.0.0-20230210082122-5cf783996398
-	github.com/NpoolPlatform/notif-manager v0.0.0-20230209090452-49c26cba0cec
+	github.com/NpoolPlatform/message v0.0.0-20230210125318-4a7396efa471
+	github.com/NpoolPlatform/notif-manager v0.0.0-20230210133114-30d9563ef27e
 	github.com/NpoolPlatform/notif-middleware v0.0.0-20230209093958-68ad3d4d225f
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/google/uuid v1.3.0

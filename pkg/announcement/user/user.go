@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"fmt"
 
 	appcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
 	usercli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
@@ -25,6 +26,26 @@ func CreateAnnouncementUsers(
 ) ([]*npool.AnnouncementUser, uint32, error) {
 	req := []*mgrpb.UserReq{}
 	for key := range userIDs {
+		exist, err := mgrcli.ExistUserConds(ctx, &mgrpb.Conds{
+			AppID: &npoolpb.StringVal{
+				Op:    cruder.EQ,
+				Value: appID,
+			},
+			UserID: &npoolpb.StringVal{
+				Op:    cruder.EQ,
+				Value: userIDs[key],
+			},
+			AnnouncementID: &npoolpb.StringVal{
+				Op:    cruder.EQ,
+				Value: announcementID,
+			},
+		})
+		if err != nil {
+			return nil, 0, err
+		}
+		if exist {
+			return nil, 0, fmt.Errorf("already exist")
+		}
 		req = append(req, &mgrpb.UserReq{
 			AppID:          &appID,
 			UserID:         &userIDs[key],

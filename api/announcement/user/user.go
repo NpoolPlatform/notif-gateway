@@ -3,6 +3,7 @@ package user
 
 import (
 	"context"
+
 	mgrcli "github.com/NpoolPlatform/notif-manager/pkg/client/announcement/user"
 
 	constant "github.com/NpoolPlatform/notif-gateway/pkg/message/const"

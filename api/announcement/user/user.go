@@ -21,6 +21,8 @@ import (
 	user1 "github.com/NpoolPlatform/notif-gateway/pkg/announcement/user"
 )
 
+const Limit = 1000
+
 func (s *Server) CreateAnnouncementUsers(
 	ctx context.Context,
 	in *npool.CreateAnnouncementUsersRequest,
@@ -46,6 +48,16 @@ func (s *Server) CreateAnnouncementUsers(
 		return &npool.CreateAnnouncementUsersResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
+	if len(in.GetUserIDs()) == 0 {
+		logger.Sugar().Errorw("CreateAnnouncementUser", "UserIDs", in.GetUserIDs(), "error", err)
+		return &npool.CreateAnnouncementUsersResponse{}, status.Error(codes.InvalidArgument, "UserIDs is empty")
+	}
+
+	if len(in.GetUserIDs()) > Limit {
+		logger.Sugar().Errorw("CreateAnnouncementUser", "UserIDs", in.GetUserIDs(), "error", err)
+		return &npool.CreateAnnouncementUsersResponse{}, status.Error(codes.InvalidArgument, "UserIDs is too many")
+	}
+
 	for _, id := range in.GetUserIDs() {
 		_, err = uuid.Parse(id)
 		if err != nil {
@@ -59,7 +71,7 @@ func (s *Server) CreateAnnouncementUsers(
 		logger.Sugar().Errorw("CreateAnnouncementUser", "AnnouncementID", in.GetAnnouncementID(), "error", err)
 		return &npool.CreateAnnouncementUsersResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
-	err = user1.CreateAnnouncementUsers(
+	infos, _, err := user1.CreateAnnouncementUsers(
 		ctx,
 		in.GetAppID(),
 		in.GetUserIDs(),
@@ -70,7 +82,9 @@ func (s *Server) CreateAnnouncementUsers(
 		return &npool.CreateAnnouncementUsersResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
-	return &npool.CreateAnnouncementUsersResponse{}, nil
+	return &npool.CreateAnnouncementUsersResponse{
+		Infos: infos,
+	}, nil
 }
 
 func (s *Server) DeleteAnnouncementUser(
@@ -115,7 +129,7 @@ func (s *Server) DeleteAnnouncementUser(
 		return &npool.DeleteAnnouncementUserResponse{}, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
-	err = user1.DeleteAnnouncementUser(
+	info1, err := user1.DeleteAnnouncementUser(
 		ctx,
 		in.GetID(),
 	)
@@ -124,7 +138,9 @@ func (s *Server) DeleteAnnouncementUser(
 		return &npool.DeleteAnnouncementUserResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
-	return &npool.DeleteAnnouncementUserResponse{}, nil
+	return &npool.DeleteAnnouncementUserResponse{
+		Info: info1,
+	}, nil
 }
 
 func (s *Server) GetAnnouncementUsers(
@@ -158,7 +174,7 @@ func (s *Server) GetAnnouncementUsers(
 		return &npool.GetAnnouncementUsersResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	infos, total, err := user1.GetAnnouncementUsers(ctx, in.GetAppID(), &in.AnnouncementID, in.GetOffset(), in.GetLimit())
+	infos, total, err := user1.GetAnnouncementUsers(ctx, in.GetAppID(), &in.AnnouncementID, nil, in.GetOffset(), in.GetLimit())
 	if err != nil {
 		logger.Sugar().Errorw("GetAnnouncementUsers", "error", err)
 		return &npool.GetAnnouncementUsersResponse{}, status.Error(codes.Internal, err.Error())
@@ -195,7 +211,7 @@ func (s *Server) GetAppAnnouncementUsers(
 		return &npool.GetAppAnnouncementUsersResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	infos, total, err := user1.GetAnnouncementUsers(ctx, in.GetAppID(), nil, in.GetOffset(), in.GetLimit())
+	infos, total, err := user1.GetAnnouncementUsers(ctx, in.GetAppID(), nil, nil, in.GetOffset(), in.GetLimit())
 	if err != nil {
 		logger.Sugar().Errorw("GetAppAnnouncementUsers", "error", err)
 		return &npool.GetAppAnnouncementUsersResponse{}, status.Error(codes.Internal, err.Error())
@@ -232,7 +248,7 @@ func (s *Server) GetNAppAnnouncementUsers(
 		return &npool.GetNAppAnnouncementUsersResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	infos, total, err := user1.GetAnnouncementUsers(ctx, in.GetTargetAppID(), nil, in.GetOffset(), in.GetLimit())
+	infos, total, err := user1.GetAnnouncementUsers(ctx, in.GetTargetAppID(), nil, nil, in.GetOffset(), in.GetLimit())
 	if err != nil {
 		logger.Sugar().Errorw("GetNAppAnnouncementUsers", "error", err)
 		return &npool.GetNAppAnnouncementUsersResponse{}, status.Error(codes.Internal, err.Error())

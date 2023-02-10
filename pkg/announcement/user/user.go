@@ -22,7 +22,7 @@ func CreateAnnouncementUsers(
 	appID string,
 	userIDs []string,
 	announcementID string,
-) error {
+) ([]*npool.AnnouncementUser, uint32, error) {
 	req := []*mgrpb.UserReq{}
 	for key := range userIDs {
 		req = append(req, &mgrpb.UserReq{
@@ -31,30 +31,43 @@ func CreateAnnouncementUsers(
 			AnnouncementID: &announcementID,
 		})
 	}
-	_, err := mgrcli.CreateUsers(ctx, req)
+	infos, err := mgrcli.CreateUsers(ctx, req)
 	if err != nil {
-		return err
+		return nil, 0, err
 	}
 
-	return nil
+	ids := []string{}
+	for _, val := range infos {
+		ids = append(ids, val.ID)
+	}
+	return GetAnnouncementUsers(ctx, appID, &announcementID, ids, 0, uint32(len(ids)))
 }
 
 func DeleteAnnouncementUser(
 	ctx context.Context,
 	id string,
-) error {
-	_, err := mgrcli.DeleteUser(ctx, id)
+) (*npool.AnnouncementUser, error) {
+	info, err := mgrcli.DeleteUser(ctx, id)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return &npool.AnnouncementUser{
+		ID:             info.ID,
+		AnnouncementID: info.AnnouncementID,
+		AppID:          info.AppID,
+		UserID:         info.UserID,
+		CreatedAt:      info.CreatedAt,
+		UpdatedAt:      info.UpdatedAt,
+	}, nil
 }
 
+//nolint:gocyclo
 func GetAnnouncementUsers(
 	ctx context.Context,
 	appID string,
 	announcementID *string,
+	ids []string,
 	offset, limit uint32,
 ) ([]*npool.AnnouncementUser, uint32, error) {
 	if limit == 0 {
@@ -70,6 +83,12 @@ func GetAnnouncementUsers(
 		conds.AnnouncementID = &npoolpb.StringVal{
 			Op:    cruder.EQ,
 			Value: *announcementID,
+		}
+	}
+	if len(ids) > 0 {
+		conds.IDs = &npoolpb.StringSliceVal{
+			Op:    cruder.IN,
+			Value: ids,
 		}
 	}
 	rows, total, err := mwcli.GetUsers(ctx, conds, int32(offset), int32(limit))

@@ -111,9 +111,3 @@ replace entgo.io/ent => entgo.io/ent v0.11.2
 replace ariga.io/atlas => ariga.io/atlas v0.5.1-0.20220717122844-8593d7eb1a8e
 
 replace github.com/ugorji/go => github.com/ugorji/go/codec v0.0.0-20190204201341-e444a5086c43
-
-replace (
-	github.com/NpoolPlatform/message => ../message
-	github.com/NpoolPlatform/notif-manager => ../notif-manager
-	github.com/NpoolPlatform/notif-middleware => ../notif-middleware
-)

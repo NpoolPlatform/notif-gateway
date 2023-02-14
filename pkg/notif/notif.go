@@ -5,6 +5,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/NpoolPlatform/message/npool/notif/mgr/v1/channel"
+
 	appcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
 	usercli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
@@ -143,6 +145,10 @@ func GetNotifs(ctx context.Context, appID, userID, langID string, offset, limit 
 		LangID: &npoolpb.StringVal{
 			Op:    cruder.EQ,
 			Value: langID,
+		},
+		Channels: &npoolpb.StringSliceVal{
+			Op:    cruder.IN,
+			Value: []string{channel.NotifChannel_ChannelFrontend.String()},
 		},
 	}, int32(offset), int32(limit))
 	if err != nil {

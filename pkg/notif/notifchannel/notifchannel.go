@@ -8,14 +8,15 @@ import (
 	"github.com/NpoolPlatform/message/npool/third/mgr/v1/usedfor"
 
 	appcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
-	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
-	npoolpb "github.com/NpoolPlatform/message/npool"
 	apppb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/app"
 
 	mgrpb "github.com/NpoolPlatform/message/npool/notif/mgr/v1/notif/notifchannel"
 	mgrcli "github.com/NpoolPlatform/notif-manager/pkg/client/notif/notifchannel"
 
 	npool "github.com/NpoolPlatform/message/npool/notif/gw/v1/notif/notifchannel"
+
+	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
+	commonpb "github.com/NpoolPlatform/message/npool"
 )
 
 func DeleteNotifChannel(ctx context.Context, id string) (*npool.NotifChannel, error) {
@@ -52,14 +53,54 @@ func CreateNotifChannels(
 	[]*npool.NotifChannel,
 	error,
 ) {
+	types := []uint32{}
+	for _, typ := range eventTypes {
+		types = append(types, uint32(typ))
+	}
+
+	ncs, _, err := mgrcli.GetNotifChannels(ctx, &mgrpb.Conds{
+		AppID: &commonpb.StringVal{
+			Op:    cruder.EQ,
+			Value: appID,
+		},
+		EventTypes: &commonpb.Uint32SliceVal{
+			Op:    cruder.IN,
+			Value: types,
+		},
+		Channel: &commonpb.Uint32Val{
+			Op:    cruder.EQ,
+			Value: uint32(channel1),
+		},
+	}, 0, int32(len(eventTypes)))
+	if err != nil {
+		return nil, err
+	}
+
+	evTypes := []usedfor.UsedFor{}
+
+nextType:
+	for _, typ := range eventTypes {
+		for _, nc := range ncs {
+			if nc.EventType == typ {
+				continue nextType
+			}
+		}
+		evTypes = append(evTypes, typ)
+	}
+
+	if len(evTypes) == 0 {
+		return nil, nil
+	}
+
 	var req []*mgrpb.NotifChannelReq
-	for key := range eventTypes {
+	for key := range evTypes {
 		req = append(req, &mgrpb.NotifChannelReq{
 			AppID:     &appID,
-			EventType: &eventTypes[key],
+			EventType: &evTypes[key],
 			Channel:   &channel1,
 		})
 	}
+
 	rows, err := mgrcli.CreateNotifChannels(ctx, req)
 	if err != nil {
 		return nil, err
@@ -86,7 +127,7 @@ func GetNotifChannels(
 	error,
 ) {
 	rows, total, err := mgrcli.GetNotifChannels(ctx, &mgrpb.Conds{
-		AppID: &npoolpb.StringVal{
+		AppID: &commonpb.StringVal{
 			Op:    cruder.EQ,
 			Value: appID,
 		},

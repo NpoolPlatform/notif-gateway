@@ -106,7 +106,7 @@ func (s *Server) UpdateNotifs(ctx context.Context, in *npool.UpdateNotifsRequest
 		}
 	}
 
-	infos, err := notif1.UpdateNotifs(ctx, in.GetIDs(), in.GetAlreadyRead())
+	infos, err := notif1.UpdateNotifs(ctx, in.GetIDs(), in.GetNotified())
 	if err != nil {
 		logger.Sugar().Errorw("GetNotif", "error", err)
 		return &npool.UpdateNotifsResponse{}, status.Error(codes.Internal, err.Error())

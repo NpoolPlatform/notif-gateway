@@ -58,15 +58,15 @@ func GetNotif(ctx context.Context, id string) (*npool.Notif, error) {
 		UseTemplate:  info.UseTemplate,
 		Title:        info.Title,
 		Content:      info.Content,
-		Channels:     info.Channels,
-		AlreadyRead:  info.AlreadyRead,
+		Channel:      info.Channel,
+		Notified:     info.Notified,
 		CreatedAt:    info.CreatedAt,
 		UpdatedAt:    info.UpdatedAt,
 	}, nil
 }
 
-func UpdateNotifs(ctx context.Context, ids []string, alreadyRead bool) ([]*npool.Notif, error) {
-	rows, err := mwcli.UpdateNotifs(ctx, ids, nil, &alreadyRead)
+func UpdateNotifs(ctx context.Context, ids []string, notified bool) ([]*npool.Notif, error) {
+	rows, err := mwcli.UpdateNotifs(ctx, ids, notified)
 	if err != nil {
 		return nil, err
 	}
@@ -123,8 +123,8 @@ func UpdateNotifs(ctx context.Context, ids []string, alreadyRead bool) ([]*npool
 			UseTemplate:  val.UseTemplate,
 			Title:        val.Title,
 			Content:      val.Content,
-			Channels:     val.Channels,
-			AlreadyRead:  val.AlreadyRead,
+			Channel:      val.Channel,
+			Notified:     val.Notified,
 			CreatedAt:    val.CreatedAt,
 			UpdatedAt:    val.UpdatedAt,
 		})
@@ -146,9 +146,9 @@ func GetNotifs(ctx context.Context, appID, userID, langID string, offset, limit 
 			Op:    cruder.EQ,
 			Value: langID,
 		},
-		Channels: &npoolpb.StringSliceVal{
-			Op:    cruder.IN,
-			Value: []string{channel.NotifChannel_ChannelFrontend.String()},
+		Channel: &npoolpb.Uint32Val{
+			Op:    cruder.EQ,
+			Value: uint32(channel.NotifChannel_ChannelFrontend),
 		},
 	}, int32(offset), int32(limit))
 	if err != nil {
@@ -207,8 +207,8 @@ func GetNotifs(ctx context.Context, appID, userID, langID string, offset, limit 
 			UseTemplate:  val.UseTemplate,
 			Title:        val.Title,
 			Content:      val.Content,
-			Channels:     val.Channels,
-			AlreadyRead:  val.AlreadyRead,
+			Channel:      val.Channel,
+			Notified:     val.Notified,
 			CreatedAt:    val.CreatedAt,
 			UpdatedAt:    val.UpdatedAt,
 		})

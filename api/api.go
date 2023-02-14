@@ -3,15 +3,12 @@ package api
 import (
 	"context"
 
-	"github.com/NpoolPlatform/notif-gateway/api/notifchannel"
-
-	"github.com/NpoolPlatform/notif-gateway/api/announcement/user"
-
 	"github.com/NpoolPlatform/notif-gateway/api/announcement"
 	"github.com/NpoolPlatform/notif-gateway/api/announcement/readstate"
 	"github.com/NpoolPlatform/notif-gateway/api/announcement/sendstate"
-
+	"github.com/NpoolPlatform/notif-gateway/api/announcement/user"
 	"github.com/NpoolPlatform/notif-gateway/api/notif"
+	"github.com/NpoolPlatform/notif-gateway/api/notif/notifchannel"
 
 	v1 "github.com/NpoolPlatform/message/npool/notif/mw/v1"
 

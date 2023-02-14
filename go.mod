@@ -8,8 +8,8 @@ require (
 	github.com/NpoolPlatform/g11n-middleware v0.0.0-20230112023858-4ed161248e8f
 	github.com/NpoolPlatform/go-service-framework v0.0.0-20221102072657-7fcc5e6f1012
 	github.com/NpoolPlatform/libent-cruder v0.0.0-20221109023947-366125b690fb
-	github.com/NpoolPlatform/message v0.0.0-20230210185231-91468dfbbbf6
-	github.com/NpoolPlatform/notif-manager v0.0.0-20230210190300-49b295f4f725
+	github.com/NpoolPlatform/message v0.0.0-20230214021209-719e7b65d420
+	github.com/NpoolPlatform/notif-manager v0.0.0-20230214021249-4e1276a065dc
 	github.com/NpoolPlatform/notif-middleware v0.0.0-20230210191014-572e78adfc4b
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/google/uuid v1.3.0
@@ -111,3 +111,9 @@ replace entgo.io/ent => entgo.io/ent v0.11.2
 replace ariga.io/atlas => ariga.io/atlas v0.5.1-0.20220717122844-8593d7eb1a8e
 
 replace github.com/ugorji/go => github.com/ugorji/go/codec v0.0.0-20190204201341-e444a5086c43
+
+replace (
+	github.com/NpoolPlatform/message => ../message
+	github.com/NpoolPlatform/notif-manager => ../notif-manager
+	github.com/NpoolPlatform/notif-middleware => ../notif-middleware
+)

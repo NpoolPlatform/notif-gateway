@@ -63,19 +63,12 @@ func (s *Server) CreateAnnouncement(ctx context.Context, in *npool.CreateAnnounc
 		return &npool.CreateAnnouncementResponse{}, status.Error(codes.InvalidArgument, "Content is empty")
 	}
 
-	if len(in.GetChannels()) == 0 {
-		logger.Sugar().Errorw("CreateAnnouncement", "Channels", in.GetChannels(), "error", err)
-		return &npool.CreateAnnouncementResponse{}, status.Error(codes.InvalidArgument, "Channels is empty")
-	}
-
-	for _, val := range in.GetChannels() {
-		switch val {
-		case channel.NotifChannel_ChannelEmail:
-		case channel.NotifChannel_ChannelSMS:
-		default:
-			logger.Sugar().Errorw("CreateAnnouncement", "Channel", in.GetChannels(), "error", err)
-			return &npool.CreateAnnouncementResponse{}, status.Error(codes.InvalidArgument, "Channel is invalid")
-		}
+	switch in.GetChannel() {
+	case channel.NotifChannel_ChannelEmail:
+	case channel.NotifChannel_ChannelSMS:
+	default:
+		logger.Sugar().Errorw("CreateAnnouncement", "Channel", in.GetChannel(), "error", err)
+		return &npool.CreateAnnouncementResponse{}, status.Error(codes.InvalidArgument, "Channel is invalid")
 	}
 
 	if in.GetEndAt() == 0 {
@@ -84,16 +77,16 @@ func (s *Server) CreateAnnouncement(ctx context.Context, in *npool.CreateAnnounc
 	}
 
 	switch in.AnnouncementType {
-	case mgrpb.AnnouncementType_AppointUsers:
-	case mgrpb.AnnouncementType_AllUsers:
+	case mgrpb.AnnouncementType_Multicast:
+	case mgrpb.AnnouncementType_Broadcast:
 	default:
 		logger.Sugar().Errorw("CreateAnnouncement", "AnnouncementType", in.GetAnnouncementType(), "error", err)
 		return &npool.CreateAnnouncementResponse{}, status.Error(codes.InvalidArgument, "AnnouncementType is invalid")
 	}
 
 	switch in.GetAnnouncementType() {
-	case mgrpb.AnnouncementType_AllUsers:
-	case mgrpb.AnnouncementType_AppointUsers:
+	case mgrpb.AnnouncementType_Broadcast:
+	case mgrpb.AnnouncementType_Multicast:
 	default:
 		logger.Sugar().Errorw("CreateAnnouncement", "AnnouncementType", in.GetAnnouncementType(), "error", err)
 		return &npool.CreateAnnouncementResponse{}, status.Error(codes.InvalidArgument, "AnnouncementType is invalid")
@@ -146,7 +139,7 @@ func (s *Server) CreateAnnouncement(ctx context.Context, in *npool.CreateAnnounc
 		in.GetTargetLangID(),
 		in.GetTitle(),
 		in.GetContent(),
-		in.GetChannels(),
+		in.GetChannel(),
 		in.GetEndAt(),
 		in.GetAnnouncementType(),
 	)
@@ -159,7 +152,6 @@ func (s *Server) CreateAnnouncement(ctx context.Context, in *npool.CreateAnnounc
 	}, nil
 }
 
-//nolint:gocyclo
 func (s *Server) UpdateAnnouncement(ctx context.Context, in *npool.UpdateAnnouncementRequest) (*npool.UpdateAnnouncementResponse, error) {
 	var err error
 
@@ -189,21 +181,6 @@ func (s *Server) UpdateAnnouncement(ctx context.Context, in *npool.UpdateAnnounc
 		return &npool.UpdateAnnouncementResponse{}, status.Error(codes.InvalidArgument, "Content is empty")
 	}
 
-	if len(in.GetChannels()) == 0 {
-		logger.Sugar().Errorw("UpdateAnnouncement", "Channels", in.GetChannels(), "error", err)
-		return &npool.UpdateAnnouncementResponse{}, status.Error(codes.InvalidArgument, "Channels is empty")
-	}
-
-	for _, val := range in.GetChannels() {
-		switch val {
-		case channel.NotifChannel_ChannelEmail:
-		case channel.NotifChannel_ChannelSMS:
-		default:
-			logger.Sugar().Errorw("CreateAnnouncement", "Channel", in.GetChannels(), "error", err)
-			return &npool.UpdateAnnouncementResponse{}, status.Error(codes.InvalidArgument, "Channel is invalid")
-		}
-	}
-
 	if in.GetEndAt() == 0 && in.EndAt != nil {
 		logger.Sugar().Errorw("UpdateAnnouncement", "EndAt", in.GetEndAt(), "error", err)
 		return &npool.UpdateAnnouncementResponse{}, status.Error(codes.InvalidArgument, "EndAt is empty")
@@ -211,10 +188,10 @@ func (s *Server) UpdateAnnouncement(ctx context.Context, in *npool.UpdateAnnounc
 
 	if in.AnnouncementType != nil {
 		switch in.GetAnnouncementType() {
-		case mgrpb.AnnouncementType_AllUsers:
-		case mgrpb.AnnouncementType_AppointUsers:
+		case mgrpb.AnnouncementType_Broadcast:
+		case mgrpb.AnnouncementType_Multicast:
 		default:
-			logger.Sugar().Errorw("CreateAnnouncement", "AnnouncementType", in.GetAnnouncementType(), "error", err)
+			logger.Sugar().Errorw("UpdateAnnouncement", "AnnouncementType", in.GetAnnouncementType(), "error", err)
 			return &npool.UpdateAnnouncementResponse{}, status.Error(codes.InvalidArgument, "AnnouncementType is invalid")
 		}
 	}
@@ -224,7 +201,6 @@ func (s *Server) UpdateAnnouncement(ctx context.Context, in *npool.UpdateAnnounc
 		in.GetID(),
 		in.Title,
 		in.Content,
-		in.GetChannels(),
 		in.EndAt,
 		in.AnnouncementType,
 	)

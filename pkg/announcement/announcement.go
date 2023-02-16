@@ -27,7 +27,7 @@ import (
 func CreateAnnouncement(
 	ctx context.Context,
 	appID, langID, title, content string,
-	channel []channelpb.NotifChannel,
+	channel channelpb.NotifChannel,
 	endAt uint32,
 	announcementType mgrpb.AnnouncementType,
 ) (*npool.Announcement, error) {
@@ -36,7 +36,7 @@ func CreateAnnouncement(
 		LangID:           &langID,
 		Title:            &title,
 		Content:          &content,
-		Channels:         channel,
+		Channel:          &channel,
 		EndAt:            &endAt,
 		AnnouncementType: &announcementType,
 	})
@@ -51,7 +51,6 @@ func UpdateAnnouncement(
 	ctx context.Context,
 	id string,
 	title, content *string,
-	channel []channelpb.NotifChannel,
 	endAt *uint32,
 	announcementType *mgrpb.AnnouncementType,
 ) (
@@ -62,7 +61,6 @@ func UpdateAnnouncement(
 		ID:               &id,
 		Title:            title,
 		Content:          content,
-		Channels:         channel,
 		EndAt:            endAt,
 		AnnouncementType: announcementType,
 	})
@@ -165,7 +163,7 @@ func GetAppAnnouncements(
 			CreatedAt:        r.CreatedAt,
 			UpdatedAt:        r.UpdatedAt,
 			EndAt:            r.EndAt,
-			Channels:         r.Channels,
+			Channel:          r.Channel,
 			AnnouncementType: r.AnnouncementType,
 		})
 	}
@@ -245,7 +243,7 @@ func GetAnnouncements(
 			Username:     userInfo.Username,
 			Title:        r.Title,
 			Content:      r.Content,
-			AlreadyRead:  r.AlreadyRead,
+			Read:         r.Read,
 			CreatedAt:    r.CreatedAt,
 			UpdatedAt:    r.UpdatedAt,
 			EndAt:        r.EndAt,
@@ -281,7 +279,7 @@ func expend(
 		CreatedAt:        info.CreatedAt,
 		UpdatedAt:        info.UpdatedAt,
 		EndAt:            info.EndAt,
-		Channels:         info.Channels,
+		Channel:          info.Channel,
 		AnnouncementType: info.AnnouncementType,
 	}, nil
 }

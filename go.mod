@@ -5,11 +5,11 @@ go 1.17
 require (
 	github.com/NpoolPlatform/appuser-manager v0.0.0-20230216022708-2ff4139544d1
 	github.com/NpoolPlatform/appuser-middleware v0.0.0-20230216023722-ef86d576f6ab
-	github.com/NpoolPlatform/basal-middleware v0.0.0-20221228013048-951da3e0461c
+	github.com/NpoolPlatform/basal-middleware v0.0.0-20230216050150-a37a157528d1
 	github.com/NpoolPlatform/g11n-middleware v0.0.0-20230112023858-4ed161248e8f
 	github.com/NpoolPlatform/go-service-framework v0.0.0-20221102072657-7fcc5e6f1012
 	github.com/NpoolPlatform/libent-cruder v0.0.0-20221109023947-366125b690fb
-	github.com/NpoolPlatform/message v0.0.0-20230216040715-b3bed54af054
+	github.com/NpoolPlatform/message v0.0.0-20230216061204-e94405ffac43
 	github.com/NpoolPlatform/notif-manager v0.0.0-20230216030932-9431d2516a27
 	github.com/NpoolPlatform/notif-middleware v0.0.0-20230216042203-6788596855ee
 	github.com/NpoolPlatform/third-middleware v0.0.0-20230216032514-6489c04c67dc

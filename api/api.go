@@ -13,6 +13,7 @@ import (
 	"github.com/NpoolPlatform/notif-gateway/api/template/email"
 	"github.com/NpoolPlatform/notif-gateway/api/template/frontend"
 	"github.com/NpoolPlatform/notif-gateway/api/template/sms"
+	"github.com/NpoolPlatform/notif-gateway/api/usercode"
 
 	v1 "github.com/NpoolPlatform/message/npool/notif/gw/v1"
 
@@ -36,6 +37,7 @@ func Register(server grpc.ServiceRegistrar) {
 	sms.Register(server)
 	user.Register(server)
 	channel.Register(server)
+	usercode.Register(server)
 }
 
 func RegisterGateway(mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) error {
@@ -70,6 +72,9 @@ func RegisterGateway(mux *runtime.ServeMux, endpoint string, opts []grpc.DialOpt
 		return err
 	}
 	if err := channel.RegisterGateway(mux, endpoint, opts); err != nil {
+		return err
+	}
+	if err := usercode.RegisterGateway(mux, endpoint, opts); err != nil {
 		return err
 	}
 	return nil

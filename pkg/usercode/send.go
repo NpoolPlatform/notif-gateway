@@ -97,6 +97,9 @@ func SendCode( //nolint
 	if err != nil {
 		return err
 	}
+	if info != nil {
+		return fmt.Errorf("cannot generate text")
+	}
 
 	err = sendmwcli.SendMessage(ctx, &sendmwpb.SendMessageRequest{
 		Subject:     info.Subject,

@@ -17,6 +17,8 @@ import (
 	"github.com/NpoolPlatform/notif-manager/pkg/db"
 	"github.com/NpoolPlatform/notif-manager/pkg/db/ent"
 	entemailtmpl "github.com/NpoolPlatform/notif-manager/pkg/db/ent/emailtemplate"
+	entfrontendtmpl "github.com/NpoolPlatform/notif-manager/pkg/db/ent/frontendtemplate"
+	entsmstmpl "github.com/NpoolPlatform/notif-manager/pkg/db/ent/smstemplate"
 
 	_ "github.com/NpoolPlatform/notif-manager/pkg/db/ent/runtime"
 
@@ -98,7 +100,7 @@ func migrateEmailTemplate(ctx context.Context) error {
 	}
 
 	return db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
-		rows, err := cli.Debug().QueryContext(
+		rows, err := cli.QueryContext(
 			ctx,
 			"select "+
 				"id,"+
@@ -188,17 +190,187 @@ func migrateEmailTemplate(ctx context.Context) error {
 			CreateBulk(bulk...).
 			Save(_ctx)
 		return err
-
-		return nil
 	})
 }
 
 func migrateSMSTemplate(ctx context.Context) error {
-	return nil
+	type tmpl struct {
+		ID        uuid.UUID
+		AppID     uuid.UUID
+		LangID    uuid.UUID
+		UsedFor   string
+		Subject   string
+		Message   string
+		CreatedAt uint32
+		UpdatedAt uint32
+		DeletedAt uint32
+	}
+
+	return db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
+		rows, err := cli.QueryContext(
+			ctx,
+			"select "+
+				"id,"+
+				"app_id,"+
+				"lang_id,"+
+				"used_for,"+
+				"subject,"+
+				"message,"+
+				"created_at,"+
+				"updated_at,"+
+				"deleted_at "+
+				"from third_manager.sms_templates",
+		)
+		if err != nil {
+			return err
+		}
+
+		bulk := []*ent.SMSTemplateCreate{}
+
+		for rows.Next() {
+			tmpl := tmpl{}
+			err := rows.Scan(
+				&tmpl.ID,
+				&tmpl.AppID,
+				&tmpl.LangID,
+				&tmpl.UsedFor,
+				&tmpl.Subject,
+				&tmpl.Message,
+				&tmpl.CreatedAt,
+				&tmpl.UpdatedAt,
+				&tmpl.DeletedAt,
+			)
+			if err != nil {
+				return err
+			}
+
+			exist, err := cli.
+				SMSTemplate.
+				Query().
+				Where(
+					entsmstmpl.ID(tmpl.ID),
+				).
+				Exist(_ctx)
+			if err != nil {
+				return err
+			}
+			if exist {
+				continue
+			}
+
+			bulk = append(
+				bulk,
+				cli.
+					SMSTemplate.
+					Create().
+					SetID(tmpl.ID).
+					SetAppID(tmpl.AppID).
+					SetLangID(tmpl.LangID).
+					SetUsedFor(tmpl.UsedFor).
+					SetSubject(tmpl.Subject).
+					SetMessage(tmpl.Message).
+					SetCreatedAt(tmpl.CreatedAt).
+					SetUpdatedAt(tmpl.UpdatedAt).
+					SetUpdatedAt(tmpl.DeletedAt),
+			)
+		}
+
+		_, err = cli.
+			SMSTemplate.
+			CreateBulk(bulk...).
+			Save(_ctx)
+		return err
+	})
 }
 
 func migrateFrontendTemplate(ctx context.Context) error {
-	return nil
+	type tmpl struct {
+		ID        uuid.UUID
+		AppID     uuid.UUID
+		LangID    uuid.UUID
+		UsedFor   string
+		Title     string
+		Content   string
+		CreatedAt uint32
+		UpdatedAt uint32
+		DeletedAt uint32
+	}
+
+	return db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
+		rows, err := cli.QueryContext(
+			ctx,
+			"select "+
+				"id,"+
+				"app_id,"+
+				"lang_id,"+
+				"used_for,"+
+				"title,"+
+				"content,"+
+				"created_at,"+
+				"updated_at,"+
+				"deleted_at "+
+				"from third_manager.frontend_templates",
+		)
+		if err != nil {
+			return err
+		}
+
+		bulk := []*ent.FrontendTemplateCreate{}
+
+		for rows.Next() {
+			tmpl := tmpl{}
+			err := rows.Scan(
+				&tmpl.ID,
+				&tmpl.AppID,
+				&tmpl.LangID,
+				&tmpl.UsedFor,
+				&tmpl.Title,
+				&tmpl.Content,
+				&tmpl.CreatedAt,
+				&tmpl.UpdatedAt,
+				&tmpl.DeletedAt,
+			)
+			if err != nil {
+				return err
+			}
+
+			exist, err := cli.
+				FrontendTemplate.
+				Query().
+				Where(
+					entfrontendtmpl.ID(tmpl.ID),
+				).
+				Exist(_ctx)
+			if err != nil {
+				return err
+			}
+			if exist {
+				continue
+			}
+
+			bulk = append(
+				bulk,
+				cli.
+					FrontendTemplate.
+					Create().
+					SetID(tmpl.ID).
+					SetAppID(tmpl.AppID).
+					SetLangID(tmpl.LangID).
+					SetUsedFor(tmpl.UsedFor).
+					SetTitle(tmpl.Title).
+					SetContent(tmpl.Content).
+					SetCreatedAt(tmpl.CreatedAt).
+					SetUpdatedAt(tmpl.UpdatedAt).
+					SetUpdatedAt(tmpl.DeletedAt),
+			)
+		}
+
+		_, err = cli.
+			FrontendTemplate.
+			CreateBulk(bulk...).
+			Save(_ctx)
+		return err
+	})
 }
 
 func Migrate(ctx context.Context) error {

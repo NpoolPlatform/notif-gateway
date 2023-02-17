@@ -72,11 +72,6 @@ func (s *Server) UpdateFrontendTemplate(
 		return &npool.UpdateFrontendTemplateResponse{}, status.Error(codes.InvalidArgument, "Content is empty")
 	}
 
-	if in.GetSender() == "" && in.Sender != nil {
-		logger.Sugar().Errorw("validate", "Sender", in.GetSender())
-		return &npool.UpdateFrontendTemplateResponse{}, status.Error(codes.InvalidArgument, "Sender is empty")
-	}
-
 	info, err := mgrcli.GetFrontendTemplate(ctx, in.GetID())
 	if err != nil {
 		logger.Sugar().Errorw("validate", "err", err)
@@ -130,7 +125,6 @@ func (s *Server) UpdateFrontendTemplate(
 		UsedFor: in.UsedFor,
 		Title:   in.Title,
 		Content: in.Content,
-		Sender:  in.Sender,
 	})
 
 	if err != nil {
@@ -226,7 +220,6 @@ func (s *Server) UpdateAppFrontendTemplate(
 		UsedFor: in.UsedFor,
 		Title:   in.Title,
 		Content: in.Content,
-		Sender:  in.Sender,
 	})
 
 	if err != nil {

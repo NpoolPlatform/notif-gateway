@@ -12,3 +12,7 @@ func Migrate(ctx context.Context) error {
 	// Unlock
 	return nil
 }
+
+func Abort(ctx context.Context) {
+
+}

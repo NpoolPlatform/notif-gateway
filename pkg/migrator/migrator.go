@@ -16,6 +16,8 @@ import (
 
 	"github.com/NpoolPlatform/notif-manager/pkg/db"
 	"github.com/NpoolPlatform/notif-manager/pkg/db/ent"
+
+	entcontact "github.com/NpoolPlatform/notif-manager/pkg/db/ent/contact"
 	entemailtmpl "github.com/NpoolPlatform/notif-manager/pkg/db/ent/emailtemplate"
 	entfrontendtmpl "github.com/NpoolPlatform/notif-manager/pkg/db/ent/frontendtemplate"
 	entsmstmpl "github.com/NpoolPlatform/notif-manager/pkg/db/ent/smstemplate"
@@ -181,7 +183,7 @@ func migrateEmailTemplate(ctx context.Context) error {
 					SetBody(tmpl.Body).
 					SetCreatedAt(tmpl.CreatedAt).
 					SetUpdatedAt(tmpl.UpdatedAt).
-					SetUpdatedAt(tmpl.DeletedAt),
+					SetDeletedAt(tmpl.DeletedAt),
 			)
 		}
 
@@ -271,7 +273,7 @@ func migrateSMSTemplate(ctx context.Context) error {
 					SetMessage(tmpl.Message).
 					SetCreatedAt(tmpl.CreatedAt).
 					SetUpdatedAt(tmpl.UpdatedAt).
-					SetUpdatedAt(tmpl.DeletedAt),
+					SetDeletedAt(tmpl.DeletedAt),
 			)
 		}
 
@@ -361,12 +363,102 @@ func migrateFrontendTemplate(ctx context.Context) error {
 					SetContent(tmpl.Content).
 					SetCreatedAt(tmpl.CreatedAt).
 					SetUpdatedAt(tmpl.UpdatedAt).
-					SetUpdatedAt(tmpl.DeletedAt),
+					SetDeletedAt(tmpl.DeletedAt),
 			)
 		}
 
 		_, err = cli.
 			FrontendTemplate.
+			CreateBulk(bulk...).
+			Save(_ctx)
+		return err
+	})
+}
+
+func migrateContact(ctx context.Context) error {
+	type contact struct {
+		ID          uuid.UUID
+		AppID       uuid.UUID
+		UsedFor     string
+		Sender      string
+		Account     string
+		AccountType string
+		CreatedAt   uint32
+		UpdatedAt   uint32
+		DeletedAt   uint32
+	}
+
+	return db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
+		rows, err := cli.QueryContext(
+			ctx,
+			"select "+
+				"id,"+
+				"app_id,"+
+				"used_for,"+
+				"sender,"+
+				"account,"+
+				"account_type,"+
+				"created_at,"+
+				"updated_at,"+
+				"deleted_at "+
+				"from third_manager.contacts",
+		)
+		if err != nil {
+			return err
+		}
+
+		bulk := []*ent.ContactCreate{}
+
+		for rows.Next() {
+			contact := contact{}
+			err := rows.Scan(
+				&contact.ID,
+				&contact.AppID,
+				&contact.UsedFor,
+				&contact.Sender,
+				&contact.Account,
+				&contact.AccountType,
+				&contact.CreatedAt,
+				&contact.UpdatedAt,
+				&contact.DeletedAt,
+			)
+			if err != nil {
+				return err
+			}
+
+			exist, err := cli.
+				Contact.
+				Query().
+				Where(
+					entcontact.ID(contact.ID),
+				).
+				Exist(_ctx)
+			if err != nil {
+				return err
+			}
+			if exist {
+				continue
+			}
+
+			bulk = append(
+				bulk,
+				cli.
+					Contact.
+					Create().
+					SetID(contact.ID).
+					SetAppID(contact.AppID).
+					SetUsedFor(contact.UsedFor).
+					SetSender(contact.Sender).
+					SetAccount(contact.Account).
+					SetAccountType(contact.AccountType).
+					SetCreatedAt(contact.CreatedAt).
+					SetUpdatedAt(contact.UpdatedAt).
+					SetDeletedAt(contact.DeletedAt),
+			)
+		}
+
+		_, err = cli.
+			Contact.
 			CreateBulk(bulk...).
 			Save(_ctx)
 		return err
@@ -399,6 +491,11 @@ func Migrate(ctx context.Context) error {
 	}
 
 	if err := migrateFrontendTemplate(ctx); err != nil {
+		logger.Sugar().Errorw("Migrate", "error", err)
+		return err
+	}
+
+	if err := migrateContact(ctx); err != nil {
 		logger.Sugar().Errorw("Migrate", "error", err)
 		return err
 	}

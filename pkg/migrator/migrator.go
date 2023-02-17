@@ -119,7 +119,8 @@ func migrateEmailTemplate(ctx context.Context) error {
 				"created_at,"+
 				"updated_at,"+
 				"deleted_at "+
-				"from third_manager.email_templates",
+				"from third_manager.email_templates "+
+				"where deleted_at=0",
 		)
 		if err != nil {
 			return err
@@ -153,6 +154,7 @@ func migrateEmailTemplate(ctx context.Context) error {
 				Query().
 				Where(
 					entemailtmpl.ID(tmpl.ID),
+					entemailtmpl.DeletedAt(0),
 				).
 				Exist(_ctx)
 			if err != nil {
@@ -210,7 +212,7 @@ func migrateSMSTemplate(ctx context.Context) error {
 	}
 
 	return db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
-		rows, err := cli.QueryContext(
+		rows, err := cli.Debug().QueryContext(
 			ctx,
 			"select "+
 				"id,"+
@@ -222,7 +224,8 @@ func migrateSMSTemplate(ctx context.Context) error {
 				"created_at,"+
 				"updated_at,"+
 				"deleted_at "+
-				"from third_manager.sms_templates",
+				"from third_manager.sms_templates "+
+				"where deleted_at=0",
 		)
 		if err != nil {
 			return err
@@ -252,6 +255,7 @@ func migrateSMSTemplate(ctx context.Context) error {
 				Query().
 				Where(
 					entsmstmpl.ID(tmpl.ID),
+					entsmstmpl.DeletedAt(0),
 				).
 				Exist(_ctx)
 			if err != nil {
@@ -312,7 +316,8 @@ func migrateFrontendTemplate(ctx context.Context) error {
 				"created_at,"+
 				"updated_at,"+
 				"deleted_at "+
-				"from third_manager.frontend_templates",
+				"from third_manager.frontend_templates "+
+				"where deleted_at=0",
 		)
 		if err != nil {
 			return err
@@ -342,6 +347,7 @@ func migrateFrontendTemplate(ctx context.Context) error {
 				Query().
 				Where(
 					entfrontendtmpl.ID(tmpl.ID),
+					entfrontendtmpl.DeletedAt(0),
 				).
 				Exist(_ctx)
 			if err != nil {
@@ -402,7 +408,8 @@ func migrateContact(ctx context.Context) error {
 				"created_at,"+
 				"updated_at,"+
 				"deleted_at "+
-				"from third_manager.contacts",
+				"from third_manager.contacts "+
+				"where deleted_at=0",
 		)
 		if err != nil {
 			return err
@@ -432,6 +439,7 @@ func migrateContact(ctx context.Context) error {
 				Query().
 				Where(
 					entcontact.ID(contact.ID),
+					entcontact.DeletedAt(0),
 				).
 				Exist(_ctx)
 			if err != nil {

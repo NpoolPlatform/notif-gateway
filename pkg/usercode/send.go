@@ -97,7 +97,7 @@ func SendCode( //nolint
 	if err != nil {
 		return err
 	}
-	if info != nil {
+	if info == nil {
 		return fmt.Errorf("cannot generate text")
 	}
 

@@ -45,7 +45,10 @@ func (s *Server) SendCode(ctx context.Context, in *npool.SendCodeRequest) (*npoo
 	case basetypes.UsedFor_Signin:
 		fallthrough //nolint
 	case basetypes.UsedFor_Update:
-		fallthrough //nolint
+		if in.Account == nil {
+			logger.Sugar().Errorw("SendCode", "Account", in.GetAccount(), "UserID", in.GetUserID())
+			return &npool.SendCodeResponse{}, status.Error(codes.InvalidArgument, "Account and UserID cannot all be empty")
+		}
 	case basetypes.UsedFor_SetWithdrawAddress:
 		fallthrough //nolint
 	case basetypes.UsedFor_Withdraw:
@@ -64,11 +67,6 @@ func (s *Server) SendCode(ctx context.Context, in *npool.SendCodeRequest) (*npoo
 	default:
 		logger.Sugar().Errorw("SendCode", "UsedFor", in.GetUsedFor())
 		return &npool.SendCodeResponse{}, status.Error(codes.InvalidArgument, "UsedFor is invalid")
-	}
-
-	if in.Account == nil && in.UserID == nil {
-		logger.Sugar().Errorw("SendCode", "Account", in.GetAccount(), "UserID", in.GetUserID())
-		return &npool.SendCodeResponse{}, status.Error(codes.InvalidArgument, "Account and UserID cannot all be empty")
 	}
 
 	switch in.GetAccountType() {

@@ -44,7 +44,7 @@ func CreateAnnouncement(
 		return nil, err
 	}
 
-	return expend(ctx, info)
+	return expand(ctx, info)
 }
 
 func UpdateAnnouncement(
@@ -68,7 +68,7 @@ func UpdateAnnouncement(
 		return nil, err
 	}
 
-	return expend(ctx, info)
+	return expand(ctx, info)
 }
 
 func DeleteAnnouncement(
@@ -87,7 +87,7 @@ func DeleteAnnouncement(
 		return nil, err
 	}
 
-	return expend(ctx, info)
+	return expand(ctx, info)
 }
 
 func GetAnnouncement(
@@ -106,7 +106,7 @@ func GetAnnouncement(
 		return nil, fmt.Errorf("announcement not exist")
 	}
 
-	return expend(ctx, info)
+	return expand(ctx, info)
 }
 
 func GetAppAnnouncements(
@@ -156,8 +156,8 @@ func GetAppAnnouncements(
 		infos = append(infos, &npool.Announcement{
 			ID:               r.ID,
 			AppID:            r.AppID,
-			LangID:           r.LangID,
 			AppName:          app.Name,
+			LangID:           r.LangID,
 			Title:            r.Title,
 			Content:          r.Content,
 			CreatedAt:        r.CreatedAt,
@@ -234,26 +234,29 @@ func GetAnnouncements(
 		}
 
 		infos = append(infos, &npool.Announcement{
-			ID:           r.AnnouncementID,
-			AppID:        r.AppID,
-			AppName:      app.Name,
-			UserID:       userInfo.ID,
-			EmailAddress: userInfo.EmailAddress,
-			PhoneNO:      userInfo.PhoneNO,
-			Username:     userInfo.Username,
-			Title:        r.Title,
-			Content:      r.Content,
-			Read:         r.Read,
-			CreatedAt:    r.CreatedAt,
-			UpdatedAt:    r.UpdatedAt,
-			EndAt:        r.EndAt,
+			ID:               r.AnnouncementID,
+			AppID:            r.AppID,
+			AppName:          app.Name,
+			UserID:           userInfo.ID,
+			EmailAddress:     userInfo.EmailAddress,
+			PhoneNO:          userInfo.PhoneNO,
+			Username:         userInfo.Username,
+			LangID:           r.LangID,
+			Title:            r.Title,
+			Content:          r.Content,
+			Read:             r.Read,
+			CreatedAt:        r.CreatedAt,
+			UpdatedAt:        r.UpdatedAt,
+			EndAt:            r.EndAt,
+			Channel:          r.Channel,
+			AnnouncementType: r.AnnouncementType,
 		})
 	}
 
 	return infos, total, nil
 }
 
-func expend(
+func expand(
 	ctx context.Context,
 	info *mgrpb.Announcement,
 ) (

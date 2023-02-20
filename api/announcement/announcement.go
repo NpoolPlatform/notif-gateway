@@ -66,6 +66,7 @@ func (s *Server) CreateAnnouncement(ctx context.Context, in *npool.CreateAnnounc
 	switch in.GetChannel() {
 	case channel.NotifChannel_ChannelEmail:
 	case channel.NotifChannel_ChannelSMS:
+	case channel.NotifChannel_ChannelFrontend:
 	default:
 		logger.Sugar().Errorw("CreateAnnouncement", "Channel", in.GetChannel(), "error", err)
 		return &npool.CreateAnnouncementResponse{}, status.Error(codes.InvalidArgument, "Channel is invalid")
@@ -74,14 +75,6 @@ func (s *Server) CreateAnnouncement(ctx context.Context, in *npool.CreateAnnounc
 	if in.GetEndAt() == 0 {
 		logger.Sugar().Errorw("CreateAnnouncement", "EndAt", in.GetEndAt(), "error", err)
 		return &npool.CreateAnnouncementResponse{}, status.Error(codes.InvalidArgument, "EndAt is empty")
-	}
-
-	switch in.AnnouncementType {
-	case mgrpb.AnnouncementType_Multicast:
-	case mgrpb.AnnouncementType_Broadcast:
-	default:
-		logger.Sugar().Errorw("CreateAnnouncement", "AnnouncementType", in.GetAnnouncementType(), "error", err)
-		return &npool.CreateAnnouncementResponse{}, status.Error(codes.InvalidArgument, "AnnouncementType is invalid")
 	}
 
 	switch in.GetAnnouncementType() {

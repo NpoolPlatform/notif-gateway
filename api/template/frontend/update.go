@@ -3,8 +3,6 @@ package frontend
 import (
 	"context"
 
-	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
-
 	"github.com/google/uuid"
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
@@ -27,7 +25,6 @@ import (
 	commonpb "github.com/NpoolPlatform/message/npool"
 )
 
-//nolint:funlen,gocyclo
 func (s *Server) UpdateFrontendTemplate(
 	ctx context.Context,
 	in *npool.UpdateFrontendTemplateRequest,
@@ -83,20 +80,6 @@ func (s *Server) UpdateFrontendTemplate(
 		return &npool.UpdateFrontendTemplateResponse{}, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
-	if in.UsedFor != nil {
-		switch in.GetUsedFor() {
-		case basetypes.UsedFor_WithdrawalRequest:
-		case basetypes.UsedFor_WithdrawalCompleted:
-		case basetypes.UsedFor_DepositReceived:
-		case basetypes.UsedFor_KYCApproved:
-		case basetypes.UsedFor_KYCRejected:
-		case basetypes.UsedFor_Announcement:
-		default:
-			logger.Sugar().Errorw("validate", "err", err)
-			return &npool.UpdateFrontendTemplateResponse{}, status.Error(codes.InvalidArgument, "UsedFor is invalid")
-		}
-	}
-
 	appLang, err := applangmwcli.GetLangOnly(ctx, &applangmgrpb.Conds{
 		AppID: &commonpb.StringVal{
 			Op:    cruder.EQ,
@@ -122,7 +105,6 @@ func (s *Server) UpdateFrontendTemplate(
 		ID:      &in.ID,
 		AppID:   &in.AppID,
 		LangID:  in.TargetLangID,
-		UsedFor: in.UsedFor,
 		Title:   in.Title,
 		Content: in.Content,
 	})
@@ -137,7 +119,6 @@ func (s *Server) UpdateFrontendTemplate(
 	}, nil
 }
 
-//nolint:gocyclo
 func (s *Server) UpdateAppFrontendTemplate(
 	ctx context.Context,
 	in *npool.UpdateAppFrontendTemplateRequest,
@@ -199,25 +180,10 @@ func (s *Server) UpdateAppFrontendTemplate(
 		return &npool.UpdateAppFrontendTemplateResponse{}, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
-	if in.UsedFor != nil {
-		switch in.GetUsedFor() {
-		case basetypes.UsedFor_WithdrawalRequest:
-		case basetypes.UsedFor_WithdrawalCompleted:
-		case basetypes.UsedFor_DepositReceived:
-		case basetypes.UsedFor_KYCApproved:
-		case basetypes.UsedFor_KYCRejected:
-		case basetypes.UsedFor_Announcement:
-		default:
-			logger.Sugar().Errorw("validate", "err", err)
-			return &npool.UpdateAppFrontendTemplateResponse{}, status.Error(codes.InvalidArgument, "UsedFor is invalid")
-		}
-	}
-
 	info, err = mgrcli.UpdateFrontendTemplate(ctx, &mgrpb.FrontendTemplateReq{
 		ID:      &in.ID,
 		AppID:   &in.TargetAppID,
 		LangID:  in.TargetLangID,
-		UsedFor: in.UsedFor,
 		Title:   in.Title,
 		Content: in.Content,
 	})

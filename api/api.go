@@ -7,8 +7,13 @@ import (
 	"github.com/NpoolPlatform/notif-gateway/api/announcement/readstate"
 	"github.com/NpoolPlatform/notif-gateway/api/announcement/sendstate"
 	"github.com/NpoolPlatform/notif-gateway/api/announcement/user"
+	"github.com/NpoolPlatform/notif-gateway/api/contact"
 	"github.com/NpoolPlatform/notif-gateway/api/notif"
-	"github.com/NpoolPlatform/notif-gateway/api/notif/notifchannel"
+	"github.com/NpoolPlatform/notif-gateway/api/notif/channel"
+	"github.com/NpoolPlatform/notif-gateway/api/template/email"
+	"github.com/NpoolPlatform/notif-gateway/api/template/frontend"
+	"github.com/NpoolPlatform/notif-gateway/api/template/sms"
+	"github.com/NpoolPlatform/notif-gateway/api/usercode"
 
 	v1 "github.com/NpoolPlatform/message/npool/notif/gw/v1"
 
@@ -26,8 +31,13 @@ func Register(server grpc.ServiceRegistrar) {
 	readstate.Register(server)
 	sendstate.Register(server)
 	notif.Register(server)
+	contact.Register(server)
+	email.Register(server)
+	frontend.Register(server)
+	sms.Register(server)
 	user.Register(server)
-	notifchannel.Register(server)
+	channel.Register(server)
+	usercode.Register(server)
 }
 
 func RegisterGateway(mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) error {
@@ -46,10 +56,25 @@ func RegisterGateway(mux *runtime.ServeMux, endpoint string, opts []grpc.DialOpt
 	if err := notif.RegisterGateway(mux, endpoint, opts); err != nil {
 		return err
 	}
+	if err := contact.RegisterGateway(mux, endpoint, opts); err != nil {
+		return err
+	}
+	if err := email.RegisterGateway(mux, endpoint, opts); err != nil {
+		return err
+	}
+	if err := frontend.RegisterGateway(mux, endpoint, opts); err != nil {
+		return err
+	}
+	if err := sms.RegisterGateway(mux, endpoint, opts); err != nil {
+		return err
+	}
 	if err := user.RegisterGateway(mux, endpoint, opts); err != nil {
 		return err
 	}
-	if err := notifchannel.RegisterGateway(mux, endpoint, opts); err != nil {
+	if err := channel.RegisterGateway(mux, endpoint, opts); err != nil {
+		return err
+	}
+	if err := usercode.RegisterGateway(mux, endpoint, opts); err != nil {
 		return err
 	}
 	return nil

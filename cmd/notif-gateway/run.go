@@ -23,6 +23,16 @@ var runCmd = &cli.Command{
 	Name:    "run",
 	Aliases: []string{"s"},
 	Usage:   "Run the daemon",
+	After: func(c *cli.Context) error {
+		if err := grpc2.HShutdown(); err != nil {
+			logger.Sugar().Warnf("graceful shutdown http server error: %v", err)
+		}
+
+		migrator.Abort(c.Context)
+
+		grpc2.GShutdown()
+		return logger.Sync()
+	},
 	Action: func(c *cli.Context) error {
 		if err := migrator.Migrate(c.Context); err != nil {
 			return err

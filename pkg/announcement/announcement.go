@@ -27,7 +27,7 @@ import (
 func CreateAnnouncement(
 	ctx context.Context,
 	appID, langID, title, content string,
-	channel []channelpb.NotifChannel,
+	channel channelpb.NotifChannel,
 	endAt uint32,
 	announcementType mgrpb.AnnouncementType,
 ) (*npool.Announcement, error) {
@@ -36,7 +36,7 @@ func CreateAnnouncement(
 		LangID:           &langID,
 		Title:            &title,
 		Content:          &content,
-		Channels:         channel,
+		Channel:          &channel,
 		EndAt:            &endAt,
 		AnnouncementType: &announcementType,
 	})
@@ -44,14 +44,13 @@ func CreateAnnouncement(
 		return nil, err
 	}
 
-	return expend(ctx, info)
+	return expand(ctx, info)
 }
 
 func UpdateAnnouncement(
 	ctx context.Context,
 	id string,
 	title, content *string,
-	channel []channelpb.NotifChannel,
 	endAt *uint32,
 	announcementType *mgrpb.AnnouncementType,
 ) (
@@ -62,7 +61,6 @@ func UpdateAnnouncement(
 		ID:               &id,
 		Title:            title,
 		Content:          content,
-		Channels:         channel,
 		EndAt:            endAt,
 		AnnouncementType: announcementType,
 	})
@@ -70,7 +68,7 @@ func UpdateAnnouncement(
 		return nil, err
 	}
 
-	return expend(ctx, info)
+	return expand(ctx, info)
 }
 
 func DeleteAnnouncement(
@@ -89,7 +87,7 @@ func DeleteAnnouncement(
 		return nil, err
 	}
 
-	return expend(ctx, info)
+	return expand(ctx, info)
 }
 
 func GetAnnouncement(
@@ -108,7 +106,7 @@ func GetAnnouncement(
 		return nil, fmt.Errorf("announcement not exist")
 	}
 
-	return expend(ctx, info)
+	return expand(ctx, info)
 }
 
 func GetAppAnnouncements(
@@ -158,14 +156,14 @@ func GetAppAnnouncements(
 		infos = append(infos, &npool.Announcement{
 			ID:               r.ID,
 			AppID:            r.AppID,
-			LangID:           r.LangID,
 			AppName:          app.Name,
+			LangID:           r.LangID,
 			Title:            r.Title,
 			Content:          r.Content,
 			CreatedAt:        r.CreatedAt,
 			UpdatedAt:        r.UpdatedAt,
 			EndAt:            r.EndAt,
-			Channels:         r.Channels,
+			Channel:          r.Channel,
 			AnnouncementType: r.AnnouncementType,
 		})
 	}
@@ -236,26 +234,29 @@ func GetAnnouncements(
 		}
 
 		infos = append(infos, &npool.Announcement{
-			ID:           r.AnnouncementID,
-			AppID:        r.AppID,
-			AppName:      app.Name,
-			UserID:       userInfo.ID,
-			EmailAddress: userInfo.EmailAddress,
-			PhoneNO:      userInfo.PhoneNO,
-			Username:     userInfo.Username,
-			Title:        r.Title,
-			Content:      r.Content,
-			AlreadyRead:  r.AlreadyRead,
-			CreatedAt:    r.CreatedAt,
-			UpdatedAt:    r.UpdatedAt,
-			EndAt:        r.EndAt,
+			ID:               r.AnnouncementID,
+			AppID:            r.AppID,
+			AppName:          app.Name,
+			UserID:           userInfo.ID,
+			EmailAddress:     userInfo.EmailAddress,
+			PhoneNO:          userInfo.PhoneNO,
+			Username:         userInfo.Username,
+			LangID:           r.LangID,
+			Title:            r.Title,
+			Content:          r.Content,
+			Read:             r.Read,
+			CreatedAt:        r.CreatedAt,
+			UpdatedAt:        r.UpdatedAt,
+			EndAt:            r.EndAt,
+			Channel:          r.Channel,
+			AnnouncementType: r.AnnouncementType,
 		})
 	}
 
 	return infos, total, nil
 }
 
-func expend(
+func expand(
 	ctx context.Context,
 	info *mgrpb.Announcement,
 ) (
@@ -281,7 +282,7 @@ func expend(
 		CreatedAt:        info.CreatedAt,
 		UpdatedAt:        info.UpdatedAt,
 		EndAt:            info.EndAt,
-		Channels:         info.Channels,
+		Channel:          info.Channel,
 		AnnouncementType: info.AnnouncementType,
 	}, nil
 }

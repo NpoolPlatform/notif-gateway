@@ -1,26 +1,26 @@
-package notifchannel
+package channel
 
 import (
 	"context"
 	"fmt"
 
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	"github.com/NpoolPlatform/message/npool/notif/mgr/v1/channel"
-	"github.com/NpoolPlatform/message/npool/third/mgr/v1/usedfor"
 
 	appcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
 	apppb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/app"
 
-	mgrpb "github.com/NpoolPlatform/message/npool/notif/mgr/v1/notif/notifchannel"
-	mgrcli "github.com/NpoolPlatform/notif-manager/pkg/client/notif/notifchannel"
+	mgrpb "github.com/NpoolPlatform/message/npool/notif/mgr/v1/notif/channel"
+	mgrcli "github.com/NpoolPlatform/notif-manager/pkg/client/notif/channel"
 
-	npool "github.com/NpoolPlatform/message/npool/notif/gw/v1/notif/notifchannel"
+	npool "github.com/NpoolPlatform/message/npool/notif/gw/v1/notif/channel"
 
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	commonpb "github.com/NpoolPlatform/message/npool"
 )
 
-func DeleteNotifChannel(ctx context.Context, id string) (*npool.NotifChannel, error) {
-	info, err := mgrcli.DeleteNotifChannel(ctx, id)
+func DeleteChannel(ctx context.Context, id string) (*npool.Channel, error) {
+	info, err := mgrcli.DeleteChannel(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +34,7 @@ func DeleteNotifChannel(ctx context.Context, id string) (*npool.NotifChannel, er
 		return nil, fmt.Errorf("app %s not found", info.AppID)
 	}
 
-	return &npool.NotifChannel{
+	return &npool.Channel{
 		ID:        info.ID,
 		AppID:     info.AppID,
 		AppName:   appInfo.Name,
@@ -44,13 +44,13 @@ func DeleteNotifChannel(ctx context.Context, id string) (*npool.NotifChannel, er
 	}, nil
 }
 
-func CreateNotifChannels(
+func CreateChannels(
 	ctx context.Context,
 	appID string,
-	eventTypes []usedfor.UsedFor,
+	eventTypes []basetypes.UsedFor,
 	channel1 channel.NotifChannel,
 ) (
-	[]*npool.NotifChannel,
+	[]*npool.Channel,
 	error,
 ) {
 	types := []uint32{}
@@ -58,7 +58,7 @@ func CreateNotifChannels(
 		types = append(types, uint32(typ))
 	}
 
-	ncs, _, err := mgrcli.GetNotifChannels(ctx, &mgrpb.Conds{
+	ncs, _, err := mgrcli.GetChannels(ctx, &mgrpb.Conds{
 		AppID: &commonpb.StringVal{
 			Op:    cruder.EQ,
 			Value: appID,
@@ -76,7 +76,7 @@ func CreateNotifChannels(
 		return nil, err
 	}
 
-	evTypes := []usedfor.UsedFor{}
+	evTypes := []basetypes.UsedFor{}
 
 nextType:
 	for _, typ := range eventTypes {
@@ -92,16 +92,16 @@ nextType:
 		return nil, nil
 	}
 
-	var req []*mgrpb.NotifChannelReq
+	var req []*mgrpb.ChannelReq
 	for key := range evTypes {
-		req = append(req, &mgrpb.NotifChannelReq{
+		req = append(req, &mgrpb.ChannelReq{
 			AppID:     &appID,
 			EventType: &evTypes[key],
 			Channel:   &channel1,
 		})
 	}
 
-	rows, err := mgrcli.CreateNotifChannels(ctx, req)
+	rows, err := mgrcli.CreateChannels(ctx, req)
 	if err != nil {
 		return nil, err
 	}
@@ -117,16 +117,16 @@ nextType:
 	return infos, nil
 }
 
-func GetNotifChannels(
+func GetChannels(
 	ctx context.Context,
 	appID string,
 	offset, limit uint32,
 ) (
-	[]*npool.NotifChannel,
+	[]*npool.Channel,
 	uint32,
 	error,
 ) {
-	rows, total, err := mgrcli.GetNotifChannels(ctx, &mgrpb.Conds{
+	rows, total, err := mgrcli.GetChannels(ctx, &mgrpb.Conds{
 		AppID: &commonpb.StringVal{
 			Op:    cruder.EQ,
 			Value: appID,
@@ -149,9 +149,9 @@ func GetNotifChannels(
 
 func extends(
 	ctx context.Context,
-	rows []*mgrpb.NotifChannel,
+	rows []*mgrpb.Channel,
 ) (
-	[]*npool.NotifChannel,
+	[]*npool.Channel,
 	error,
 ) {
 	appIDs := []string{}
@@ -168,14 +168,14 @@ func extends(
 		appMap[val.ID] = val
 	}
 
-	infos := []*npool.NotifChannel{}
+	infos := []*npool.Channel{}
 	for _, val := range rows {
 		app, ok := appMap[val.AppID]
 		if !ok {
 			continue
 		}
 
-		infos = append(infos, &npool.NotifChannel{
+		infos = append(infos, &npool.Channel{
 			ID:        val.ID,
 			AppID:     val.AppID,
 			AppName:   app.Name,

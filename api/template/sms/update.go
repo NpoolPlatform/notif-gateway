@@ -93,8 +93,8 @@ func (s *Server) UpdateSMSTemplate(
 	info, err = mgrcli.UpdateSMSTemplate(ctx, &mgrpb.SMSTemplateReq{
 		ID:      &in.ID,
 		LangID:  &in.TargetLangID,
-		Subject: &in.Subject,
-		Message: &in.Message,
+		Subject: in.Subject,
+		Message: in.Message,
 	})
 
 	if err != nil {
@@ -165,8 +165,8 @@ func (s *Server) UpdateAppSMSTemplate(
 	info, err := mgrcli.UpdateSMSTemplate(ctx, &mgrpb.SMSTemplateReq{
 		ID:      &in.ID,
 		LangID:  &in.TargetLangID,
-		Subject: &in.Subject,
-		Message: &in.Message,
+		Subject: in.Subject,
+		Message: in.Message,
 	})
 
 	if err != nil {

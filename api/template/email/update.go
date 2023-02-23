@@ -94,12 +94,12 @@ func (s *Server) UpdateEmailTemplate(
 	info, err = mgrcli.UpdateEmailTemplate(ctx, &mgrpb.EmailTemplateReq{
 		ID:                &in.ID,
 		LangID:            &in.TargetLangID,
-		Sender:            &in.Sender,
+		Sender:            in.Sender,
 		ReplyTos:          in.ReplyTos,
 		CCTos:             in.CCTos,
-		Subject:           &in.Subject,
-		Body:              &in.Body,
-		DefaultToUsername: &in.DefaultToUsername,
+		Subject:           in.Subject,
+		Body:              in.Body,
+		DefaultToUsername: in.DefaultToUsername,
 	})
 
 	if err != nil {
@@ -170,12 +170,12 @@ func (s *Server) UpdateAppEmailTemplate(
 	info, err := mgrcli.UpdateEmailTemplate(ctx, &mgrpb.EmailTemplateReq{
 		ID:                &in.ID,
 		LangID:            &in.TargetLangID,
-		Sender:            &in.Sender,
+		Sender:            in.Sender,
 		ReplyTos:          in.ReplyTos,
 		CCTos:             in.CCTos,
-		Subject:           &in.Subject,
-		Body:              &in.Body,
-		DefaultToUsername: &in.DefaultToUsername,
+		Subject:           in.Subject,
+		Body:              in.Body,
+		DefaultToUsername: in.DefaultToUsername,
 	})
 
 	if err != nil {

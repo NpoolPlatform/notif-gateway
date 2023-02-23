@@ -42,20 +42,11 @@ func GetSendStates(
 	}
 
 	conds := &mwpb.Conds{
-		AppID: &npoolpb.StringVal{
-			Op:    cruder.EQ,
-			Value: appID,
-		},
-		UserID: &npoolpb.StringVal{
-			Op:    cruder.EQ,
-			Value: userID,
-		},
+		AppID:  &npoolpb.StringVal{Op: cruder.EQ, Value: appID},
+		UserID: &npoolpb.StringVal{Op: cruder.EQ, Value: userID},
 	}
 	if channel != nil {
-		conds.Channel = &npoolpb.Uint32Val{
-			Op:    cruder.EQ,
-			Value: uint32(channel.Number()),
-		}
+		conds.Channel = &npoolpb.Uint32Val{Op: cruder.EQ, Value: uint32(channel.Number())}
 	}
 	rows, total, err := mwcli.GetSendStates(ctx, conds, int32(offset), int32(limit))
 	if err != nil {
@@ -119,16 +110,10 @@ func GetAppSendStates(
 		limit = 100
 	}
 	conds := &mwpb.Conds{
-		AppID: &npoolpb.StringVal{
-			Op:    cruder.EQ,
-			Value: appID,
-		},
+		AppID: &npoolpb.StringVal{Op: cruder.EQ, Value: appID},
 	}
 	if channel != nil {
-		conds.Channel = &npoolpb.Uint32Val{
-			Op:    cruder.EQ,
-			Value: uint32(*channel),
-		}
+		conds.Channel = &npoolpb.Uint32Val{Op: cruder.EQ, Value: uint32(*channel)}
 	}
 	rows, total, err := mwcli.GetSendStates(ctx, conds, int32(offset), int32(limit))
 	if err != nil {

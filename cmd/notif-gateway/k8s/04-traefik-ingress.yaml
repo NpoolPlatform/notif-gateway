@@ -42,6 +42,10 @@ spec:
       http: *http_rules
     - host: api.lpsecretbase.com
       http: *http_rules
+    - host: api.procyon.npool.top
+      http: *http_rules
+    - host: api.lpsb.npool.top
+      http: *http_rules
 
 ---
 
@@ -102,13 +106,17 @@ spec:
       http: *http_rules
     - host: api.lpsecretbase.com
       http: *http_rules
+    - host: api.procyon.npool.top
+      http: *http_rules
+    - host: api.lpsb.npool.top
+      http: *http_rules
 
 ---
 
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
-  name: notif-gateway-traefik-app-user-ingress
+  name: notif-gateway-traefik-send-ingress
   namespace: kube-system
   annotations:
     k8s.kuboard.cn/displayName: notif-gateway-traefik-app-user
@@ -149,4 +157,8 @@ spec:
     - host: api.japan-procyon-production.npool.top
       http: *http_rules
     - host: api.lpsecretbase.com
+      http: *http_rules
+    - host: api.procyon.npool.top
+      http: *http_rules
+    - host: api.lpsb.npool.top
       http: *http_rules

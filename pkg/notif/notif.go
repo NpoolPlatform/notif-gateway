@@ -1,4 +1,3 @@
-//nolint:dupl
 package notif
 
 import (
@@ -136,7 +135,7 @@ func UpdateNotifs(ctx context.Context, ids []string, notified bool) ([]*npool.No
 }
 
 func GetNotifs(ctx context.Context, conds *mgrpb.Conds, offset, limit int32) ([]*npool.Notif, uint32, error) {
-	rows, total, err := mgrcli.GetNotifs(ctx, conds, int32(offset), int32(limit))
+	rows, total, err := mgrcli.GetNotifs(ctx, conds, offset, limit)
 	if err != nil {
 		return nil, 0, err
 	}

@@ -116,7 +116,7 @@ spec:
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
-  name: notif-gateway-traefik-app-ingress
+  name: notif-gateway-traefik-send-ingress
   namespace: kube-system
   annotations:
     k8s.kuboard.cn/displayName: notif-gateway-traefik-app-user

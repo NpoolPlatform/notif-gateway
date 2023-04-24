@@ -4,15 +4,16 @@ import (
 	"context"
 	"fmt"
 
-	appcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
-	usercli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
+	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
+	usermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
-	apppb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/app"
-	userpb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/user"
+	appmwpb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/app"
+	usermwpb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/user"
 	npool "github.com/NpoolPlatform/message/npool/notif/gw/v1/announcement/sendstate"
 	channelpb "github.com/NpoolPlatform/message/npool/notif/mgr/v1/channel"
 
 	npoolpb "github.com/NpoolPlatform/message/npool"
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 
 	mwpb "github.com/NpoolPlatform/message/npool/notif/mw/v1/announcement/sendstate"
 	mwcli "github.com/NpoolPlatform/notif-middleware/pkg/client/announcement/sendstate"
@@ -32,7 +33,7 @@ func GetSendStates(
 	if limit == 0 {
 		limit = 100
 	}
-	userInfo, err := usercli.GetUser(ctx, appID, userID)
+	userInfo, err := usermwcli.GetUser(ctx, appID, userID)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -63,11 +64,13 @@ func GetSendStates(
 		appIDs = append(appIDs, val.AppID)
 	}
 
-	appInfos, _, err := appcli.GetManyApps(ctx, appIDs)
+	appInfos, _, err := appmwcli.GetApps(ctx, &appmwpb.Conds{
+		IDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: appIDs},
+	}, 0, int32(len(appIDs)))
 	if err != nil {
 		return nil, 0, err
 	}
-	appMap := map[string]*apppb.App{}
+	appMap := map[string]*appmwpb.App{}
 	for _, val := range appInfos {
 		appMap[val.ID] = val
 	}
@@ -133,19 +136,23 @@ func GetAppSendStates(
 			userIDs = append(userIDs, val.UserID)
 		}
 	}
-	appInfos, _, err := appcli.GetManyApps(ctx, appIDs)
+	appInfos, _, err := appmwcli.GetApps(ctx, &appmwpb.Conds{
+		IDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: appIDs},
+	}, 0, int32(len(appIDs)))
 	if err != nil {
 		return nil, 0, err
 	}
-	appMap := map[string]*apppb.App{}
+	appMap := map[string]*appmwpb.App{}
 	for _, val := range appInfos {
 		appMap[val.ID] = val
 	}
-	userInfos, _, err := usercli.GetManyUsers(ctx, userIDs)
+	userInfos, _, err := usermwcli.GetUsers(ctx, &usermwpb.Conds{
+		IDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: userIDs},
+	}, 0, int32(len(userIDs)))
 	if err != nil {
 		return nil, 0, err
 	}
-	userMap := map[string]*userpb.User{}
+	userMap := map[string]*usermwpb.User{}
 	for _, val := range userInfos {
 		userMap[val.ID] = val
 	}

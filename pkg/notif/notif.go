@@ -22,6 +22,7 @@ import (
 
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	commonpb "github.com/NpoolPlatform/message/npool"
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 )
 
 func GetNotif(ctx context.Context, id string) (*npool.Notif, error) {
@@ -84,7 +85,9 @@ func UpdateNotifs(ctx context.Context, ids []string, notified bool) ([]*npool.No
 		appIDs = append(appIDs, val.AppID)
 		userIDs = append(userIDs, val.UserID)
 	}
-	appInfos, _, err := appmwcli.GetManyApps(ctx, appIDs)
+	appInfos, _, err := appmwcli.GetApps(ctx, &appmwpb.Conds{
+		IDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: appIDs},
+	}, 0, int32(len(appIDs)))
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +96,9 @@ func UpdateNotifs(ctx context.Context, ids []string, notified bool) ([]*npool.No
 		appMap[val.ID] = val
 	}
 
-	userInfos, _, err := usermwcli.GetManyUsers(ctx, userIDs)
+	userInfos, _, err := usermwcli.GetUsers(ctx, &usermwpb.Conds{
+		IDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: userIDs},
+	}, 0, int32(len(userIDs)))
 	if err != nil {
 		return nil, err
 	}
@@ -153,7 +158,9 @@ func GetNotifs(ctx context.Context, conds *mgrpb.Conds, offset, limit int32) ([]
 		userIDs = append(userIDs, val.UserID)
 		langIDs = append(langIDs, val.LangID)
 	}
-	appInfos, _, err := appmwcli.GetManyApps(ctx, appIDs)
+	appInfos, _, err := appmwcli.GetApps(ctx, &appmwpb.Conds{
+		IDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: appIDs},
+	}, 0, int32(len(appIDs)))
 	if err != nil {
 		return nil, 0, err
 	}
@@ -162,7 +169,9 @@ func GetNotifs(ctx context.Context, conds *mgrpb.Conds, offset, limit int32) ([]
 		appMap[val.ID] = val
 	}
 
-	userInfos, _, err := usermwcli.GetManyUsers(ctx, userIDs)
+	userInfos, _, err := usermwcli.GetUsers(ctx, &usermwpb.Conds{
+		IDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: userIDs},
+	}, 0, int32(len(userIDs)))
 	if err != nil {
 		return nil, 0, err
 	}

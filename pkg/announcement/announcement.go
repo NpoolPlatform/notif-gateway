@@ -12,6 +12,7 @@ import (
 	channelpb "github.com/NpoolPlatform/message/npool/notif/mgr/v1/channel"
 
 	npoolpb "github.com/NpoolPlatform/message/npool"
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 
 	npool "github.com/NpoolPlatform/message/npool/notif/gw/v1/announcement"
 	mgrpb "github.com/NpoolPlatform/message/npool/notif/mgr/v1/announcement"
@@ -20,8 +21,8 @@ import (
 	mwpb "github.com/NpoolPlatform/message/npool/notif/mw/v1/announcement"
 	mwcli "github.com/NpoolPlatform/notif-middleware/pkg/client/announcement"
 
-	appcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
-	apppb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/app"
+	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
+	appmwpb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/app"
 )
 
 func CreateAnnouncement(
@@ -138,11 +139,13 @@ func GetAppAnnouncements(
 		appIDs = append(appIDs, r.AppID)
 	}
 
-	appInfos, _, err := appcli.GetManyApps(ctx, appIDs)
+	appInfos, _, err := appmwcli.GetApps(ctx, &appmwpb.Conds{
+		IDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: appIDs},
+	}, 0, int32(len(appIDs)))
 	if err != nil {
 		return nil, 0, err
 	}
-	appMap := map[string]*apppb.App{}
+	appMap := map[string]*appmwpb.App{}
 	for _, val := range appInfos {
 		appMap[val.ID] = val
 	}
@@ -209,11 +212,13 @@ func GetAnnouncements(
 		appIDs = append(appIDs, r.AppID)
 	}
 
-	appInfos, _, err := appcli.GetManyApps(ctx, appIDs)
+	appInfos, _, err := appmwcli.GetApps(ctx, &appmwpb.Conds{
+		IDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: appIDs},
+	}, 0, int32(len(appIDs)))
 	if err != nil {
 		return nil, 0, err
 	}
-	appMap := map[string]*apppb.App{}
+	appMap := map[string]*appmwpb.App{}
 	for _, val := range appInfos {
 		appMap[val.ID] = val
 	}
@@ -263,7 +268,7 @@ func expand(
 	*npool.Announcement,
 	error,
 ) {
-	appInfo, err := appcli.GetApp(ctx, info.AppID)
+	appInfo, err := appmwcli.GetApp(ctx, info.AppID)
 	if err != nil {
 		return nil, err
 	}

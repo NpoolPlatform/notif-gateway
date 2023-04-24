@@ -16,7 +16,7 @@ import (
 	mgrpb "github.com/NpoolPlatform/message/npool/notif/mgr/v1/template/email"
 	mgrcli "github.com/NpoolPlatform/notif-manager/pkg/client/template/email"
 
-	appusermgrcli "github.com/NpoolPlatform/appuser-manager/pkg/client/app"
+	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
 
 	applangmwcli "github.com/NpoolPlatform/g11n-middleware/pkg/client/applang"
 	applangmgrpb "github.com/NpoolPlatform/message/npool/g11n/mgr/v1/applang"
@@ -32,7 +32,7 @@ func validate(ctx context.Context, in *email.CreateEmailTemplateRequest) error {
 		return status.Error(codes.InvalidArgument, "AppID is invalid")
 	}
 
-	exist, err := appusermgrcli.ExistApp(ctx, in.GetAppID())
+	exist, err := appmwcli.ExistApp(ctx, in.GetAppID())
 	if err != nil {
 		logger.Sugar().Errorw("validate", "err", err)
 		return status.Error(codes.Internal, err.Error())

@@ -7,8 +7,8 @@ import (
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	"github.com/NpoolPlatform/message/npool/notif/mgr/v1/channel"
 
-	appcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
-	apppb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/app"
+	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
+	appmwpb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/app"
 
 	mgrpb "github.com/NpoolPlatform/message/npool/notif/mgr/v1/notif/channel"
 	mgrcli "github.com/NpoolPlatform/notif-manager/pkg/client/notif/channel"
@@ -25,7 +25,7 @@ func DeleteChannel(ctx context.Context, id string) (*npool.Channel, error) {
 		return nil, err
 	}
 
-	appInfo, err := appcli.GetApp(ctx, info.AppID)
+	appInfo, err := appmwcli.GetApp(ctx, info.AppID)
 	if err != nil {
 		return nil, err
 	}
@@ -159,11 +159,13 @@ func extends(
 	for _, val := range rows {
 		appIDs = append(appIDs, val.AppID)
 	}
-	appInfos, _, err := appcli.GetManyApps(ctx, appIDs)
+	appInfos, _, err := appmwcli.GetApps(ctx, &appmwpb.Conds{
+		IDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: appIDs},
+	}, 0, int32(len(appIDs)))
 	if err != nil {
 		return nil, err
 	}
-	appMap := map[string]*apppb.App{}
+	appMap := map[string]*appmwpb.App{}
 	for _, val := range appInfos {
 		appMap[val.ID] = val
 	}

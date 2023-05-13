@@ -6,7 +6,7 @@ import (
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 
-	appusermgrcli "github.com/NpoolPlatform/appuser-manager/pkg/client/app"
+	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 
 	"github.com/google/uuid"
@@ -31,7 +31,7 @@ func validate(ctx context.Context, in *sms.CreateSMSTemplateRequest) error {
 		return status.Error(codes.InvalidArgument, "AppID is invalid")
 	}
 
-	exist, err := appusermgrcli.ExistApp(ctx, in.GetAppID())
+	exist, err := appmwcli.ExistApp(ctx, in.GetAppID())
 	if err != nil {
 		logger.Sugar().Errorw("validate", "err", err)
 		return status.Error(codes.Internal, err.Error())

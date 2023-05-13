@@ -4,8 +4,8 @@ package user
 import (
 	"context"
 
-	appcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
-	usercli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
+	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
+	usermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
 
 	mgrcli "github.com/NpoolPlatform/notif-manager/pkg/client/announcement/user"
 
@@ -17,10 +17,13 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
+	usermwpb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/user"
 	npool "github.com/NpoolPlatform/message/npool/notif/gw/v1/announcement/user"
 
 	"github.com/google/uuid"
 
+	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	user1 "github.com/NpoolPlatform/notif-gateway/pkg/announcement/user"
 
 	announcementmgrcli "github.com/NpoolPlatform/notif-manager/pkg/client/announcement"
@@ -96,7 +99,9 @@ func (s *Server) CreateAnnouncementUsers(
 		return &npool.CreateAnnouncementUsersResponse{}, status.Error(codes.InvalidArgument, "Announcement not exist")
 	}
 
-	userInfos, _, err := usercli.GetManyUsers(ctx, in.GetUserIDs())
+	userInfos, _, err := usermwcli.GetUsers(ctx, &usermwpb.Conds{
+		IDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: in.GetUserIDs()},
+	}, 0, int32(len(in.GetUserIDs())))
 	if err != nil {
 		logger.Sugar().Errorw("CreateAnnouncementUser", "AnnouncementID", in.GetAnnouncementID(), "error", err)
 		return &npool.CreateAnnouncementUsersResponse{}, status.Error(codes.InvalidArgument, err.Error())
@@ -106,7 +111,7 @@ func (s *Server) CreateAnnouncementUsers(
 		return &npool.CreateAnnouncementUsersResponse{}, status.Error(codes.InvalidArgument, "User not exist")
 	}
 
-	appInfo, err := appcli.GetApp(ctx, in.GetAppID())
+	appInfo, err := appmwcli.GetApp(ctx, in.GetAppID())
 	if err != nil {
 		return nil, err
 	}

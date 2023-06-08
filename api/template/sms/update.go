@@ -18,10 +18,11 @@ import (
 	mgrcli "github.com/NpoolPlatform/notif-manager/pkg/client/template/sms"
 
 	applangmwcli "github.com/NpoolPlatform/g11n-middleware/pkg/client/applang"
-	applangmgrpb "github.com/NpoolPlatform/message/npool/g11n/mgr/v1/applang"
+	applangmwpb "github.com/NpoolPlatform/message/npool/g11n/mw/v1/applang"
+
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
-	commonpb "github.com/NpoolPlatform/message/npool"
 )
 
 func (s *Server) UpdateSMSTemplate(
@@ -69,12 +70,12 @@ func (s *Server) UpdateSMSTemplate(
 		return &npool.UpdateSMSTemplateResponse{}, status.Error(codes.InvalidArgument, "Subject is empty")
 	}
 
-	appLang, err := applangmwcli.GetLangOnly(ctx, &applangmgrpb.Conds{
-		AppID: &commonpb.StringVal{
+	appLang, err := applangmwcli.GetLangOnly(ctx, &applangmwpb.Conds{
+		AppID: &basetypes.StringVal{
 			Op:    cruder.EQ,
 			Value: in.GetAppID(),
 		},
-		LangID: &commonpb.StringVal{
+		LangID: &basetypes.StringVal{
 			Op:    cruder.EQ,
 			Value: in.GetTargetLangID(),
 		},
@@ -141,12 +142,12 @@ func (s *Server) UpdateAppSMSTemplate(
 		return &npool.UpdateAppSMSTemplateResponse{}, status.Error(codes.InvalidArgument, "Subject is empty")
 	}
 
-	appLang, err := applangmwcli.GetLangOnly(ctx, &applangmgrpb.Conds{
-		AppID: &commonpb.StringVal{
+	appLang, err := applangmwcli.GetLangOnly(ctx, &applangmwpb.Conds{
+		AppID: &basetypes.StringVal{
 			Op:    cruder.EQ,
 			Value: in.GetTargetAppID(),
 		},
-		LangID: &commonpb.StringVal{
+		LangID: &basetypes.StringVal{
 			Op:    cruder.EQ,
 			Value: in.GetTargetLangID(),
 		},

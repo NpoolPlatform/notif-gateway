@@ -6,10 +6,11 @@ import (
 
 	appcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
-	npoolpb "github.com/NpoolPlatform/message/npool"
+
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 
 	g11ncli "github.com/NpoolPlatform/g11n-middleware/pkg/client/applang"
-	g11npb "github.com/NpoolPlatform/message/npool/g11n/mgr/v1/applang"
+	g11npb "github.com/NpoolPlatform/message/npool/g11n/mw/v1/applang"
 
 	mgrpb "github.com/NpoolPlatform/message/npool/notif/mgr/v1/announcement"
 
@@ -102,11 +103,11 @@ func (s *Server) CreateAnnouncement(ctx context.Context, in *npool.CreateAnnounc
 	}
 
 	appLang, err := g11ncli.GetLangOnly(ctx, &g11npb.Conds{
-		AppID: &npoolpb.StringVal{
+		AppID: &basetypes.StringVal{
 			Op:    cruder.EQ,
 			Value: in.GetAppID(),
 		},
-		LangID: &npoolpb.StringVal{
+		LangID: &basetypes.StringVal{
 			Op:    cruder.EQ,
 			Value: in.GetTargetLangID(),
 		},

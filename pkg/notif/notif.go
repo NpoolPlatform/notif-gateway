@@ -179,7 +179,7 @@ func GetNotifs(ctx context.Context, conds *mgrpb.Conds, offset, limit int32) ([]
 	}
 
 	langs, _, err := applangmwcli.GetLangs(ctx, &applangmwpb.Conds{
-		AppID:   &basetypes.StringVal{Op: cruder.EQ, Value: conds.AppID.Value},
+		AppID:   &basetypes.StringVal{Op: cruder.EQ, Value: conds.GetAppID().GetValue()},
 		LangIDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: langIDs},
 	}, 0, int32(len(langIDs)))
 	if err != nil {

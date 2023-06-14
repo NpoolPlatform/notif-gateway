@@ -16,6 +16,7 @@ type Handler struct {
 	ID      *string
 	AppID   *string
 	LangID  *string
+	UserID  *string
 	Title   *string
 	Content *string
 	Channel *basetypes.NotifChannel
@@ -42,6 +43,16 @@ func WithID(id *string) func(context.Context, *Handler) error {
 			return err
 		}
 		h.ID = id
+		return nil
+	}
+}
+func WithUserID(userID *string) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		_, err := uuid.Parse(*userID)
+		if err != nil {
+			return err
+		}
+		h.UserID = userID
 		return nil
 	}
 }

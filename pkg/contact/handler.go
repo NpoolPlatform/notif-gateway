@@ -11,8 +11,8 @@ import (
 )
 
 type Handler struct {
-	ID          *uuid.UUID
-	AppID       *uuid.UUID
+	ID          *string
+	AppID       *string
 	UsedFor     *basetypes.UsedFor
 	AccountType *basetypes.SignMethod
 	Account     *string
@@ -37,18 +37,18 @@ func NewHandler(ctx context.Context, options ...interface{}) (*Handler, error) {
 
 func WithID(id *string) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
-		_id, err := uuid.Parse(*id)
+		_, err := uuid.Parse(*id)
 		if err != nil {
 			return err
 		}
-		h.ID = &_id
+		h.ID = id
 		return nil
 	}
 }
 
 func WithAppID(appID *string) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
-		_appID, err := uuid.Parse(*appID)
+		_, err := uuid.Parse(*appID)
 		if err != nil {
 			return err
 		}
@@ -60,7 +60,7 @@ func WithAppID(appID *string) func(context.Context, *Handler) error {
 			return fmt.Errorf("invalid app")
 		}
 
-		h.AppID = &_appID
+		h.AppID = appID
 		return nil
 	}
 }

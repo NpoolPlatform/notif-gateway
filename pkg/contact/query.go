@@ -16,7 +16,7 @@ func (h *Handler) GetContacts(ctx context.Context) ([]*npool.Contact, uint32, er
 		&npool.Conds{
 			AppID: &basetypes.StringVal{
 				Op:    cruder.EQ,
-				Value: h.AppID.String(),
+				Value: *h.AppID,
 			},
 		},
 		h.Offset,
@@ -34,7 +34,7 @@ func (h *Handler) GetContact(ctx context.Context) (*npool.Contact, error) {
 		return nil, fmt.Errorf("invalid contact id")
 	}
 
-	info, err := cli.GetContact(ctx, h.ID.String())
+	info, err := cli.GetContact(ctx, *h.ID)
 	if err != nil {
 		return nil, err
 	}

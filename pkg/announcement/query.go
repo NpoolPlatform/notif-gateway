@@ -13,20 +13,25 @@ import (
 )
 
 func (h *Handler) GetAnnouncements(ctx context.Context) ([]*npool.Announcement, uint32, error) {
-	infos, total, err := mwcli.GetAnnouncementStates(ctx, &mwpb.Conds{
+	conds := &mwpb.Conds{
 		AppID: &basetypes.StringVal{
 			Op:    cruder.EQ,
 			Value: *h.AppID,
 		},
-		UserID: &basetypes.StringVal{
+	}
+	if h.UserID != nil {
+		conds.UserID = &basetypes.StringVal{
 			Op:    cruder.EQ,
 			Value: *h.UserID,
-		},
-		LangID: &basetypes.StringVal{
+		}
+	}
+	if h.LangID != nil {
+		conds.LangID = &basetypes.StringVal{
 			Op:    cruder.EQ,
 			Value: *h.LangID,
-		},
-	}, int32(h.Offset), int32(h.Limit))
+		}
+	}
+	infos, total, err := mwcli.GetAnnouncementStates(ctx, conds, int32(h.Offset), int32(h.Limit))
 	if err != nil {
 		return nil, 0, err
 	}

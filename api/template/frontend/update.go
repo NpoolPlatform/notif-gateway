@@ -19,10 +19,11 @@ import (
 	mgrcli "github.com/NpoolPlatform/notif-manager/pkg/client/template/frontend"
 
 	applangmwcli "github.com/NpoolPlatform/g11n-middleware/pkg/client/applang"
-	applangmgrpb "github.com/NpoolPlatform/message/npool/g11n/mgr/v1/applang"
+	applangmwpb "github.com/NpoolPlatform/message/npool/g11n/mw/v1/applang"
+
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
-	commonpb "github.com/NpoolPlatform/message/npool"
 )
 
 func (s *Server) UpdateFrontendTemplate(
@@ -80,12 +81,12 @@ func (s *Server) UpdateFrontendTemplate(
 		return &npool.UpdateFrontendTemplateResponse{}, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
-	appLang, err := applangmwcli.GetLangOnly(ctx, &applangmgrpb.Conds{
-		AppID: &commonpb.StringVal{
+	appLang, err := applangmwcli.GetLangOnly(ctx, &applangmwpb.Conds{
+		AppID: &basetypes.StringVal{
 			Op:    cruder.EQ,
 			Value: in.GetAppID(),
 		},
-		LangID: &commonpb.StringVal{
+		LangID: &basetypes.StringVal{
 			Op:    cruder.EQ,
 			Value: in.GetTargetLangID(),
 		},
@@ -150,12 +151,12 @@ func (s *Server) UpdateAppFrontendTemplate(
 		return &npool.UpdateAppFrontendTemplateResponse{}, status.Error(codes.InvalidArgument, "LangID is invalid")
 	}
 
-	appLang, err := applangmwcli.GetLangOnly(ctx, &applangmgrpb.Conds{
-		AppID: &commonpb.StringVal{
+	appLang, err := applangmwcli.GetLangOnly(ctx, &applangmwpb.Conds{
+		AppID: &basetypes.StringVal{
 			Op:    cruder.EQ,
 			Value: in.GetTargetAppID(),
 		},
-		LangID: &commonpb.StringVal{
+		LangID: &basetypes.StringVal{
 			Op:    cruder.EQ,
 			Value: in.GetTargetLangID(),
 		},

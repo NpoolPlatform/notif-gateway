@@ -19,10 +19,10 @@ import (
 	mgrcli "github.com/NpoolPlatform/notif-manager/pkg/client/template/email"
 
 	applangmwcli "github.com/NpoolPlatform/g11n-middleware/pkg/client/applang"
-	applangmgrpb "github.com/NpoolPlatform/message/npool/g11n/mgr/v1/applang"
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
+	applangmwpb "github.com/NpoolPlatform/message/npool/g11n/mw/v1/applang"
 
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
-	commonpb "github.com/NpoolPlatform/message/npool"
 )
 
 func (s *Server) UpdateEmailTemplate(
@@ -70,12 +70,12 @@ func (s *Server) UpdateEmailTemplate(
 		return &npool.UpdateEmailTemplateResponse{}, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
-	appLang, err := applangmwcli.GetLangOnly(ctx, &applangmgrpb.Conds{
-		AppID: &commonpb.StringVal{
+	appLang, err := applangmwcli.GetLangOnly(ctx, &applangmwpb.Conds{
+		AppID: &basetypes.StringVal{
 			Op:    cruder.EQ,
 			Value: in.GetAppID(),
 		},
-		LangID: &commonpb.StringVal{
+		LangID: &basetypes.StringVal{
 			Op:    cruder.EQ,
 			Value: in.GetTargetLangID(),
 		},
@@ -148,12 +148,12 @@ func (s *Server) UpdateAppEmailTemplate(
 		return &npool.UpdateAppEmailTemplateResponse{}, status.Error(codes.InvalidArgument, "Subject is empty")
 	}
 
-	appLang, err := applangmwcli.GetLangOnly(ctx, &applangmgrpb.Conds{
-		AppID: &commonpb.StringVal{
+	appLang, err := applangmwcli.GetLangOnly(ctx, &applangmwpb.Conds{
+		AppID: &basetypes.StringVal{
 			Op:    cruder.EQ,
 			Value: in.GetTargetAppID(),
 		},
-		LangID: &commonpb.StringVal{
+		LangID: &basetypes.StringVal{
 			Op:    cruder.EQ,
 			Value: in.GetTargetLangID(),
 		},

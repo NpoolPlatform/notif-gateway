@@ -19,7 +19,7 @@ import (
 	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
 
 	applangmwcli "github.com/NpoolPlatform/g11n-middleware/pkg/client/applang"
-	applangmgrpb "github.com/NpoolPlatform/message/npool/g11n/mgr/v1/applang"
+	applangmwpb "github.com/NpoolPlatform/message/npool/g11n/mw/v1/applang"
 
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	commonpb "github.com/NpoolPlatform/message/npool"
@@ -48,12 +48,12 @@ func validate(ctx context.Context, in *email.CreateEmailTemplateRequest) error {
 		return status.Error(codes.InvalidArgument, "TargetLangID is invalid")
 	}
 
-	appLang, err := applangmwcli.GetLangOnly(ctx, &applangmgrpb.Conds{
-		AppID: &commonpb.StringVal{
+	appLang, err := applangmwcli.GetLangOnly(ctx, &applangmwpb.Conds{
+		AppID: &basetypes.StringVal{
 			Op:    cruder.EQ,
 			Value: in.GetAppID(),
 		},
-		LangID: &commonpb.StringVal{
+		LangID: &basetypes.StringVal{
 			Op:    cruder.EQ,
 			Value: in.GetTargetLangID(),
 		},

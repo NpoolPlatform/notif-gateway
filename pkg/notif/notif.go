@@ -10,7 +10,6 @@ import (
 
 	appmwpb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/app"
 	usermwpb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/user"
-	applangmgrpb "github.com/NpoolPlatform/message/npool/g11n/mgr/v1/applang"
 	applangmwpb "github.com/NpoolPlatform/message/npool/g11n/mw/v1/applang"
 
 	mgrpb "github.com/NpoolPlatform/message/npool/notif/mgr/v1/notif"
@@ -21,7 +20,6 @@ import (
 	npool "github.com/NpoolPlatform/message/npool/notif/gw/v1/notif"
 
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
-	commonpb "github.com/NpoolPlatform/message/npool"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 )
 
@@ -180,9 +178,9 @@ func GetNotifs(ctx context.Context, conds *mgrpb.Conds, offset, limit int32) ([]
 		userMap[val.ID] = val
 	}
 
-	langs, _, err := applangmwcli.GetLangs(ctx, &applangmgrpb.Conds{
-		AppID:   conds.AppID,
-		LangIDs: &commonpb.StringSliceVal{Op: cruder.IN, Value: langIDs},
+	langs, _, err := applangmwcli.GetLangs(ctx, &applangmwpb.Conds{
+		AppID:   &basetypes.StringVal{Op: cruder.EQ, Value: conds.GetAppID().GetValue()},
+		LangIDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: langIDs},
 	}, 0, int32(len(langIDs)))
 	if err != nil {
 		return nil, 0, err

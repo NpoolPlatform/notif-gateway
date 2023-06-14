@@ -31,7 +31,8 @@ func (h *Handler) GetAnnouncements(ctx context.Context) ([]*npool.Announcement, 
 			Value: *h.LangID,
 		}
 	}
-	infos, total, err := mwcli.GetAnnouncementStates(ctx, conds, int32(h.Offset), int32(h.Limit))
+
+	infos, total, err := mwcli.GetAnnouncementStates(ctx, conds, h.Offset, h.Limit)
 	if err != nil {
 		return nil, 0, err
 	}

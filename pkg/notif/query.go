@@ -29,14 +29,14 @@ func (h *Handler) GetNotif(ctx context.Context) (*npool.Notif, error) {
 		return nil, err
 	}
 	if app == nil {
-		return nil, fmt.Errorf("app %s not found", h.AppID)
+		return nil, fmt.Errorf("app %s not found", *h.AppID)
 	}
 	user, err := usermwcli.GetUser(ctx, *h.AppID, *h.UserID)
 	if err != nil {
 		return nil, err
 	}
 	if user == nil {
-		return nil, fmt.Errorf("user %s not found", h.UserID)
+		return nil, fmt.Errorf("user %s not found", *h.UserID)
 	}
 	return &npool.Notif{
 		ID:           info.ID,

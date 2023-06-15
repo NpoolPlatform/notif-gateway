@@ -4,7 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	npool "github.com/NpoolPlatform/message/npool/notif/mw/v1/announcement/user"
+	npool "github.com/NpoolPlatform/message/npool/notif/gw/v1/announcement/user"
+	mwpb "github.com/NpoolPlatform/message/npool/notif/mw/v1/announcement/user"
 	cli "github.com/NpoolPlatform/notif-middleware/pkg/client/announcement/user"
 )
 
@@ -36,7 +37,7 @@ func (h *Handler) CreateAnnouncementUser(ctx context.Context) (*npool.Announceme
 
 	info, err := cli.CreateAnnouncementUser(
 		ctx,
-		&npool.AnnouncementUserReq{
+		&mwpb.AnnouncementUserReq{
 			AppID:          h.AppID,
 			UserID:         h.UserID,
 			AnnouncementID: h.AnnouncementID,

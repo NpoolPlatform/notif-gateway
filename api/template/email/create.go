@@ -3,19 +3,12 @@ package email
 import (
 	"context"
 
-	tracer "github.com/NpoolPlatform/notif-manager/pkg/tracer/template/email"
-
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	npool "github.com/NpoolPlatform/message/npool/notif/gw/v1/template/email"
-	constant "github.com/NpoolPlatform/notif-gateway/pkg/message/const"
-	commontracer "github.com/NpoolPlatform/notif-gateway/pkg/tracer"
-	"go.opentelemetry.io/otel"
-	scodes "go.opentelemetry.io/otel/codes"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	mgrpb "github.com/NpoolPlatform/message/npool/notif/mgr/v1/template/email"
-	mgrcli "github.com/NpoolPlatform/notif-manager/pkg/client/template/email"
+	emailtemplate1 "github.com/NpoolPlatform/notif-gateway/pkg/template/email"
 )
 
 func (s *Server) CreateEmailTemplate(
@@ -25,53 +18,35 @@ func (s *Server) CreateEmailTemplate(
 	*npool.CreateEmailTemplateResponse,
 	error,
 ) {
-	var err error
-
-	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "CreateContact")
-	defer span.End()
-
-	defer func() {
-		if err != nil {
-			span.SetStatus(scodes.Error, err.Error())
-			span.RecordError(err)
-		}
-	}()
-
-	templateInfo := &mgrpb.EmailTemplateReq{
-		AppID:             &in.AppID,
-		LangID:            &in.TargetLangID,
-		UsedFor:           &in.UsedFor,
-		Sender:            &in.Sender,
-		ReplyTos:          in.ReplyTos,
-		CCTos:             in.CCTos,
-		Subject:           &in.Subject,
-		Body:              &in.Body,
-		DefaultToUsername: &in.DefaultToUsername,
+	handler, err := emailtemplate1.NewHandler(
+		ctx,
+		emailtemplate1.WithAppID(&in.AppID),
+		emailtemplate1.WithLangID(&in.TargetLangID),
+		emailtemplate1.WithUsedFor(&in.UsedFor),
+		emailtemplate1.WithSubject(&in.Subject),
+		emailtemplate1.WithDefaultToUsername(&in.DefaultToUsername),
+		emailtemplate1.WithUsedFor(&in.UsedFor),
+		emailtemplate1.WithSender(&in.Sender),
+		emailtemplate1.WithReplyTos(in.ReplyTos),
+		emailtemplate1.WithCCTos(in.CCTos),
+		emailtemplate1.WithBody(&in.Body),
+	)
+	if err != nil {
+		logger.Sugar().Errorw(
+			"CreateEmailTemplate",
+			"In", in,
+			"Error", err,
+		)
+		return &npool.CreateEmailTemplateResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	tracer.Trace(span, templateInfo)
-
-	err = validate(ctx, &npool.CreateEmailTemplateRequest{
-		AppID:             in.AppID,
-		TargetLangID:      in.TargetLangID,
-		UsedFor:           in.UsedFor,
-		Sender:            in.Sender,
-		ReplyTos:          in.ReplyTos,
-		CCTos:             in.CCTos,
-		Subject:           in.Subject,
-		Body:              in.Body,
-		DefaultToUsername: in.DefaultToUsername,
-	})
+	info, err := handler.CreateEmailTemplate(ctx)
 	if err != nil {
-		return nil, err
-	}
-
-	span = commontracer.TraceInvoker(span, "contact", "manager", "CreateEmailTemplate")
-
-	info, err := mgrcli.CreateEmailTemplate(ctx, templateInfo)
-
-	if err != nil {
-		logger.Sugar().Errorw("validate", "err", err)
+		logger.Sugar().Errorw(
+			"CreateEmailTemplate",
+			"In", in,
+			"Error", err,
+		)
 		return &npool.CreateEmailTemplateResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
@@ -87,53 +62,35 @@ func (s *Server) CreateAppEmailTemplate(
 	*npool.CreateAppEmailTemplateResponse,
 	error,
 ) {
-	var err error
-
-	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "CreateContact")
-	defer span.End()
-
-	defer func() {
-		if err != nil {
-			span.SetStatus(scodes.Error, err.Error())
-			span.RecordError(err)
-		}
-	}()
-
-	templateInfo := &mgrpb.EmailTemplateReq{
-		AppID:             &in.TargetAppID,
-		LangID:            &in.TargetLangID,
-		UsedFor:           &in.UsedFor,
-		Sender:            &in.Sender,
-		ReplyTos:          in.ReplyTos,
-		CCTos:             in.CCTos,
-		Subject:           &in.Subject,
-		Body:              &in.Body,
-		DefaultToUsername: &in.DefaultToUsername,
+	handler, err := emailtemplate1.NewHandler(
+		ctx,
+		emailtemplate1.WithAppID(&in.TargetAppID),
+		emailtemplate1.WithLangID(&in.TargetLangID),
+		emailtemplate1.WithUsedFor(&in.UsedFor),
+		emailtemplate1.WithSubject(&in.Subject),
+		emailtemplate1.WithDefaultToUsername(&in.DefaultToUsername),
+		emailtemplate1.WithUsedFor(&in.UsedFor),
+		emailtemplate1.WithSender(&in.Sender),
+		emailtemplate1.WithReplyTos(in.ReplyTos),
+		emailtemplate1.WithCCTos(in.CCTos),
+		emailtemplate1.WithBody(&in.Body),
+	)
+	if err != nil {
+		logger.Sugar().Errorw(
+			"CreateAppEmailTemplate",
+			"In", in,
+			"Error", err,
+		)
+		return &npool.CreateAppEmailTemplateResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	tracer.Trace(span, templateInfo)
-
-	span = commontracer.TraceInvoker(span, "contact", "manager", "CreateEmailTemplate")
-
-	err = validate(ctx, &npool.CreateEmailTemplateRequest{
-		AppID:             in.TargetAppID,
-		TargetLangID:      in.TargetLangID,
-		UsedFor:           in.UsedFor,
-		Sender:            in.Sender,
-		ReplyTos:          in.ReplyTos,
-		CCTos:             in.CCTos,
-		Subject:           in.Subject,
-		Body:              in.Body,
-		DefaultToUsername: in.DefaultToUsername,
-	})
+	info, err := handler.CreateEmailTemplate(ctx)
 	if err != nil {
-		return nil, err
-	}
-
-	info, err := mgrcli.CreateEmailTemplate(ctx, templateInfo)
-
-	if err != nil {
-		logger.Sugar().Errorw("validate", "err", err)
+		logger.Sugar().Errorw(
+			"CreateAppEmailTemplate",
+			"In", in,
+			"Error", err,
+		)
 		return &npool.CreateAppEmailTemplateResponse{}, status.Error(codes.Internal, err.Error())
 	}
 

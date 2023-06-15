@@ -35,6 +35,7 @@ func (h *Handler) CreateAnnouncementUser(ctx context.Context) (*npool.Announceme
 		return nil, err
 	}
 
+	// TODO: judge whether exist
 	info, err := cli.CreateAnnouncementUser(
 		ctx,
 		&mwpb.AnnouncementUserReq{

@@ -38,6 +38,6 @@ func (s *Server) CreateChannels(ctx context.Context, in *npool.CreateChannelsReq
 	}
 
 	return &npool.CreateChannelsResponse{
-		Info: info,
+		Infos: info,
 	}, nil
 }

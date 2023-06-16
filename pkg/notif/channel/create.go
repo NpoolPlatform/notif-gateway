@@ -34,13 +34,11 @@ func (h *Handler) CreateChannel(ctx context.Context) (*npool.Channel, error) {
 		return nil, fmt.Errorf("channel exist")
 	}
 
-	info, err := cli.CreateChannel(
-		ctx,
-		&npool.ChannelReq{
-			AppID:     h.AppID,
-			EventType: h.EventType,
-			Channel:   h.Channel,
-		},
+	info, err := cli.CreateChannel(ctx, &npool.ChannelReq{
+		AppID:     h.AppID,
+		EventType: h.EventType,
+		Channel:   h.Channel,
+	},
 	)
 	if err != nil {
 		return nil, err
@@ -48,4 +46,21 @@ func (h *Handler) CreateChannel(ctx context.Context) (*npool.Channel, error) {
 
 	h.ID = &info.ID
 	return h.GetChannel(ctx)
+}
+
+func (h *Handler) CreateChannels(ctx context.Context) (infos []*npool.Channel, err error) {
+	reqs := []*npool.ChannelReq{}
+	for _, _type := range h.EventTypes {
+		reqs = append(reqs, &npool.ChannelReq{
+			AppID:     h.AppID,
+			EventType: &_type,
+			Channel:   h.Channel,
+		})
+	}
+	infos, err = cli.CreateChannels(ctx, reqs)
+	if err != nil {
+		return nil, err
+	}
+
+	return infos, nil
 }

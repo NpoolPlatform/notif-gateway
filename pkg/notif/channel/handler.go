@@ -11,12 +11,13 @@ import (
 )
 
 type Handler struct {
-	ID        *string
-	AppID     *string
-	Channel   *basetypes.NotifChannel
-	EventType *basetypes.UsedFor
-	Offset    int32
-	Limit     int32
+	ID         *string
+	AppID      *string
+	Channel    *basetypes.NotifChannel
+	EventType  *basetypes.UsedFor
+	EventTypes []basetypes.UsedFor
+	Offset     int32
+	Limit      int32
 }
 
 func NewHandler(ctx context.Context, options ...func(context.Context, *Handler) error) (*Handler, error) {
@@ -90,6 +91,29 @@ func WithEventType(_type *basetypes.UsedFor) func(context.Context, *Handler) err
 		}
 
 		h.EventType = _type
+		return nil
+	}
+}
+
+func WithEventTypes(_types []basetypes.UsedFor) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if _types == nil {
+			return nil
+		}
+		for _, _type := range _types {
+			switch _type {
+			case basetypes.UsedFor_WithdrawalRequest:
+			case basetypes.UsedFor_WithdrawalCompleted:
+			case basetypes.UsedFor_DepositReceived:
+			case basetypes.UsedFor_KYCApproved:
+			case basetypes.UsedFor_KYCRejected:
+			case basetypes.UsedFor_Announcement:
+			default:
+				return fmt.Errorf("EventType is invalid")
+			}
+		}
+
+		h.EventTypes = _types
 		return nil
 	}
 }

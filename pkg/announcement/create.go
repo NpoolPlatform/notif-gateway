@@ -4,7 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	npool "github.com/NpoolPlatform/message/npool/notif/mw/v1/announcement"
+	npool "github.com/NpoolPlatform/message/npool/notif/gw/v1/announcement"
+	mwpb "github.com/NpoolPlatform/message/npool/notif/mw/v1/announcement"
 	cli "github.com/NpoolPlatform/notif-middleware/pkg/client/announcement"
 )
 
@@ -22,7 +23,7 @@ func (h *createHandler) validate() error {
 	if h.Type == nil {
 		return fmt.Errorf("type is empty")
 	}
-	if &h.EndAt == nil {
+	if h.EndAt == nil {
 		return fmt.Errorf("endat is empty")
 	}
 	return nil
@@ -39,14 +40,14 @@ func (h *Handler) CreateAnnouncement(ctx context.Context) (*npool.Announcement, 
 
 	info, err := cli.CreateAnnouncement(
 		ctx,
-		&npool.AnnouncementReq{
+		&mwpb.AnnouncementReq{
 			AppID:            h.AppID,
 			Title:            h.Title,
 			Content:          h.Content,
 			LangID:           h.LangID,
 			Channel:          h.Channel,
 			AnnouncementType: h.Type,
-			EndAt:            &h.EndAt,
+			EndAt:            h.EndAt,
 		},
 	)
 	if err != nil {

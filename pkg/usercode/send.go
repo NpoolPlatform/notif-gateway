@@ -14,21 +14,14 @@ import (
 	tmplmwpb "github.com/NpoolPlatform/message/npool/notif/mw/v1/template"
 	tmplmwcli "github.com/NpoolPlatform/notif-middleware/pkg/client/template"
 
-	chanmgrpb "github.com/NpoolPlatform/message/npool/notif/mgr/v1/channel"
-
 	usercodemwcli "github.com/NpoolPlatform/basal-middleware/pkg/client/usercode"
 	usercodemwpb "github.com/NpoolPlatform/message/npool/basal/mw/v1/usercode"
 )
 
-func SendCode( //nolint
+func (h *Handler) SendCode( //nolint
 	ctx context.Context,
-	appID, langID string,
-	userID, account *string,
-	accountType basetypes.SignMethod,
-	usedFor basetypes.UsedFor,
-	toUsername *string,
 ) error {
-	switch usedFor {
+	switch *h.UsedFor {
 	case basetypes.UsedFor_SetWithdrawAddress:
 		fallthrough //nolint
 	case basetypes.UsedFor_Withdraw:
@@ -40,57 +33,57 @@ func SendCode( //nolint
 	case basetypes.UsedFor_SetTransferTargetUser:
 		fallthrough //nolint
 	case basetypes.UsedFor_Transfer:
-		if userID != nil && *userID != "" {
-			user, err := usermwcli.GetUser(ctx, appID, *userID)
+		if h.UserID != nil && *h.UserID != "" {
+			user, err := usermwcli.GetUser(ctx, *h.AppID, *h.UserID)
 			if err != nil {
 				return err
 			}
 			if user == nil {
 				return fmt.Errorf("invalid user")
 			}
-			switch accountType {
+			switch *h.AccountType {
 			case basetypes.SignMethod_Mobile:
-				account = &user.PhoneNO
+				h.Account = &user.PhoneNO
 			case basetypes.SignMethod_Email:
-				account = &user.EmailAddress
+				h.Account = &user.EmailAddress
 			}
-			if toUsername == nil || *toUsername == "" {
-				toUsername = &user.Username
+			if h.ToUsername == nil || *h.ToUsername == "" {
+				h.ToUsername = &user.Username
 			}
 		}
 	}
 
-	if account == nil || *account == "" {
+	if h.Account == nil || *h.Account == "" {
 		return fmt.Errorf("invalid account")
 	}
 
-	channel := chanmgrpb.NotifChannel_ChannelEmail
-	switch accountType {
+	channel := basetypes.NotifChannel_ChannelEmail
+	switch *h.AccountType {
 	case basetypes.SignMethod_Email:
 	case basetypes.SignMethod_Mobile:
-		channel = chanmgrpb.NotifChannel_ChannelSMS
+		channel = basetypes.NotifChannel_ChannelSMS
 	default:
 		return fmt.Errorf("invalid account type")
 	}
 
 	code, err := usercodemwcli.CreateUserCode(ctx, &usercodemwpb.CreateUserCodeRequest{
 		Prefix:      basetypes.Prefix_PrefixUserCode.String(),
-		AppID:       appID,
-		Account:     *account,
-		AccountType: accountType,
-		UsedFor:     usedFor,
+		AppID:       *h.AppID,
+		Account:     *h.Account,
+		AccountType: *h.AccountType,
+		UsedFor:     *h.UsedFor,
 	})
 	if err != nil {
 		return err
 	}
 
 	info, err := tmplmwcli.GenerateText(ctx, &tmplmwpb.GenerateTextRequest{
-		AppID:     appID,
-		LangID:    langID,
+		AppID:     *h.AppID,
+		LangID:    *h.LangID,
 		Channel:   channel,
-		EventType: usedFor,
+		EventType: *h.UsedFor,
 		Vars: &tmplmwpb.TemplateVars{
-			Username: toUsername,
+			Username: h.ToUsername,
 			Code:     &code.Code,
 		},
 	})
@@ -105,10 +98,10 @@ func SendCode( //nolint
 		Subject:     info.Subject,
 		Content:     info.Content,
 		From:        info.From,
-		To:          *account,
+		To:          *h.Account,
 		ToCCs:       info.ToCCs,
 		ReplyTos:    info.ReplyTos,
-		AccountType: accountType,
+		AccountType: *h.AccountType,
 	})
 	if err != nil {
 		return err

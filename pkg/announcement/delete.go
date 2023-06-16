@@ -3,7 +3,7 @@ package announcement
 import (
 	"context"
 
-	npool "github.com/NpoolPlatform/message/npool/notif/mw/v1/announcement"
+	npool "github.com/NpoolPlatform/message/npool/notif/gw/v1/announcement"
 	cli "github.com/NpoolPlatform/notif-middleware/pkg/client/announcement"
 )
 

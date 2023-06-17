@@ -16,7 +16,7 @@ func (s *Server) GetReadState(ctx context.Context, in *npool.GetReadStateRequest
 		ctx,
 		notifreadstate1.WithAppID(&in.AppID),
 		notifreadstate1.WithUserID(&in.AppID, &in.UserID),
-		notifreadstate1.WithNotifID(&in.AppID, &in.NotifID),
+		notifreadstate1.WithNotifID(&in.NotifID),
 		notifreadstate1.WithOffset(0),
 		notifreadstate1.WithLimit(1),
 	)
@@ -77,7 +77,13 @@ func (s *Server) GetReadStates(ctx context.Context, in *npool.GetReadStatesReque
 	}, nil
 }
 
-func (s *Server) GetAppUserReadStates(ctx context.Context, in *npool.GetAppUserReadStatesRequest) (*npool.GetAppUserReadStatesResponse, error) {
+func (s *Server) GetAppUserReadStates(
+	ctx context.Context,
+	in *npool.GetAppUserReadStatesRequest,
+) (
+	*npool.GetAppUserReadStatesResponse,
+	error,
+) {
 	resp, err := s.GetReadStates(ctx, &npool.GetReadStatesRequest{
 		AppID:  in.TargetAppID,
 		UserID: in.TargetUserID,

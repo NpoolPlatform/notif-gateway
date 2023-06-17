@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
+	appusercli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
 	constant "github.com/NpoolPlatform/notif-gateway/pkg/const"
 
 	"github.com/google/uuid"
@@ -63,15 +64,22 @@ func WithAppID(id *string) func(context.Context, *Handler) error {
 	}
 }
 
-func WithUserID(id *string) func(context.Context, *Handler) error {
+func WithUserID(appID, userID *string) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
-		if id == nil {
-			return nil
-		}
-		if _, err := uuid.Parse(*id); err != nil {
+		_, err := uuid.Parse(*userID)
+		if err != nil {
 			return err
 		}
-		h.UserID = id
+
+		exist, err := appusercli.ExistUser(ctx, *appID, *userID)
+		if err != nil {
+			return err
+		}
+		if !exist {
+			return fmt.Errorf("invalid user")
+		}
+
+		h.UserID = userID
 		return nil
 	}
 }

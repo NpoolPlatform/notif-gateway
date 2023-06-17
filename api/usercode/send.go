@@ -16,7 +16,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (s *Server) SendCode(ctx context.Context, in *npool.SendCodeRequest) (*npool.SendCodeResponse, error) { //nolint
+func (s *Server) SendCode(ctx context.Context, in *npool.SendCodeRequest) (*npool.SendCodeResponse, error) {
 	handler, err := usercode1.NewHandler(
 		ctx,
 		usercode1.WithAppID(&in.AppID),
@@ -27,6 +27,14 @@ func (s *Server) SendCode(ctx context.Context, in *npool.SendCodeRequest) (*npoo
 		usercode1.WithUsedFor(&in.UsedFor),
 		usercode1.WithToUsername(in.ToUsername),
 	)
+	if err != nil {
+		logger.Sugar().Errorw(
+			"SendCode",
+			"In", in,
+			"Error", err,
+		)
+		return &npool.SendCodeResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
 
 	switch in.GetUsedFor() {
 	case basetypes.UsedFor_Update:

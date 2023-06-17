@@ -151,5 +151,4 @@ func (h *Handler) GetNotifs(ctx context.Context) ([]*npool.Notif, uint32, error)
 		})
 	}
 	return infos, total, nil
-
 }

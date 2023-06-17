@@ -16,7 +16,7 @@ func (s *Server) CreateNotifUser(ctx context.Context, in *npool.CreateNotifUserR
 		ctx,
 		notifuser1.WithAppID(&in.AppID),
 		notifuser1.WithUserID(&in.AppID, &in.UserID),
-		notifuser1.WithNotifID(&in.AppID, &in.NotifID),
+		notifuser1.WithNotifID(&in.NotifID),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

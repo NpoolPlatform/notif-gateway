@@ -59,6 +59,18 @@ func (h *Handler) GetNotif(ctx context.Context) (*npool.Notif, error) {
 
 func (h *Handler) GetNotifs(ctx context.Context) ([]*npool.Notif, uint32, error) {
 	conds := &notifmwpb.Conds{}
+	if h.AppID != nil {
+		conds.AppID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID}
+	}
+	if h.UserID != nil {
+		conds.UserID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.UserID}
+	}
+	if h.LangID != nil {
+		conds.LangID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.LangID}
+	}
+	if h.Channel != nil {
+		conds.Channel = &basetypes.Uint32Val{Op: cruder.EQ, Value: uint32(*h.Channel)}
+	}
 	if len(h.IDs) > 0 {
 		conds.IDs = &basetypes.StringSliceVal{Op: cruder.IN, Value: h.IDs}
 	}

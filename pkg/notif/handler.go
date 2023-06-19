@@ -5,20 +5,32 @@ import (
 	"fmt"
 
 	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
+	npool "github.com/NpoolPlatform/message/npool/notif/mw/v1/notif"
+	templatemwpb "github.com/NpoolPlatform/message/npool/notif/mw/v1/template"
 	constant "github.com/NpoolPlatform/notif-gateway/pkg/const"
 
 	"github.com/google/uuid"
 )
 
 type Handler struct {
-	ID       *string
-	AppID    *string
-	UserID   *string
-	LangID   *string
-	Notified *bool
-	IDs      []string
-	Offset   int32
-	Limit    int32
+	ID          *string
+	AppID       *string
+	UserID      *string
+	LangID      *string
+	EventID     *string
+	Notified    *bool
+	EventType   *basetypes.UsedFor
+	UseTemplate *bool
+	Title       *string
+	Content     *string
+	Channel     *basetypes.NotifChannel
+	Extra       *string
+	NotifType   *npool.NotifType
+	Vars        *templatemwpb.TemplateVars
+	IDs         []string
+	Offset      int32
+	Limit       int32
 }
 
 func NewHandler(ctx context.Context, options ...func(context.Context, *Handler) error) (*Handler, error) {
@@ -90,9 +102,134 @@ func WithLangID(id *string) func(context.Context, *Handler) error {
 	}
 }
 
+func WithEventID(eventid *string) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if eventid == nil {
+			return nil
+		}
+		_, err := uuid.Parse(*eventid)
+		if err != nil {
+			return err
+		}
+		h.EventID = eventid
+		return nil
+	}
+}
+
 func WithNotified(notified *bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		h.Notified = notified
+		return nil
+	}
+}
+
+func WithUseTemplate(usetemplate *bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		h.UseTemplate = usetemplate
+		return nil
+	}
+}
+
+func WithTitle(title *string) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if title == nil {
+			return nil
+		}
+		if *title == "" {
+			return fmt.Errorf("invalid title")
+		}
+		h.Title = title
+		return nil
+	}
+}
+
+func WithContent(content *string) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if content == nil {
+			return nil
+		}
+		if *content == "" {
+			return fmt.Errorf("invalid content")
+		}
+		h.Content = content
+		return nil
+	}
+}
+
+func WithChannel(_channel *basetypes.NotifChannel) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if _channel == nil {
+			return nil
+		}
+		switch *_channel {
+		case basetypes.NotifChannel_ChannelFrontend:
+		case basetypes.NotifChannel_ChannelEmail:
+		case basetypes.NotifChannel_ChannelSMS:
+		default:
+			return fmt.Errorf("invalid channel")
+		}
+		h.Channel = _channel
+		return nil
+	}
+}
+
+func WithExtra(extra *string) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if extra == nil {
+			return nil
+		}
+		if *extra == "" {
+			return fmt.Errorf("invalid extra")
+		}
+		h.Extra = extra
+		return nil
+	}
+}
+
+func WithEventType(eventtype *basetypes.UsedFor) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if eventtype == nil {
+			return nil
+		}
+		switch *eventtype {
+		case basetypes.UsedFor_WithdrawalRequest:
+		case basetypes.UsedFor_WithdrawalCompleted:
+		case basetypes.UsedFor_DepositReceived:
+		case basetypes.UsedFor_KYCApproved:
+		case basetypes.UsedFor_KYCRejected:
+		case basetypes.UsedFor_Announcement:
+		default:
+			return fmt.Errorf("invalid eventtype")
+		}
+		h.EventType = eventtype
+		return nil
+	}
+}
+
+func WithNotifType(_type *npool.NotifType) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if _type == nil {
+			return nil
+		}
+		switch *_type {
+		case npool.NotifType_DefaultType:
+		case npool.NotifType_Broadcast:
+		case npool.NotifType_Multicast:
+		case npool.NotifType_Unicast:
+			if h.UserID == nil {
+				return fmt.Errorf("invalid userid")
+			}
+		default:
+			return fmt.Errorf("invalid type")
+		}
+		h.NotifType = _type
+		return nil
+	}
+}
+
+func WithVars(vars *templatemwpb.TemplateVars) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		h.Vars = vars
 		return nil
 	}
 }

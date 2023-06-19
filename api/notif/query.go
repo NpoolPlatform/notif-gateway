@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	npool "github.com/NpoolPlatform/message/npool/notif/gw/v1/notif"
 	notif1 "github.com/NpoolPlatform/notif-gateway/pkg/notif"
 
@@ -41,11 +42,13 @@ func (s *Server) GetNotif(ctx context.Context, in *npool.GetNotifRequest) (*npoo
 }
 
 func (s *Server) GetNotifs(ctx context.Context, in *npool.GetNotifsRequest) (*npool.GetNotifsResponse, error) {
+	channel := basetypes.NotifChannel_ChannelFrontend
 	hangler, err := notif1.NewHandler(
 		ctx,
 		notif1.WithAppID(&in.AppID),
 		notif1.WithUserID(&in.UserID),
 		notif1.WithLangID(&in.LangID),
+		notif1.WithChannel(&channel),
 		notif1.WithOffset(in.GetOffset()),
 		notif1.WithLimit(in.GetLimit()),
 	)

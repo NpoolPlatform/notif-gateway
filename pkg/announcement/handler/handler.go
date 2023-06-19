@@ -86,6 +86,9 @@ func WithUserID(appID, userID *string) func(context.Context, *Handler) error {
 
 func WithAnnouncementID(appID, amtID *string) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
+		if amtID == nil {
+			return fmt.Errorf("invalid announcement id")
+		}
 		_, err := uuid.Parse(*amtID)
 		if err != nil {
 			return err

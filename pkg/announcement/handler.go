@@ -6,7 +6,10 @@ import (
 	"time"
 
 	appcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
+	g11ncli "github.com/NpoolPlatform/g11n-middleware/pkg/client/applang"
+	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
+	"github.com/NpoolPlatform/message/npool/g11n/mw/v1/applang"
 	npool "github.com/NpoolPlatform/message/npool/notif/mw/v1/announcement"
 	constant "github.com/NpoolPlatform/notif-middleware/pkg/const"
 	"github.com/google/uuid"
@@ -91,15 +94,24 @@ func WithLangID(appID, langID *string) func(context.Context, *Handler) error {
 		if err != nil {
 			return err
 		}
-		// wait g11n-middleware merger to master
-		// TODO: judge lang id
-		// exist, err := appcli.ExistApp(ctx, *appID)
-		// if err != nil {
-		// 	return err
-		// }
-		// if !exist {
-		// 	return fmt.Errorf("invalid app")
-		// }
+
+		exist, err := g11ncli.ExistAppLangConds(ctx, &applang.Conds{
+			AppID: &basetypes.StringVal{
+				Op:    cruder.EQ,
+				Value: *appID,
+			},
+			ID: &basetypes.StringVal{
+				Op:    cruder.EQ,
+				Value: *langID,
+			},
+		})
+
+		if err != nil {
+			return err
+		}
+		if !exist {
+			return fmt.Errorf("invalid lang id")
+		}
 
 		h.LangID = langID
 		return nil

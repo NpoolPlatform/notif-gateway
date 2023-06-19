@@ -90,24 +90,6 @@ func WithAnnouncementID(appID, amtID *string) func(context.Context, *Handler) er
 		if err != nil {
 			return err
 		}
-
-		// handler, err := amt1.NewHandler(ctx,
-		// 	amt1.WithID(amtID),
-		// 	amt1.WithAppID(appID),
-		// )
-		// if err != nil {
-		// 	return err
-		// }
-
-		// TODO
-		// exist, err := handler.ExistAnnouncement(ctx)
-		// if err != nil {
-		// 	return err
-		// }
-		// if !exist {
-		// 	return fmt.Errorf("invalid announcement id")
-		// }
-
 		h.AnnouncementID = amtID
 		return nil
 	}

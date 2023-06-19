@@ -6,7 +6,7 @@ import (
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	npool "github.com/NpoolPlatform/message/npool/notif/gw/v1/announcement/sendstate"
 
-	"github.com/NpoolPlatform/notif-gateway/pkg/announcement/handler"
+	handler1 "github.com/NpoolPlatform/notif-gateway/pkg/announcement/handler"
 	amtsend1 "github.com/NpoolPlatform/notif-gateway/pkg/announcement/sendstate"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -15,11 +15,11 @@ import (
 func (s *Server) GetSendStates(ctx context.Context, in *npool.GetSendStatesRequest) (*npool.GetSendStatesResponse, error) {
 	handler, err := amtsend1.NewHandler(
 		ctx,
-		handler.WithAppID(&in.AppID),
-		handler.WithUserID(&in.AppID, &in.UserID),
+		handler1.WithAppID(&in.AppID),
+		handler1.WithUserID(&in.AppID, &in.UserID),
 		amtsend1.WithChannel(in.Channel),
-		handler.WithOffset(in.Offset),
-		handler.WithLimit(in.Limit),
+		handler1.WithOffset(in.Offset),
+		handler1.WithLimit(in.Limit),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
@@ -46,7 +46,7 @@ func (s *Server) GetSendStates(ctx context.Context, in *npool.GetSendStatesReque
 	}, nil
 }
 
-func (s *Server) GetAppUserSendStates(ctx context.Context, in *npool.GetAppUserSendStatesRequest) (*npool.GetAppUserSendStatesResponse, error) {
+func (s *Server) GetAppUserSendStates(ctx context.Context, in *npool.GetAppUserSendStatesRequest) (*npool.GetAppUserSendStatesResponse, error) { //nolint
 	resp, err := s.GetSendStates(ctx, &npool.GetSendStatesRequest{
 		AppID:   in.TargetAppID,
 		UserID:  in.TargetUserID,
@@ -73,9 +73,9 @@ func (s *Server) GetAppUserSendStates(ctx context.Context, in *npool.GetAppUserS
 func (s *Server) GetAppSendStates(ctx context.Context, in *npool.GetAppSendStatesRequest) (*npool.GetAppSendStatesResponse, error) {
 	handler, err := amtsend1.NewHandler(
 		ctx,
-		handler.WithAppID(&in.AppID),
-		handler.WithOffset(in.Offset),
-		handler.WithLimit(in.Limit),
+		handler1.WithAppID(&in.AppID),
+		handler1.WithOffset(in.Offset),
+		handler1.WithLimit(in.Limit),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

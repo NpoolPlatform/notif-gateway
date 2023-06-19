@@ -6,7 +6,7 @@ import (
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	npool "github.com/NpoolPlatform/message/npool/notif/gw/v1/announcement/readstate"
 
-	"github.com/NpoolPlatform/notif-gateway/pkg/announcement/handler"
+	handler1 "github.com/NpoolPlatform/notif-gateway/pkg/announcement/handler"
 	amtread1 "github.com/NpoolPlatform/notif-gateway/pkg/announcement/readstate"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -15,11 +15,11 @@ import (
 func (s *Server) GetReadState(ctx context.Context, in *npool.GetReadStateRequest) (*npool.GetReadStateResponse, error) {
 	handler, err := amtread1.NewHandler(
 		ctx,
-		handler.WithAppID(&in.AppID),
-		handler.WithUserID(&in.AppID, &in.UserID),
-		handler.WithAnnouncementID(&in.AppID, &in.AnnouncementID),
-		handler.WithOffset(0),
-		handler.WithLimit(1),
+		handler1.WithAppID(&in.AppID),
+		handler1.WithUserID(&in.AppID, &in.UserID),
+		handler1.WithAnnouncementID(&in.AppID, &in.AnnouncementID),
+		handler1.WithOffset(0),
+		handler1.WithLimit(1),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
@@ -48,10 +48,10 @@ func (s *Server) GetReadState(ctx context.Context, in *npool.GetReadStateRequest
 func (s *Server) GetReadStates(ctx context.Context, in *npool.GetReadStatesRequest) (*npool.GetReadStatesResponse, error) {
 	handler, err := amtread1.NewHandler(
 		ctx,
-		handler.WithAppID(&in.AppID),
-		handler.WithUserID(&in.AppID, &in.UserID),
-		handler.WithOffset(in.Offset),
-		handler.WithLimit(in.Limit),
+		handler1.WithAppID(&in.AppID),
+		handler1.WithUserID(&in.AppID, &in.UserID),
+		handler1.WithOffset(in.Offset),
+		handler1.WithLimit(in.Limit),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
@@ -78,7 +78,7 @@ func (s *Server) GetReadStates(ctx context.Context, in *npool.GetReadStatesReque
 	}, nil
 }
 
-func (s *Server) GetAppUserReadStates(ctx context.Context, in *npool.GetAppUserReadStatesRequest) (*npool.GetAppUserReadStatesResponse, error) {
+func (s *Server) GetAppUserReadStates(ctx context.Context, in *npool.GetAppUserReadStatesRequest) (*npool.GetAppUserReadStatesResponse, error) {//nolint
 	resp, err := s.GetReadStates(ctx, &npool.GetReadStatesRequest{
 		AppID:  in.TargetAppID,
 		UserID: in.TargetUserID,
@@ -104,9 +104,9 @@ func (s *Server) GetAppUserReadStates(ctx context.Context, in *npool.GetAppUserR
 func (s *Server) GetAppReadStates(ctx context.Context, in *npool.GetAppReadStatesRequest) (*npool.GetAppReadStatesResponse, error) {
 	handler, err := amtread1.NewHandler(
 		ctx,
-		handler.WithAppID(&in.AppID),
-		handler.WithOffset(in.Offset),
-		handler.WithLimit(in.Limit),
+		handler1.WithAppID(&in.AppID),
+		handler1.WithOffset(in.Offset),
+		handler1.WithLimit(in.Limit),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

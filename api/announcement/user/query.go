@@ -6,19 +6,19 @@ import (
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	npool "github.com/NpoolPlatform/message/npool/notif/gw/v1/announcement/user"
 
-	"github.com/NpoolPlatform/notif-gateway/pkg/announcement/handler"
+	handler1 "github.com/NpoolPlatform/notif-gateway/pkg/announcement/handler"
 	amtuser1 "github.com/NpoolPlatform/notif-gateway/pkg/announcement/user"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
-func (s *Server) GetAnnouncementUsers(ctx context.Context, in *npool.GetAnnouncementUsersRequest) (*npool.GetAnnouncementUsersResponse, error) {
+func (s *Server) GetAnnouncementUsers(ctx context.Context, in *npool.GetAnnouncementUsersRequest) (*npool.GetAnnouncementUsersResponse, error) { //nolint
 	handler, err := amtuser1.NewHandler(
 		ctx,
-		handler.WithAppID(&in.AppID),
-		handler.WithAnnouncementID(&in.AppID, &in.AnnouncementID),
-		handler.WithOffset(in.Offset),
-		handler.WithLimit(in.Limit),
+		handler1.WithAppID(&in.AppID),
+		handler1.WithAnnouncementID(&in.AppID, &in.AnnouncementID),
+		handler1.WithOffset(in.Offset),
+		handler1.WithLimit(in.Limit),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
@@ -45,12 +45,12 @@ func (s *Server) GetAnnouncementUsers(ctx context.Context, in *npool.GetAnnounce
 	}, nil
 }
 
-func (s *Server) GetAppAnnouncementUsers(ctx context.Context, in *npool.GetAppAnnouncementUsersRequest) (*npool.GetAppAnnouncementUsersResponse, error) {
+func (s *Server) GetAppAnnouncementUsers(ctx context.Context, in *npool.GetAppAnnouncementUsersRequest) (*npool.GetAppAnnouncementUsersResponse, error) { // nolint
 	handler, err := amtuser1.NewHandler(
 		ctx,
-		handler.WithAppID(&in.AppID),
-		handler.WithOffset(in.Offset),
-		handler.WithLimit(in.Limit),
+		handler1.WithAppID(&in.AppID),
+		handler1.WithOffset(in.Offset),
+		handler1.WithLimit(in.Limit),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
@@ -77,7 +77,7 @@ func (s *Server) GetAppAnnouncementUsers(ctx context.Context, in *npool.GetAppAn
 	}, nil
 }
 
-func (s *Server) GetNAppAnnouncementUsers(ctx context.Context, in *npool.GetNAppAnnouncementUsersRequest) (*npool.GetNAppAnnouncementUsersResponse, error) {
+func (s *Server) GetNAppAnnouncementUsers(ctx context.Context, in *npool.GetNAppAnnouncementUsersRequest) (*npool.GetNAppAnnouncementUsersResponse, error) { //nolint
 	resp, err := s.GetAppAnnouncementUsers(ctx, &npool.GetAppAnnouncementUsersRequest{
 		AppID:  in.TargetAppID,
 		Offset: in.Offset,

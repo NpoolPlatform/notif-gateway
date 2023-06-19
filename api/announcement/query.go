@@ -11,6 +11,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+//nolint
 func (s *Server) GetAnnouncement(ctx context.Context, in *npool.GetAnnouncementRequest) (*npool.GetAnnouncementResponse, error) {
 	handler, err := amt1.NewHandler(
 		ctx,
@@ -74,6 +75,7 @@ func (s *Server) GetAnnouncements(ctx context.Context, in *npool.GetAnnouncement
 	}, nil
 }
 
+//nolint
 func (s *Server) GetAppAnnouncements(ctx context.Context, in *npool.GetAppAnnouncementsRequest) (*npool.GetAppAnnouncementsResponse, error) {
 	resp, err := s.GetAnnouncements(ctx, &npool.GetAnnouncementsRequest{
 		AppID:  in.AppID,
@@ -96,6 +98,7 @@ func (s *Server) GetAppAnnouncements(ctx context.Context, in *npool.GetAppAnnoun
 	}, nil
 }
 
+//nolint
 func (s *Server) GetNAppAnnouncements(ctx context.Context, in *npool.GetNAppAnnouncementsRequest) (*npool.GetNAppAnnouncementsResponse, error) {
 	resp, err := s.GetAnnouncements(ctx, &npool.GetAnnouncementsRequest{
 		AppID:  in.TargetAppID,

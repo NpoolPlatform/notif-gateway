@@ -13,7 +13,7 @@ func (h *Handler) DeleteAnnouncementUser(ctx context.Context) (*npool.Announceme
 		return nil, err
 	}
 
-	_, err = cli.DeleteAnnouncementUser(ctx, *h.ID)
+	_, err = cli.DeleteAnnouncementUser(ctx, *h.AppID, *h.ID)
 	if err != nil {
 		return nil, err
 	}

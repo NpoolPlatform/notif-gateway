@@ -20,7 +20,7 @@ func (s *Server) CreateChannels(ctx context.Context, in *npool.CreateChannelsReq
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"CreateChannel",
+			"CreateChannels",
 			"In", in,
 			"Error", err,
 		)
@@ -30,7 +30,7 @@ func (s *Server) CreateChannels(ctx context.Context, in *npool.CreateChannelsReq
 	info, err := handler.CreateChannels(ctx)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"CreateChannel",
+			"CreateChannels",
 			"In", in,
 			"Error", err,
 		)

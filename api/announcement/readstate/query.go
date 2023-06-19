@@ -23,31 +23,25 @@ func (s *Server) GetReadState(ctx context.Context, in *npool.GetReadStateRequest
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"GetReadStates",
+			"GetReadState",
 			"In", in,
 			"Error", err,
 		)
 		return &npool.GetReadStateResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	infos, _, err := handler.GetReadStates(ctx)
+	info, err := handler.GetReadState(ctx)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"GetReadStates",
+			"GetReadState",
 			"In", in,
 			"Error", err,
 		)
 		return &npool.GetReadStateResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
-	if len(infos) == 0 {
-		return &npool.GetReadStateResponse{
-			Info: nil,
-		}, nil
-	}
-
 	return &npool.GetReadStateResponse{
-		Info: infos[0],
+		Info: info,
 	}, nil
 }
 

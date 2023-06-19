@@ -8,6 +8,7 @@ import (
 	usermwpb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/user"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	npool "github.com/NpoolPlatform/message/npool/notif/gw/v1/announcement/sendstate"
+	amttype "github.com/NpoolPlatform/message/npool/notif/mw/v1/announcement"
 	mwpb "github.com/NpoolPlatform/message/npool/notif/mw/v1/announcement/sendstate"
 	mwcli "github.com/NpoolPlatform/notif-middleware/pkg/client/announcement/sendstate"
 )
@@ -77,18 +78,18 @@ func (h *Handler) GetSendStates(ctx context.Context) ([]*npool.SendState, uint32
 			continue
 		}
 		infos = append(infos, &npool.SendState{
-			ID:             val.ID,
-			AnnouncementID: val.AnnouncementID,
-			AppID:          val.AppID,
-			UserID:         val.UserID,
-			EmailAddress:   user.EmailAddress,
-			PhoneNO:        user.PhoneNO,
-			Username:       user.Username,
-			// Title:            val.Title, // TODO
-			// Content:          val.Content,
-			// AnnouncementType: val.AnnouncementType,
-			CreatedAt: val.CreatedAt,
-			UpdatedAt: val.UpdatedAt,
+			ID:               val.ID,
+			AnnouncementID:   val.AnnouncementID,
+			AppID:            val.AppID,
+			UserID:           val.UserID,
+			EmailAddress:     user.EmailAddress,
+			PhoneNO:          user.PhoneNO,
+			Username:         user.Username,
+			Title:            val.Title,
+			Content:          val.Content,
+			AnnouncementType: amttype.AnnouncementType(amttype.AnnouncementType_value[val.AnnouncementType]),
+			CreatedAt:        val.CreatedAt,
+			UpdatedAt:        val.UpdatedAt,
 		})
 	}
 	return infos, total, nil

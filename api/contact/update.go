@@ -43,6 +43,7 @@ func (s *Server) UpdateContact(ctx context.Context, in *npool.UpdateContactReque
 	}, nil
 }
 
+//nolint
 func (s *Server) UpdateAppContact(ctx context.Context, in *npool.UpdateAppContactRequest) (*npool.UpdateAppContactResponse, error) {
 	resp, err := s.UpdateContact(ctx, &npool.UpdateContactRequest{
 		ID:          in.ID,

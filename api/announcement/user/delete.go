@@ -9,14 +9,14 @@ import (
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	npool "github.com/NpoolPlatform/message/npool/notif/gw/v1/announcement/user"
 
-	"github.com/NpoolPlatform/notif-gateway/pkg/announcement/handler"
+	handler1 "github.com/NpoolPlatform/notif-gateway/pkg/announcement/handler"
 	amtuser1 "github.com/NpoolPlatform/notif-gateway/pkg/announcement/user"
 )
 
-func (s *Server) DeleteAnnouncementUser(ctx context.Context, in *npool.DeleteAnnouncementUserRequest) (*npool.DeleteAnnouncementUserResponse, error) {
+func (s *Server) DeleteAnnouncementUser(ctx context.Context, in *npool.DeleteAnnouncementUserRequest) (*npool.DeleteAnnouncementUserResponse, error) { //nolint
 	handler, err := amtuser1.NewHandler(
 		ctx,
-		handler.WithID(&in.ID),
+		handler1.WithID(&in.ID),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

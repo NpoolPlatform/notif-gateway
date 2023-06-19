@@ -187,7 +187,6 @@ func formalize(ctx context.Context, appID, userID string, amts []*mwpb.Announcem
 			Channel:          amt.Channel,
 			AnnouncementType: amt.AnnouncementType,
 		})
-
 	}
 	return announcements, nil
 }

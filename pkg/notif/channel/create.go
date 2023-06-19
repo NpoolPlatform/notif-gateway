@@ -53,7 +53,7 @@ func (h *Handler) CreateChannels(ctx context.Context) (infos []*npool.Channel, e
 	for _, _type := range h.EventTypes {
 		reqs = append(reqs, &npool.ChannelReq{
 			AppID:     h.AppID,
-			EventType: &_type,
+			EventType: &_type, //nolint
 			Channel:   h.Channel,
 		})
 	}

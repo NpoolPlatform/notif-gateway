@@ -5,19 +5,18 @@ import (
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	npool "github.com/NpoolPlatform/message/npool/notif/gw/v1/announcement/user"
-	"github.com/NpoolPlatform/notif-gateway/pkg/announcement/handler"
+	handler1 "github.com/NpoolPlatform/notif-gateway/pkg/announcement/handler"
 	amtuser1 "github.com/NpoolPlatform/notif-gateway/pkg/announcement/user"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
-// TODO: Need Refactor
-func (s *Server) CreateAnnouncementUser(ctx context.Context, in *npool.CreateAnnouncementUserRequest) (*npool.CreateAnnouncementUserResponse, error) {
+func (s *Server) CreateAnnouncementUser(ctx context.Context, in *npool.CreateAnnouncementUserRequest) (*npool.CreateAnnouncementUserResponse, error) { //nolint
 	handler, err := amtuser1.NewHandler(
 		ctx,
-		handler.WithAppID(&in.AppID),
-		handler.WithUserID(&in.AppID, &in.UserID),
-		handler.WithAnnouncementID(&in.AppID, &in.AnnouncementID),
+		handler1.WithAppID(&in.AppID),
+		handler1.WithUserID(&in.AppID, &in.UserID),
+		handler1.WithAnnouncementID(&in.AppID, &in.AnnouncementID),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
@@ -43,7 +42,7 @@ func (s *Server) CreateAnnouncementUser(ctx context.Context, in *npool.CreateAnn
 	}, nil
 }
 
-func (s *Server) CreateAnnouncementUsers(ctx context.Context, in *npool.CreateAnnouncementUsersRequest) (*npool.CreateAnnouncementUsersResponse, error) {
+func (s *Server) CreateAnnouncementUsers(ctx context.Context, in *npool.CreateAnnouncementUsersRequest) (*npool.CreateAnnouncementUsersResponse, error) { //nolint
 	announcementUsers := []*npool.AnnouncementUser{}
 	for _, userID := range in.GetUserIDs() {
 		resp, err := s.CreateAnnouncementUser(ctx, &npool.CreateAnnouncementUserRequest{

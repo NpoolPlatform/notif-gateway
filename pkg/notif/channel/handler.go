@@ -62,6 +62,9 @@ func WithAppID(appID *string) func(context.Context, *Handler) error {
 
 func WithChannel(channel *basetypes.NotifChannel) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
+		if channel == nil {
+			return fmt.Errorf("invalid channel")
+		}
 		switch *channel {
 		case basetypes.NotifChannel_ChannelEmail:
 		case basetypes.NotifChannel_ChannelSMS:
@@ -97,8 +100,8 @@ func WithEventType(_type *basetypes.UsedFor) func(context.Context, *Handler) err
 
 func WithEventTypes(_types []basetypes.UsedFor) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
-		if _types == nil {
-			return nil
+		if len(_types) == 0 {
+			return fmt.Errorf("invalid event types")
 		}
 		for _, _type := range _types {
 			switch _type {
@@ -109,7 +112,7 @@ func WithEventTypes(_types []basetypes.UsedFor) func(context.Context, *Handler) 
 			case basetypes.UsedFor_KYCRejected:
 			case basetypes.UsedFor_Announcement:
 			default:
-				return fmt.Errorf("EventType is invalid")
+				return fmt.Errorf("event type is invalid")
 			}
 		}
 

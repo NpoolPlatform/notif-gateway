@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	npool "github.com/NpoolPlatform/message/npool/notif/gw/v1/announcement/user"
 	mwpb "github.com/NpoolPlatform/message/npool/notif/mw/v1/announcement/user"
 	cli "github.com/NpoolPlatform/notif-middleware/pkg/client/announcement/user"
@@ -35,7 +37,32 @@ func (h *Handler) CreateAnnouncementUser(ctx context.Context) (*npool.Announceme
 		return nil, err
 	}
 
-	// TODO: judge whether exist
+	exist, err := cli.ExistAnnouncementUserConds(
+		ctx,
+		&mwpb.ExistAnnouncementUserCondsRequest{
+			Conds: &mwpb.Conds{
+				AppID: &basetypes.StringVal{
+					Op:    cruder.EQ,
+					Value: *h.AppID,
+				},
+				UserID: &basetypes.StringVal{
+					Op:    cruder.EQ,
+					Value: *h.UserID,
+				},
+				AnnouncementID: &basetypes.StringVal{
+					Op:    cruder.EQ,
+					Value: *h.AnnouncementID,
+				},
+			},
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+	if !exist {
+		return nil, fmt.Errorf("user exist")
+	}
+
 	info, err := cli.CreateAnnouncementUser(
 		ctx,
 		&mwpb.AnnouncementUserReq{

@@ -59,7 +59,7 @@ func (h *Handler) CreateAnnouncementUser(ctx context.Context) (*npool.Announceme
 	if err != nil {
 		return nil, err
 	}
-	if !exist {
+	if exist {
 		return nil, fmt.Errorf("user exist")
 	}
 

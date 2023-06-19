@@ -10,7 +10,7 @@ require (
 	github.com/NpoolPlatform/libent-cruder v0.0.0-20221109023947-366125b690fb
 	github.com/NpoolPlatform/message v0.0.0-20230619030119-1bc2dfc09da7
 	github.com/NpoolPlatform/notif-manager v0.0.0-20230524065114-b1b16877fab1
-	github.com/NpoolPlatform/notif-middleware v0.0.0-20230619060106-b6e0ba37d22b
+	github.com/NpoolPlatform/notif-middleware v0.0.0-20230619081350-a3e7c96d5cb3
 	github.com/NpoolPlatform/third-middleware v0.0.0-20230221094357-40a170d76e2b
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/google/uuid v1.3.0

@@ -40,6 +40,12 @@ func (s *Server) GetReadState(ctx context.Context, in *npool.GetReadStateRequest
 		return &npool.GetReadStateResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
+	if len(infos) == 0 {
+		return &npool.GetReadStateResponse{
+			Info: nil,
+		}, nil
+	}
+
 	return &npool.GetReadStateResponse{
 		Info: infos[0],
 	}, nil
@@ -78,7 +84,7 @@ func (s *Server) GetReadStates(ctx context.Context, in *npool.GetReadStatesReque
 	}, nil
 }
 
-func (s *Server) GetAppUserReadStates(ctx context.Context, in *npool.GetAppUserReadStatesRequest) (*npool.GetAppUserReadStatesResponse, error) {//nolint
+func (s *Server) GetAppUserReadStates(ctx context.Context, in *npool.GetAppUserReadStatesRequest) (*npool.GetAppUserReadStatesResponse, error) { //nolint
 	resp, err := s.GetReadStates(ctx, &npool.GetReadStatesRequest{
 		AppID:  in.TargetAppID,
 		UserID: in.TargetUserID,

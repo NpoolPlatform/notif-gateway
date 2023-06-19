@@ -13,7 +13,13 @@ import (
 )
 
 //nolint
-func (s *Server) DeleteAnnouncement(ctx context.Context, in *npool.DeleteAnnouncementRequest) (*npool.DeleteAnnouncementResponse, error) {
+func (s *Server) DeleteAnnouncement(
+	ctx context.Context,
+	in *npool.DeleteAnnouncementRequest,
+) (
+	*npool.DeleteAnnouncementResponse,
+	error,
+) {
 	handler, err := amt1.NewHandler(
 		ctx,
 		amt1.WithID(&in.ID),

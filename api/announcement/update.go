@@ -10,7 +10,13 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (s *Server) UpdateAnnouncement(ctx context.Context, in *npool.UpdateAnnouncementRequest) (*npool.UpdateAnnouncementResponse, error) {
+func (s *Server) UpdateAnnouncement(
+	ctx context.Context,
+	in *npool.UpdateAnnouncementRequest,
+) (
+	*npool.UpdateAnnouncementResponse,
+	error,
+) {
 	handler, err := amt1.NewHandler(
 		ctx,
 		amt1.WithID(&in.ID),

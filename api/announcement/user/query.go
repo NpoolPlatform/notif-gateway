@@ -12,7 +12,13 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (s *Server) GetAnnouncementUsers(ctx context.Context, in *npool.GetAnnouncementUsersRequest) (*npool.GetAnnouncementUsersResponse, error) { //nolint
+func (s *Server) GetAnnouncementUsers(
+	ctx context.Context,
+	in *npool.GetAnnouncementUsersRequest,
+) (
+	*npool.GetAnnouncementUsersResponse,
+	error,
+) {
 	handler, err := amtuser1.NewHandler(
 		ctx,
 		handler1.WithAppID(&in.AppID),

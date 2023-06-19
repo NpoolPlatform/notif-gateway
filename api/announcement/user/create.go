@@ -11,7 +11,13 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (s *Server) CreateAnnouncementUser(ctx context.Context, in *npool.CreateAnnouncementUserRequest) (*npool.CreateAnnouncementUserResponse, error) { //nolint
+func (s *Server) CreateAnnouncementUser(
+	ctx context.Context,
+	in *npool.CreateAnnouncementUserRequest,
+) (
+	*npool.CreateAnnouncementUserResponse,
+	error,
+) {
 	handler, err := amtuser1.NewHandler(
 		ctx,
 		handler1.WithAppID(&in.AppID),
@@ -42,7 +48,13 @@ func (s *Server) CreateAnnouncementUser(ctx context.Context, in *npool.CreateAnn
 	}, nil
 }
 
-func (s *Server) CreateAnnouncementUsers(ctx context.Context, in *npool.CreateAnnouncementUsersRequest) (*npool.CreateAnnouncementUsersResponse, error) { //nolint
+func (s *Server) CreateAnnouncementUsers(
+	ctx context.Context,
+	in *npool.CreateAnnouncementUsersRequest,
+) (
+	*npool.CreateAnnouncementUsersResponse,
+	error,
+) {
 	announcementUsers := []*npool.AnnouncementUser{}
 	for _, userID := range in.GetUserIDs() {
 		resp, err := s.CreateAnnouncementUser(ctx, &npool.CreateAnnouncementUserRequest{

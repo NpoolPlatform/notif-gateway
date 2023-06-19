@@ -48,6 +48,9 @@ func WithID(id *string) func(context.Context, *Handler) error {
 }
 func WithUserID(userID *string) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
+		if userID == nil {
+			return fmt.Errorf("invalid user id")
+		}
 		_, err := uuid.Parse(*userID)
 		if err != nil {
 			return err
@@ -59,6 +62,9 @@ func WithUserID(userID *string) func(context.Context, *Handler) error {
 
 func WithAppID(appID *string) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
+		if appID == nil {
+			return fmt.Errorf("invalid app id")
+		}
 		_, err := uuid.Parse(*appID)
 		if err != nil {
 			return err
@@ -78,6 +84,9 @@ func WithAppID(appID *string) func(context.Context, *Handler) error {
 
 func WithLangID(appID, langID *string) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
+		if langID == nil {
+			return fmt.Errorf("invalid lang id")
+		}
 		_, err := uuid.Parse(*langID)
 		if err != nil {
 			return err

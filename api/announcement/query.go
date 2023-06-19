@@ -12,7 +12,13 @@ import (
 )
 
 //nolint
-func (s *Server) GetAnnouncement(ctx context.Context, in *npool.GetAnnouncementRequest) (*npool.GetAnnouncementResponse, error) {
+func (s *Server) GetAnnouncement(
+	ctx context.Context,
+	in *npool.GetAnnouncementRequest,
+) (
+	*npool.GetAnnouncementResponse,
+	error,
+) {
 	handler, err := amt1.NewHandler(
 		ctx,
 		amt1.WithID(&in.ID),

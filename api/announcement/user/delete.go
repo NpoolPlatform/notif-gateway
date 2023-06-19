@@ -13,7 +13,13 @@ import (
 	amtuser1 "github.com/NpoolPlatform/notif-gateway/pkg/announcement/user"
 )
 
-func (s *Server) DeleteAnnouncementUser(ctx context.Context, in *npool.DeleteAnnouncementUserRequest) (*npool.DeleteAnnouncementUserResponse, error) { //nolint
+func (s *Server) DeleteAnnouncementUser(
+	ctx context.Context,
+	in *npool.DeleteAnnouncementUserRequest,
+) (
+	*npool.DeleteAnnouncementUserResponse,
+	error,
+) {
 	handler, err := amtuser1.NewHandler(
 		ctx,
 		handler1.WithID(&in.ID),

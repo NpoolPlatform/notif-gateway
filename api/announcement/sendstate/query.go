@@ -12,7 +12,13 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (s *Server) GetSendStates(ctx context.Context, in *npool.GetSendStatesRequest) (*npool.GetSendStatesResponse, error) {
+func (s *Server) GetSendStates(
+	ctx context.Context,
+	in *npool.GetSendStatesRequest,
+) (
+	*npool.GetSendStatesResponse,
+	error,
+) {
 	handler, err := amtsend1.NewHandler(
 		ctx,
 		handler1.WithAppID(&in.AppID),

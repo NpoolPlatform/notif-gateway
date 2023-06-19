@@ -11,7 +11,13 @@ import (
 	amt1 "github.com/NpoolPlatform/notif-gateway/pkg/announcement"
 )
 
-func (s *Server) CreateAnnouncement(ctx context.Context, in *npool.CreateAnnouncementRequest) (*npool.CreateAnnouncementResponse, error) {
+func (s *Server) CreateAnnouncement(
+	ctx context.Context,
+	in *npool.CreateAnnouncementRequest,
+) (
+	*npool.CreateAnnouncementResponse,
+	error,
+) {
 	handler, err := amt1.NewHandler(
 		ctx,
 		amt1.WithTitle(&in.Title),

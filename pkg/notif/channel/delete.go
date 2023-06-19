@@ -13,7 +13,7 @@ func (h *Handler) DeleteChannel(ctx context.Context) (*npool.Channel, error) {
 		return nil, err
 	}
 
-	_, err = cli.DeleteChannel(ctx, *h.ID)
+	_, err = cli.DeleteChannel(ctx, *h.AppID, *h.ID)
 	if err != nil {
 		return nil, err
 	}

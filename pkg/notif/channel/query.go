@@ -33,8 +33,11 @@ func (h *Handler) GetChannel(ctx context.Context) (*npool.Channel, error) {
 	if h.ID == nil {
 		return nil, fmt.Errorf("invalid channel id")
 	}
+	if h.AppID == nil {
+		return nil, fmt.Errorf("invalid channel id")
+	}
 
-	info, err := cli.GetChannel(ctx, *h.ID)
+	info, err := cli.GetChannel(ctx, *h.AppID, *h.ID)
 	if err != nil {
 		return nil, err
 	}

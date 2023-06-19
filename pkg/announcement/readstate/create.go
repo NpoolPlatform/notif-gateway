@@ -2,13 +2,37 @@ package readstate
 
 import (
 	"context"
+	"fmt"
 
+	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	npool "github.com/NpoolPlatform/message/npool/notif/gw/v1/announcement/readstate"
 	mwpb "github.com/NpoolPlatform/message/npool/notif/mw/v1/announcement/readstate"
 	cli "github.com/NpoolPlatform/notif-middleware/pkg/client/announcement/readstate"
 )
 
 func (h *Handler) CreateReadState(ctx context.Context) (*npool.ReadState, error) {
+	infos, _, err := cli.GetReadStates(ctx, &mwpb.Conds{
+		AppID: &basetypes.StringVal{
+			Op:    cruder.EQ,
+			Value: *h.AppID,
+		},
+		UserID: &basetypes.StringVal{
+			Op:    cruder.EQ,
+			Value: *h.UserID,
+		},
+		AnnouncementID: &basetypes.StringVal{
+			Op:    cruder.EQ,
+			Value: *h.AnnouncementID,
+		},
+	}, 0, 1)
+	if err != nil {
+		return nil, err
+	}
+	if len(infos) > 0 {
+		return nil, fmt.Errorf("read state exist")
+	}
+
 	info, err := cli.CreateReadState(
 		ctx,
 		&mwpb.ReadStateReq{

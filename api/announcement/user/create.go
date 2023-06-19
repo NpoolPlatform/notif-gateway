@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	npool "github.com/NpoolPlatform/message/npool/notif/gw/v1/announcement/user"
@@ -55,6 +56,9 @@ func (s *Server) CreateAnnouncementUsers(
 	*npool.CreateAnnouncementUsersResponse,
 	error,
 ) {
+	if len(in.GetUserIDs()) == 0 {
+		return nil, fmt.Errorf("user ids is empty")
+	}
 	announcementUsers := []*npool.AnnouncementUser{}
 	for _, userID := range in.GetUserIDs() {
 		resp, err := s.CreateAnnouncementUser(ctx, &npool.CreateAnnouncementUserRequest{

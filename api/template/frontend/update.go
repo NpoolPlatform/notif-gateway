@@ -24,7 +24,6 @@ func (s *Server) UpdateFrontendTemplate(
 		ctx,
 		frontendtemplate1.WithID(&in.ID),
 		frontendtemplate1.WithAppID(&in.AppID),
-		frontendtemplate1.WithLangID(in.TargetLangID),
 		frontendtemplate1.WithTitle(in.Title),
 		frontendtemplate1.WithContent(in.Content),
 	)
@@ -63,7 +62,6 @@ func (s *Server) UpdateAppFrontendTemplate(
 		ctx,
 		frontendtemplate1.WithID(&in.ID),
 		frontendtemplate1.WithAppID(&in.TargetAppID),
-		frontendtemplate1.WithLangID(in.TargetLangID),
 		frontendtemplate1.WithTitle(in.Title),
 		frontendtemplate1.WithContent(in.Content),
 	)

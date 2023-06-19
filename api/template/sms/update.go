@@ -23,7 +23,6 @@ func (s *Server) UpdateSMSTemplate(
 		ctx,
 		smstemplate1.WithID(&in.ID),
 		smstemplate1.WithAppID(&in.AppID),
-		smstemplate1.WithLangID(&in.TargetLangID),
 		smstemplate1.WithSubject(in.Subject),
 		smstemplate1.WithMessage(in.Message),
 	)
@@ -62,7 +61,6 @@ func (s *Server) UpdateAppSMSTemplate(
 		ctx,
 		smstemplate1.WithID(&in.ID),
 		smstemplate1.WithAppID(&in.TargetAppID),
-		smstemplate1.WithLangID(&in.TargetLangID),
 		smstemplate1.WithSubject(in.Subject),
 		smstemplate1.WithMessage(in.Message),
 	)

@@ -100,8 +100,8 @@ func WithEventType(_type *basetypes.UsedFor) func(context.Context, *Handler) err
 
 func WithEventTypes(_types []basetypes.UsedFor) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
-		if _types == nil {
-			return nil
+		if len(_types) == 0 {
+			return fmt.Errorf("invalid event types")
 		}
 		for _, _type := range _types {
 			switch _type {

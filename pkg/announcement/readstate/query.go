@@ -2,6 +2,7 @@ package readstate
 
 import (
 	"context"
+	"fmt"
 
 	usermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
@@ -87,4 +88,39 @@ func (h *Handler) GetReadStates(ctx context.Context) ([]*npool.ReadState, uint32
 		})
 	}
 	return infos, total, nil
+}
+
+func (h *Handler) GetReadState(ctx context.Context) (*npool.ReadState, error) {
+	if h.ID == nil {
+		return nil, fmt.Errorf("invalid readstate id")
+	}
+
+	val, err := mwcli.GetReadState(ctx, *h.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	user, err := usermwcli.GetUser(ctx, *h.AppID, *h.UserID)
+	if err != nil {
+		return nil, err
+	}
+	if user == nil {
+		return nil, fmt.Errorf("invalid user")
+	}
+
+	info := &npool.ReadState{
+		ID:               val.ID,
+		AnnouncementID:   val.AnnouncementID,
+		AppID:            val.AppID,
+		UserID:           val.UserID,
+		EmailAddress:     user.EmailAddress,
+		PhoneNO:          user.PhoneNO,
+		Username:         user.Username,
+		Title:            val.Title,
+		Content:          val.Content,
+		AnnouncementType: amttype.AnnouncementType(amttype.AnnouncementType_value[val.AnnouncementType]),
+		CreatedAt:        val.CreatedAt,
+		UpdatedAt:        val.UpdatedAt,
+	}
+	return info, nil
 }

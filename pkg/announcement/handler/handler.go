@@ -67,6 +67,9 @@ func WithAppID(appID *string) func(context.Context, *Handler) error {
 
 func WithUserID(appID, userID *string) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
+		if userID == nil {
+			return fmt.Errorf("invalid userid")
+		}
 		_, err := uuid.Parse(*userID)
 		if err != nil {
 			return err

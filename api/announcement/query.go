@@ -77,12 +77,12 @@ func (s *Server) GetAnnouncements(ctx context.Context, in *npool.GetAnnouncement
 
 //nolint
 func (s *Server) GetAppAnnouncements(ctx context.Context, in *npool.GetAppAnnouncementsRequest) (*npool.GetAppAnnouncementsResponse, error) {
-	resp, err := s.GetAnnouncements(ctx, &npool.GetAnnouncementsRequest{
-		AppID:  in.AppID,
-		Offset: in.Offset,
-		Limit:  in.Limit,
-	})
-
+	handler, err := amt1.NewHandler(
+		ctx,
+		amt1.WithAppID(&in.AppID),
+		amt1.WithOffset(in.Offset),
+		amt1.WithLimit(in.Limit),
+	)
 	if err != nil {
 		logger.Sugar().Errorw(
 			"GetAppAnnouncements",
@@ -92,15 +92,25 @@ func (s *Server) GetAppAnnouncements(ctx context.Context, in *npool.GetAppAnnoun
 		return &npool.GetAppAnnouncementsResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
+	infos, total, err := handler.GetAnnouncements(ctx)
+	if err != nil {
+		logger.Sugar().Errorw(
+			"GetAppAnnouncements",
+			"In", in,
+			"Error", err,
+		)
+		return &npool.GetAppAnnouncementsResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
 	return &npool.GetAppAnnouncementsResponse{
-		Infos: resp.Infos,
-		Total: resp.Total,
+		Infos: infos,
+		Total: total,
 	}, nil
 }
 
 //nolint
 func (s *Server) GetNAppAnnouncements(ctx context.Context, in *npool.GetNAppAnnouncementsRequest) (*npool.GetNAppAnnouncementsResponse, error) {
-	resp, err := s.GetAnnouncements(ctx, &npool.GetAnnouncementsRequest{
+	resp, err := s.GetAppAnnouncements(ctx, &npool.GetAppAnnouncementsRequest{
 		AppID:  in.TargetAppID,
 		Offset: in.Offset,
 		Limit:  in.Limit,

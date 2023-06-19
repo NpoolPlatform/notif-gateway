@@ -25,7 +25,7 @@ func (h *Handler) UpdateContact(ctx context.Context) (*npool.Contact, error) {
 				},
 				AppID: &basetypes.StringVal{
 					Op:    cruder.EQ,
-					Value: *h.ID,
+					Value: *h.AppID,
 				},
 			},
 		},

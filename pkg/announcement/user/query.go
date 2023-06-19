@@ -90,7 +90,7 @@ func (h *Handler) GetAnnouncementUsers(ctx context.Context) ([]*npool.Announceme
 }
 
 func (h *Handler) GetAnnouncementUser(ctx context.Context) (*npool.AnnouncementUser, error) {
-	row, err := mwcli.GetAnnouncementUser(ctx, *h.ID)
+	row, err := mwcli.GetAnnouncementUser(ctx, *h.AppID, *h.ID)
 	if err != nil {
 		return nil, err
 	}

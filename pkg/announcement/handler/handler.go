@@ -7,6 +7,7 @@ import (
 	appcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
 	appusercli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
 	constant "github.com/NpoolPlatform/notif-gateway/pkg/const"
+	cli "github.com/NpoolPlatform/notif-middleware/pkg/client/announcement"
 	"github.com/google/uuid"
 )
 
@@ -89,7 +90,15 @@ func WithAnnouncementID(appID, amtID *string) func(context.Context, *Handler) er
 		if amtID == nil {
 			return fmt.Errorf("invalid announcement id")
 		}
-		_, err := uuid.Parse(*amtID)
+		exist, err := cli.ExistAnnouncement(ctx, *amtID, *appID)
+		if err != nil {
+			return err
+		}
+		if !exist {
+			return fmt.Errorf("announcement id not exist")
+		}
+
+		_, err = uuid.Parse(*amtID)
 		if err != nil {
 			return err
 		}

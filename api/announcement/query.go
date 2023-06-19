@@ -110,7 +110,7 @@ func (s *Server) GetAppAnnouncements(ctx context.Context, in *npool.GetAppAnnoun
 
 //nolint
 func (s *Server) GetNAppAnnouncements(ctx context.Context, in *npool.GetNAppAnnouncementsRequest) (*npool.GetNAppAnnouncementsResponse, error) {
-	resp, err := s.GetAnnouncements(ctx, &npool.GetAnnouncementsRequest{
+	resp, err := s.GetAppAnnouncements(ctx, &npool.GetAppAnnouncementsRequest{
 		AppID:  in.TargetAppID,
 		Offset: in.Offset,
 		Limit:  in.Limit,

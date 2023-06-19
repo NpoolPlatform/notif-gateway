@@ -34,7 +34,7 @@ func (h *Handler) UpdateContact(ctx context.Context) (*npool.Contact, error) {
 		return nil, err
 	}
 	if !exist {
-		return nil, fmt.Errorf("invalid app id")
+		return nil, fmt.Errorf("invalid id or app id")
 	}
 
 	_, err = cli.UpdateContact(ctx, &npool.ContactReq{

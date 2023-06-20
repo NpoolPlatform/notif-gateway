@@ -61,7 +61,7 @@ func (h *Handler) GetNotif(ctx context.Context) (*npool.Notif, error) {
 	}, nil
 }
 
-func (h *Handler) GetNotifs(ctx context.Context) ([]*npool.Notif, uint32, error) {
+func (h *Handler) setConds() *notifmwpb.Conds {
 	conds := &notifmwpb.Conds{}
 	if h.AppID != nil {
 		conds.AppID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID}
@@ -78,15 +78,24 @@ func (h *Handler) GetNotifs(ctx context.Context) ([]*npool.Notif, uint32, error)
 	if len(h.IDs) > 0 {
 		conds.IDs = &basetypes.StringSliceVal{Op: cruder.IN, Value: h.IDs}
 	}
+	return conds
+}
+
+func (h *Handler) GetNotifs(
+	ctx context.Context,
+) (
+	[]*npool.Notif,
+	uint32,
+	error,
+) {
+	conds := h.setConds()
 	rows, total, err := notifmwcli.GetNotifs(ctx, conds, h.Offset, h.Limit)
 	if err != nil {
 		return nil, 0, err
 	}
-
 	if len(rows) == 0 {
 		return nil, 0, nil
 	}
-
 	appIDs := []string{}
 	userIDs := []string{}
 	langIDs := []string{}
@@ -106,7 +115,6 @@ func (h *Handler) GetNotifs(ctx context.Context) ([]*npool.Notif, uint32, error)
 	for _, val := range appInfos {
 		appMap[val.ID] = val
 	}
-
 	userInfos, _, err := usermwcli.GetUsers(ctx, &usermwpb.Conds{
 		IDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: userIDs},
 	}, 0, int32(len(userIDs)))
@@ -125,7 +133,6 @@ func (h *Handler) GetNotifs(ctx context.Context) ([]*npool.Notif, uint32, error)
 	if err != nil {
 		return nil, 0, err
 	}
-
 	langMap := map[string]*applangmwpb.Lang{}
 	for _, lang := range langs {
 		langMap[lang.LangID] = lang

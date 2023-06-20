@@ -24,6 +24,10 @@ func (h *Handler) GetNotif(ctx context.Context) (*npool.Notif, error) {
 	if err != nil {
 		return nil, err
 	}
+	if info == nil {
+		return nil, nil
+	}
+
 	app, err := appmwcli.GetApp(ctx, info.AppID)
 	if err != nil {
 		return nil, err

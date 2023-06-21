@@ -22,7 +22,7 @@ func (s *Server) UpdateNotifs(ctx context.Context, in *npool.UpdateNotifsRequest
 		ctx,
 		notif1.WithIDs(in.IDs),
 		notif1.WithAppID(&in.AppID),
-		notif1.WithUserID(&in.UserID),
+		notif1.WithUserID(&in.AppID, &in.UserID),
 		notif1.WithNotified(&in.Notified),
 	)
 	if err != nil {

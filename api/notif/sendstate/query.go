@@ -79,6 +79,7 @@ func (s *Server) GetAppSendStates(ctx context.Context, in *npool.GetAppSendState
 	handler, err := notifsendstate1.NewHandler(
 		ctx,
 		notifsendstate1.WithAppID(&in.AppID),
+		notifsendstate1.WithChannel(in.Channel),
 		notifsendstate1.WithOffset(in.Offset),
 		notifsendstate1.WithLimit(in.Limit),
 	)
@@ -91,7 +92,7 @@ func (s *Server) GetAppSendStates(ctx context.Context, in *npool.GetAppSendState
 		return &npool.GetAppSendStatesResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	infos, total, err := handler.GetSendStates(ctx)
+	infos, total, err := handler.GetAppSendStates(ctx)
 	if err != nil {
 		logger.Sugar().Errorw(
 			"GetSendStates",
@@ -109,9 +110,10 @@ func (s *Server) GetAppSendStates(ctx context.Context, in *npool.GetAppSendState
 
 func (s *Server) GetNAppSendStates(ctx context.Context, in *npool.GetNAppSendStatesRequest) (*npool.GetNAppSendStatesResponse, error) {
 	resp, err := s.GetAppSendStates(ctx, &npool.GetAppSendStatesRequest{
-		AppID:  in.TargetAppID,
-		Offset: in.Offset,
-		Limit:  in.Limit,
+		AppID:   in.TargetAppID,
+		Channel: in.Channel,
+		Offset:  in.Offset,
+		Limit:   in.Limit,
 	})
 
 	if err != nil {

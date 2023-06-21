@@ -12,13 +12,22 @@ import (
 	mwcli "github.com/NpoolPlatform/notif-middleware/pkg/client/notif"
 
 	npool "github.com/NpoolPlatform/message/npool/notif/gw/v1/notif"
+	notifmwpb "github.com/NpoolPlatform/message/npool/notif/mw/v1/notif"
 
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 )
 
 func (h *Handler) UpdateNotifs(ctx context.Context) ([]*npool.Notif, error) {
-	rows, err := mwcli.UpdateNotifs(ctx, h.IDs, *h.Notified)
+	reqs := []*notifmwpb.NotifReq{}
+	for _, id := range h.IDs {
+		_req := &notifmwpb.NotifReq{
+			ID:       &id,
+			Notified: h.Notified,
+		}
+		reqs = append(reqs, _req)
+	}
+	rows, err := mwcli.UpdateNotifs(ctx, reqs)
 	if err != nil {
 		return nil, err
 	}

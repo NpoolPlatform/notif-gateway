@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
+	appusermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
-	npool "github.com/NpoolPlatform/message/npool/notif/mw/v1/notif"
 	templatemwpb "github.com/NpoolPlatform/message/npool/notif/mw/v1/template"
 	constant "github.com/NpoolPlatform/notif-gateway/pkg/const"
 
@@ -26,7 +26,7 @@ type Handler struct {
 	Content     *string
 	Channel     *basetypes.NotifChannel
 	Extra       *string
-	NotifType   *npool.NotifType
+	NotifType   *basetypes.NotifType
 	Vars        *templatemwpb.TemplateVars
 	IDs         []string
 	Offset      int32
@@ -56,35 +56,44 @@ func WithID(id *string) func(context.Context, *Handler) error {
 	}
 }
 
-func WithAppID(id *string) func(context.Context, *Handler) error {
+func WithAppID(appID *string) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
-		if id == nil {
+		if appID == nil {
 			return nil
 		}
-		if _, err := uuid.Parse(*id); err != nil {
+		if _, err := uuid.Parse(*appID); err != nil {
 			return err
 		}
-		_app, err := appmwcli.GetApp(ctx, *id)
+		exist, err := appmwcli.ExistApp(ctx, *appID)
 		if err != nil {
 			return err
 		}
-		if _app == nil {
+		if !exist {
 			return fmt.Errorf("invalid app")
 		}
-		h.AppID = id
+		h.AppID = appID
 		return nil
 	}
 }
 
-func WithUserID(id *string) func(context.Context, *Handler) error {
+func WithUserID(appID, userID *string) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
-		if id == nil {
+		if appID == nil || userID == nil {
 			return nil
 		}
-		if _, err := uuid.Parse(*id); err != nil {
+		_, err := uuid.Parse(*userID)
+		if err != nil {
 			return err
 		}
-		h.UserID = id
+		exist, err := appusermwcli.ExistUser(ctx, *appID, *userID)
+		if err != nil {
+			return err
+		}
+		if !exist {
+			return fmt.Errorf("invalid user")
+		}
+
+		h.UserID = userID
 		return nil
 	}
 }
@@ -206,16 +215,15 @@ func WithEventType(eventtype *basetypes.UsedFor) func(context.Context, *Handler)
 	}
 }
 
-func WithNotifType(_type *npool.NotifType) func(context.Context, *Handler) error {
+func WithNotifType(_type *basetypes.NotifType) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if _type == nil {
 			return nil
 		}
 		switch *_type {
-		case npool.NotifType_DefaultType:
-		case npool.NotifType_Broadcast:
-		case npool.NotifType_Multicast:
-		case npool.NotifType_Unicast:
+		case basetypes.NotifType_NotifBroadcast:
+		case basetypes.NotifType_NotifMulticast:
+		case basetypes.NotifType_NotifUnicast:
 			if h.UserID == nil {
 				return fmt.Errorf("invalid userid")
 			}

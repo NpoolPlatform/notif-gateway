@@ -10,6 +10,9 @@ import (
 	"github.com/NpoolPlatform/notif-gateway/api/contact"
 	"github.com/NpoolPlatform/notif-gateway/api/notif"
 	"github.com/NpoolPlatform/notif-gateway/api/notif/channel"
+	notifreadstate "github.com/NpoolPlatform/notif-gateway/api/notif/readstate"
+	notifsendstate "github.com/NpoolPlatform/notif-gateway/api/notif/sendstate"
+	notifuser "github.com/NpoolPlatform/notif-gateway/api/notif/user"
 	"github.com/NpoolPlatform/notif-gateway/api/template/email"
 	"github.com/NpoolPlatform/notif-gateway/api/template/frontend"
 	"github.com/NpoolPlatform/notif-gateway/api/template/sms"
@@ -38,6 +41,9 @@ func Register(server grpc.ServiceRegistrar) {
 	user.Register(server)
 	channel.Register(server)
 	usercode.Register(server)
+	notifreadstate.Register(server)
+	notifsendstate.Register(server)
+	notifuser.Register(server)
 }
 
 func RegisterGateway(mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) error {

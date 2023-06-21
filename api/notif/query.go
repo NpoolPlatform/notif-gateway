@@ -46,7 +46,7 @@ func (s *Server) GetNotifs(ctx context.Context, in *npool.GetNotifsRequest) (*np
 	hangler, err := notif1.NewHandler(
 		ctx,
 		notif1.WithAppID(&in.AppID),
-		notif1.WithUserID(&in.UserID),
+		notif1.WithUserID(&in.AppID, &in.UserID),
 		notif1.WithLangID(&in.LangID),
 		notif1.WithChannel(&channel),
 		notif1.WithOffset(in.GetOffset()),

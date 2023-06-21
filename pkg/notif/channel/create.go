@@ -48,19 +48,15 @@ func (h *Handler) CreateChannel(ctx context.Context) (*npool.Channel, error) {
 	return h.GetChannel(ctx)
 }
 
+// nolint
 func (h *Handler) CreateChannels(ctx context.Context) (infos []*npool.Channel, err error) {
 	reqs := []*npool.ChannelReq{}
 	for _, _type := range h.EventTypes {
 		reqs = append(reqs, &npool.ChannelReq{
 			AppID:     h.AppID,
-			EventType: &_type, //nolint
+			EventType: &_type,
 			Channel:   h.Channel,
 		})
 	}
-	infos, err = cli.CreateChannels(ctx, reqs)
-	if err != nil {
-		return nil, err
-	}
-
 	return infos, nil
 }

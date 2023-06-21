@@ -127,10 +127,6 @@ func formalize(ctx context.Context, appID, userID string, amts []*mwpb.Announcem
 			Op:    cruder.EQ,
 			Value: userID,
 		},
-		AnnouncementIDs: &basetypes.StringSliceVal{
-			Op:    cruder.IN,
-			Value: amtIDs,
-		},
 	}, 0, int32(len(amts)))
 	if err != nil {
 		return nil, err

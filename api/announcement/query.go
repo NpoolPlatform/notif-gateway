@@ -11,42 +11,6 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-//nolint
-func (s *Server) GetAnnouncement(
-	ctx context.Context,
-	in *npool.GetAnnouncementRequest,
-) (
-	*npool.GetAnnouncementResponse,
-	error,
-) {
-	handler, err := amt1.NewHandler(
-		ctx,
-		amt1.WithID(&in.ID),
-	)
-	if err != nil {
-		logger.Sugar().Errorw(
-			"GetAnnouncement",
-			"In", in,
-			"Error", err,
-		)
-		return &npool.GetAnnouncementResponse{}, status.Error(codes.InvalidArgument, err.Error())
-	}
-
-	info, err := handler.GetAnnouncement(ctx)
-	if err != nil {
-		logger.Sugar().Errorw(
-			"GetAnnouncement",
-			"In", in,
-			"Error", err,
-		)
-		return &npool.GetAnnouncementResponse{}, status.Error(codes.Internal, err.Error())
-	}
-
-	return &npool.GetAnnouncementResponse{
-		Info: info,
-	}, nil
-}
-
 func (s *Server) GetAnnouncements(ctx context.Context, in *npool.GetAnnouncementsRequest) (*npool.GetAnnouncementsResponse, error) {
 	handler, err := amt1.NewHandler(
 		ctx,

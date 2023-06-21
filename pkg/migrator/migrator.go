@@ -14,11 +14,11 @@ import (
 	constant "github.com/NpoolPlatform/go-service-framework/pkg/mysql/const"
 	constant1 "github.com/NpoolPlatform/notif-gateway/pkg/message/const"
 
-	"github.com/NpoolPlatform/notif-manager/pkg/db"
-	"github.com/NpoolPlatform/notif-manager/pkg/db/ent"
-	entnotif "github.com/NpoolPlatform/notif-manager/pkg/db/ent/notif"
+	"github.com/NpoolPlatform/notif-middleware/pkg/db"
+	"github.com/NpoolPlatform/notif-middleware/pkg/db/ent"
+	entnotif "github.com/NpoolPlatform/notif-middleware/pkg/db/ent/notif"
 
-	_ "github.com/NpoolPlatform/notif-manager/pkg/db/ent/runtime"
+	_ "github.com/NpoolPlatform/notif-middleware/pkg/db/ent/runtime"
 )
 
 const (

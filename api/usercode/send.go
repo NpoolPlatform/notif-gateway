@@ -21,7 +21,7 @@ func (s *Server) SendCode(ctx context.Context, in *npool.SendCodeRequest) (*npoo
 		ctx,
 		usercode1.WithAppID(&in.AppID),
 		usercode1.WithLangID(&in.LangID),
-		usercode1.WithUserID(in.UserID),
+		usercode1.WithUserID(&in.AppID, in.UserID),
 		usercode1.WithAccount(in.Account),
 		usercode1.WithAccountType(&in.AccountType),
 		usercode1.WithUsedFor(&in.UsedFor),

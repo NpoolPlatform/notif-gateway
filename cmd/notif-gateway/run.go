@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/NpoolPlatform/notif-gateway/api"
 	"github.com/NpoolPlatform/notif-gateway/pkg/migrator"
-	"github.com/NpoolPlatform/notif-manager/pkg/db"
+	"github.com/NpoolPlatform/notif-middleware/pkg/db"
 
 	grpc2 "github.com/NpoolPlatform/go-service-framework/pkg/grpc"
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"

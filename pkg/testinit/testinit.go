@@ -7,7 +7,7 @@ import (
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/app"
 
-	"github.com/NpoolPlatform/notif-manager/pkg/db"
+	"github.com/NpoolPlatform/notif-middleware/pkg/db"
 
 	servicename "github.com/NpoolPlatform/notif-gateway/pkg/servicename"
 

@@ -9,7 +9,6 @@ import (
 	usermwpb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/user"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	npool "github.com/NpoolPlatform/message/npool/notif/gw/v1/announcement/readstate"
-	amttype "github.com/NpoolPlatform/message/npool/notif/mw/v1/announcement"
 	mwpb "github.com/NpoolPlatform/message/npool/notif/mw/v1/announcement/readstate"
 	mwcli "github.com/NpoolPlatform/notif-middleware/pkg/client/announcement/readstate"
 )
@@ -82,7 +81,7 @@ func (h *Handler) GetReadStates(ctx context.Context) ([]*npool.ReadState, uint32
 			Username:         user.Username,
 			Title:            val.Title,
 			Content:          val.Content,
-			AnnouncementType: amttype.AnnouncementType(amttype.AnnouncementType_value[val.AnnouncementType]),
+			AnnouncementType: basetypes.NotifType(basetypes.NotifType_value[val.AnnouncementType]),
 			CreatedAt:        val.CreatedAt,
 			UpdatedAt:        val.UpdatedAt,
 		})

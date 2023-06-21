@@ -22,7 +22,7 @@ func (s *Server) GetAnnouncementUsers(
 	handler, err := amtuser1.NewHandler(
 		ctx,
 		handler1.WithAppID(&in.AppID),
-		handler1.WithAnnouncementID(&in.AppID, &in.AnnouncementID),
+		handler1.WithAnnouncementID(&in.AppID, in.AnnouncementID),
 		handler1.WithOffset(in.Offset),
 		handler1.WithLimit(in.Limit),
 	)
@@ -54,7 +54,7 @@ func (s *Server) GetAnnouncementUsers(
 func (s *Server) GetAppAnnouncementUsers(ctx context.Context, in *npool.GetAppAnnouncementUsersRequest) (*npool.GetAppAnnouncementUsersResponse, error) { // nolint
 	handler, err := amtuser1.NewHandler(
 		ctx,
-		handler1.WithAppID(&in.AppID),
+		handler1.WithAppID(&in.TargetAppID),
 		handler1.WithOffset(in.Offset),
 		handler1.WithLimit(in.Limit),
 	)
@@ -80,26 +80,5 @@ func (s *Server) GetAppAnnouncementUsers(ctx context.Context, in *npool.GetAppAn
 	return &npool.GetAppAnnouncementUsersResponse{
 		Infos: infos,
 		Total: total,
-	}, nil
-}
-
-func (s *Server) GetNAppAnnouncementUsers(ctx context.Context, in *npool.GetNAppAnnouncementUsersRequest) (*npool.GetNAppAnnouncementUsersResponse, error) { //nolint
-	resp, err := s.GetAppAnnouncementUsers(ctx, &npool.GetAppAnnouncementUsersRequest{
-		AppID:  in.TargetAppID,
-		Offset: in.Offset,
-		Limit:  in.Limit,
-	})
-
-	if err != nil {
-		logger.Sugar().Errorw(
-			"GetNAppAnnouncementUsers",
-			"In", in,
-			"Error", err,
-		)
-		return &npool.GetNAppAnnouncementUsersResponse{}, status.Error(codes.InvalidArgument, err.Error())
-	}
-	return &npool.GetNAppAnnouncementUsersResponse{
-		Infos: resp.Infos,
-		Total: resp.Total,
 	}, nil
 }

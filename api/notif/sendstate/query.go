@@ -92,7 +92,7 @@ func (s *Server) GetAppSendStates(ctx context.Context, in *npool.GetAppSendState
 		return &npool.GetAppSendStatesResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	infos, total, err := handler.GetSendStates(ctx)
+	infos, total, err := handler.GetAppSendStates(ctx)
 	if err != nil {
 		logger.Sugar().Errorw(
 			"GetSendStates",

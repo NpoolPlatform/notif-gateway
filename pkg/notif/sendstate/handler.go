@@ -4,10 +4,12 @@ import (
 	"context"
 	"fmt"
 
-	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
-	appusercli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
+	appusermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
+	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
+	notifmwpb "github.com/NpoolPlatform/message/npool/notif/mw/v1/notif"
 	constant "github.com/NpoolPlatform/notif-gateway/pkg/const"
+	notifmwcli "github.com/NpoolPlatform/notif-middleware/pkg/client/notif"
 
 	"github.com/google/uuid"
 )
@@ -16,7 +18,7 @@ type Handler struct {
 	ID      *string
 	AppID   *string
 	UserID  *string
-	NotifID *string
+	EventID *string
 	Channel *basetypes.NotifChannel
 	IDs     []string
 	Offset  int32
@@ -46,34 +48,36 @@ func WithID(id *string) func(context.Context, *Handler) error {
 	}
 }
 
-func WithAppID(id *string) func(context.Context, *Handler) error {
+func WithAppID(appID *string) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
-		if id == nil {
+		if appID == nil {
 			return nil
 		}
-		if _, err := uuid.Parse(*id); err != nil {
+		if _, err := uuid.Parse(*appID); err != nil {
 			return err
 		}
-		_app, err := appmwcli.GetApp(ctx, *id)
-		if err != nil {
-			return err
-		}
-		if _app == nil {
-			return fmt.Errorf("invalid app")
-		}
-		h.AppID = id
+		// exist, err := appmwcli.ExistApp(ctx, *appID)
+		// if err != nil {
+		// 	return err
+		// }
+		// if !exist {
+		// 	return fmt.Errorf("invalid app")
+		// }
+		h.AppID = appID
 		return nil
 	}
 }
 
 func WithUserID(appID, userID *string) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
+		if appID == nil || userID == nil {
+			return nil
+		}
 		_, err := uuid.Parse(*userID)
 		if err != nil {
 			return err
 		}
-
-		exist, err := appusercli.ExistUser(ctx, *appID, *userID)
+		exist, err := appusermwcli.ExistUser(ctx, *appID, *userID)
 		if err != nil {
 			return err
 		}
@@ -86,15 +90,31 @@ func WithUserID(appID, userID *string) func(context.Context, *Handler) error {
 	}
 }
 
-func WithNotifID(id *string) func(context.Context, *Handler) error {
+func WithEventID(appID, eventID *string) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
-		if id == nil {
-			return nil
+		if eventID == nil {
+			return fmt.Errorf("invalid eventid")
 		}
-		if _, err := uuid.Parse(*id); err != nil {
+		if _, err := uuid.Parse(*eventID); err != nil {
 			return err
 		}
-		h.NotifID = id
+		exist, err := notifmwcli.ExistNotifConds(ctx, &notifmwpb.Conds{
+			AppID: &basetypes.StringVal{
+				Op:    cruder.EQ,
+				Value: *appID,
+			},
+			EventID: &basetypes.StringVal{
+				Op:    cruder.EQ,
+				Value: *eventID,
+			},
+		})
+		if err != nil {
+			return err
+		}
+		if !exist {
+			return fmt.Errorf("invalid notif")
+		}
+		h.EventID = eventID
 		return nil
 	}
 }

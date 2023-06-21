@@ -44,22 +44,22 @@ func WithID(id *string) func(context.Context, *Handler) error {
 	}
 }
 
-func WithAppID(id *string) func(context.Context, *Handler) error {
+func WithAppID(appID *string) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
-		if id == nil {
+		if appID == nil {
 			return nil
 		}
-		if _, err := uuid.Parse(*id); err != nil {
+		if _, err := uuid.Parse(*appID); err != nil {
 			return err
 		}
-		_app, err := appmwcli.GetApp(ctx, *id)
+		exist, err := appmwcli.ExistApp(ctx, *appID)
 		if err != nil {
 			return err
 		}
-		if _app == nil {
+		if !exist {
 			return fmt.Errorf("invalid app")
 		}
-		h.AppID = id
+		h.AppID = appID
 		return nil
 	}
 }

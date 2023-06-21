@@ -5,10 +5,10 @@ import (
 	"fmt"
 
 	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
-	appusercli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
+	appusermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
-	notifpb "github.com/NpoolPlatform/message/npool/notif/mw/v1/notif"
+	notifmwpb "github.com/NpoolPlatform/message/npool/notif/mw/v1/notif"
 	constant "github.com/NpoolPlatform/notif-gateway/pkg/const"
 	notifmwcli "github.com/NpoolPlatform/notif-middleware/pkg/client/notif"
 
@@ -50,6 +50,9 @@ func WithID(id *string) func(context.Context, *Handler) error {
 
 func WithAppID(appID *string) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
+		if appID == nil {
+			return nil
+		}
 		if _, err := uuid.Parse(*appID); err != nil {
 			return err
 		}
@@ -67,14 +70,14 @@ func WithAppID(appID *string) func(context.Context, *Handler) error {
 
 func WithUserID(appID, userID *string) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
-		if userID == nil {
-			return fmt.Errorf("invalid userid")
+		if appID == nil || userID == nil {
+			return nil
 		}
 		_, err := uuid.Parse(*userID)
 		if err != nil {
 			return err
 		}
-		exist, err := appusercli.ExistUser(ctx, *appID, *userID)
+		exist, err := appusermwcli.ExistUser(ctx, *appID, *userID)
 		if err != nil {
 			return err
 		}
@@ -95,7 +98,7 @@ func WithNotifID(appID, notifID *string) func(context.Context, *Handler) error {
 		if _, err := uuid.Parse(*notifID); err != nil {
 			return err
 		}
-		exist, err := notifmwcli.ExistNotifConds(ctx, &notifpb.Conds{
+		exist, err := notifmwcli.ExistNotifConds(ctx, &notifmwpb.Conds{
 			AppID: &basetypes.StringVal{
 				Op:    cruder.EQ,
 				Value: *appID,

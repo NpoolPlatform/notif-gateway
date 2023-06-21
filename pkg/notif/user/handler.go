@@ -5,20 +5,21 @@ import (
 	"fmt"
 
 	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
-	appusercli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
+	appusermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	constant "github.com/NpoolPlatform/notif-gateway/pkg/const"
 
 	"github.com/google/uuid"
 )
 
 type Handler struct {
-	ID      *string
-	AppID   *string
-	UserID  *string
-	NotifID *string
-	IDs     []string
-	Offset  int32
-	Limit   int32
+	ID        *string
+	AppID     *string
+	UserID    *string
+	EventType *basetypes.UsedFor
+	IDs       []string
+	Offset    int32
+	Limit     int32
 }
 
 func NewHandler(ctx context.Context, options ...func(context.Context, *Handler) error) (*Handler, error) {
@@ -44,34 +45,36 @@ func WithID(id *string) func(context.Context, *Handler) error {
 	}
 }
 
-func WithAppID(id *string) func(context.Context, *Handler) error {
+func WithAppID(appID *string) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
-		if id == nil {
+		if appID == nil {
 			return nil
 		}
-		if _, err := uuid.Parse(*id); err != nil {
+		if _, err := uuid.Parse(*appID); err != nil {
 			return err
 		}
-		_app, err := appmwcli.GetApp(ctx, *id)
+		exist, err := appmwcli.ExistApp(ctx, *appID)
 		if err != nil {
 			return err
 		}
-		if _app == nil {
+		if !exist {
 			return fmt.Errorf("invalid app")
 		}
-		h.AppID = id
+		h.AppID = appID
 		return nil
 	}
 }
 
 func WithUserID(appID, userID *string) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
+		if appID == nil || userID == nil {
+			return nil
+		}
 		_, err := uuid.Parse(*userID)
 		if err != nil {
 			return err
 		}
-
-		exist, err := appusercli.ExistUser(ctx, *appID, *userID)
+		exist, err := appusermwcli.ExistUser(ctx, *appID, *userID)
 		if err != nil {
 			return err
 		}
@@ -84,15 +87,23 @@ func WithUserID(appID, userID *string) func(context.Context, *Handler) error {
 	}
 }
 
-func WithNotifID(id *string) func(context.Context, *Handler) error {
+func WithEventType(_type *basetypes.UsedFor) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
-		if id == nil {
+		if _type == nil {
 			return nil
 		}
-		if _, err := uuid.Parse(*id); err != nil {
-			return err
+		switch *_type {
+		case basetypes.UsedFor_WithdrawalRequest:
+		case basetypes.UsedFor_WithdrawalCompleted:
+		case basetypes.UsedFor_DepositReceived:
+		case basetypes.UsedFor_KYCApproved:
+		case basetypes.UsedFor_KYCRejected:
+		case basetypes.UsedFor_Announcement:
+		default:
+			return fmt.Errorf("EventType is invalid")
 		}
-		h.NotifID = id
+
+		h.EventType = _type
 		return nil
 	}
 }

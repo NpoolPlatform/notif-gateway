@@ -20,8 +20,8 @@ func (h *createHandler) validate() error {
 	if h.UserID == nil {
 		return fmt.Errorf("user id is empty")
 	}
-	if h.NotifID == nil {
-		return fmt.Errorf("notif id is empty")
+	if h.EventType == nil {
+		return fmt.Errorf("notif id is eventtype")
 	}
 	return nil
 }
@@ -35,13 +35,12 @@ func (h *Handler) CreateNotifUser(ctx context.Context) (*npool.NotifUser, error)
 		return nil, err
 	}
 
-	// TODO: judge whether exist
-	info, err := cli.CreateUser(
+	info, err := cli.CreateNotifUser(
 		ctx,
-		&mwpb.UserNotifReq{
-			AppID:   h.AppID,
-			UserID:  h.UserID,
-			NotifID: h.NotifID,
+		&mwpb.NotifUserReq{
+			AppID:     h.AppID,
+			UserID:    h.UserID,
+			EventType: h.EventType,
 		},
 	)
 	if err != nil {

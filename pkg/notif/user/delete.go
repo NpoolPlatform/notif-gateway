@@ -14,7 +14,7 @@ func (h *Handler) DeleteNotifUser(ctx context.Context) (*npool.NotifUser, error)
 		return nil, err
 	}
 
-	_, err = cli.DeleteUser(ctx, &notifusermw.UserNotifReq{
+	_, err = cli.DeleteNotifUser(ctx, &notifusermw.NotifUserReq{
 		ID: h.ID,
 	})
 	if err != nil {

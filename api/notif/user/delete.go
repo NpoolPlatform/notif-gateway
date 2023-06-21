@@ -16,6 +16,7 @@ func (s *Server) DeleteNotifUser(ctx context.Context, in *npool.DeleteNotifUserR
 	handler, err := notifuser1.NewHandler(
 		ctx,
 		notifuser1.WithID(&in.ID),
+		notifuser1.WithAppID(&in.AppID),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

@@ -93,7 +93,7 @@ func WithAnnouncementID(appID, amtID *string) func(context.Context, *Handler) er
 		if amtID == nil {
 			return fmt.Errorf("invalid announcement id")
 		}
-		exist, err := cli.ExistAnnouncement(ctx, *amtID, *appID)
+		exist, err := cli.ExistAnnouncement(ctx, *amtID)
 		if err != nil {
 			return err
 		}

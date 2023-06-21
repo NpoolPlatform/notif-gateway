@@ -12,7 +12,6 @@ import (
 	amt1 "github.com/NpoolPlatform/notif-gateway/pkg/announcement"
 )
 
-//nolint
 func (s *Server) DeleteAnnouncement(
 	ctx context.Context,
 	in *npool.DeleteAnnouncementRequest,

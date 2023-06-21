@@ -21,7 +21,7 @@ func (h *createHandler) validate() error {
 		return fmt.Errorf("user id is empty")
 	}
 	if h.EventType == nil {
-		return fmt.Errorf("notif id is eventtype")
+		return fmt.Errorf("eventtype is empty")
 	}
 	return nil
 }

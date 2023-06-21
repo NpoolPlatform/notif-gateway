@@ -20,9 +20,10 @@ import (
 
 func (h *Handler) UpdateNotifs(ctx context.Context) ([]*npool.Notif, error) {
 	reqs := []*notifmwpb.NotifReq{}
-	for _, id := range h.IDs {
+	for _, _id := range h.IDs {
+		notifID := _id
 		_req := &notifmwpb.NotifReq{
-			ID:       &id,
+			ID:       &notifID,
 			Notified: h.Notified,
 		}
 		reqs = append(reqs, _req)

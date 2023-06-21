@@ -17,13 +17,13 @@ func (h *Handler) CreateContact(ctx context.Context) (*npool.Contact, error) {
 				Op:    cruder.EQ,
 				Value: *h.AppID,
 			},
-			AccountType: &basetypes.Int32Val{
+			AccountType: &basetypes.Uint32Val{
 				Op:    cruder.EQ,
-				Value: int32(*h.AccountType),
+				Value: uint32(*h.AccountType),
 			},
-			UsedFor: &basetypes.Int32Val{
+			UsedFor: &basetypes.Uint32Val{
 				Op:    cruder.EQ,
-				Value: int32(*h.UsedFor),
+				Value: uint32(*h.UsedFor),
 			},
 		},
 	})

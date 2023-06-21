@@ -107,7 +107,6 @@ func WithChannel(_channel *basetypes.NotifChannel) func(context.Context, *Handle
 		switch *_channel {
 		case basetypes.NotifChannel_ChannelEmail:
 		case basetypes.NotifChannel_ChannelSMS:
-		case basetypes.NotifChannel_ChannelFrontend:
 		default:
 			return fmt.Errorf("channel %v invalid", *_channel)
 		}

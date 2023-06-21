@@ -2,8 +2,9 @@ package sendstate
 
 import (
 	"context"
+	"fmt"
 
-	usermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
+	appusermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	usermwpb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/user"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
@@ -13,22 +14,85 @@ import (
 )
 
 func (h *Handler) GetSendStates(ctx context.Context) ([]*npool.SendState, uint32, error) {
+	if h.AppID == nil {
+		return nil, 0, fmt.Errorf("invalid appid")
+	}
+	if h.UserID == nil {
+		return nil, 0, fmt.Errorf("invalid userid")
+	}
+
+	user, err := appusermwcli.GetUser(ctx, *h.AppID, *h.UserID)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	if user == nil {
+		return nil, 0, fmt.Errorf("invalid user")
+	}
+
+	conds := &mwpb.Conds{
+		AppID: &basetypes.StringVal{
+			Op:    cruder.EQ,
+			Value: *h.AppID,
+		},
+		UserID: &basetypes.StringVal{
+			Op:    cruder.EQ,
+			Value: *h.UserID,
+		},
+	}
+	if h.EventID != nil {
+		conds.EventID = &basetypes.StringVal{
+			Op:    cruder.EQ,
+			Value: *h.EventID,
+		}
+	}
+	if h.Channel != nil {
+		conds.Channel = &basetypes.Uint32Val{
+			Op:    cruder.EQ,
+			Value: uint32(*h.Channel),
+		}
+	}
+
+	rows, total, err := mwcli.GetSendStates(ctx, conds, h.Offset, h.Limit)
+	if err != nil {
+		return nil, 0, err
+	}
+	if len(rows) == 0 {
+		return nil, total, nil
+	}
+
+	infos := []*npool.SendState{}
+	for _, val := range rows {
+		infos = append(infos, &npool.SendState{
+			ID:           val.ID,
+			EventID:      val.EventID,
+			AppID:        val.AppID,
+			UserID:       val.UserID,
+			EmailAddress: user.EmailAddress,
+			PhoneNO:      user.PhoneNO,
+			Username:     user.Username,
+			Channel:      val.Channel,
+			CreatedAt:    val.CreatedAt,
+			UpdatedAt:    val.UpdatedAt,
+		})
+	}
+	return infos, total, nil
+}
+
+func (h *Handler) GetAppSendStates(ctx context.Context) ([]*npool.SendState, uint32, error) {
+	if h.AppID == nil {
+		return nil, 0, fmt.Errorf("invalid appid")
+	}
 	conds := &mwpb.Conds{
 		AppID: &basetypes.StringVal{
 			Op:    cruder.EQ,
 			Value: *h.AppID,
 		},
 	}
-	if h.UserID != nil {
-		conds.UserID = &basetypes.StringVal{
+	if h.EventID != nil {
+		conds.EventID = &basetypes.StringVal{
 			Op:    cruder.EQ,
-			Value: *h.UserID,
-		}
-	}
-	if h.NotifID != nil {
-		conds.NotifID = &basetypes.StringVal{
-			Op:    cruder.EQ,
-			Value: *h.NotifID,
+			Value: *h.EventID,
 		}
 	}
 	if h.Channel != nil {
@@ -56,7 +120,7 @@ func (h *Handler) GetSendStates(ctx context.Context) ([]*npool.SendState, uint32
 
 	userMap := map[string]*usermwpb.User{}
 	if len(userIDs) > 0 {
-		userInfos, _, err := usermwcli.GetUsers(ctx, &usermwpb.Conds{
+		userInfos, _, err := appusermwcli.GetUsers(ctx, &usermwpb.Conds{
 			IDs: &basetypes.StringSliceVal{
 				Op: cruder.IN, Value: userIDs,
 			},
@@ -78,7 +142,7 @@ func (h *Handler) GetSendStates(ctx context.Context) ([]*npool.SendState, uint32
 		}
 		infos = append(infos, &npool.SendState{
 			ID:           val.ID,
-			NotifID:      val.NotifID,
+			EventID:      val.EventID,
 			AppID:        val.AppID,
 			UserID:       val.UserID,
 			EmailAddress: user.EmailAddress,

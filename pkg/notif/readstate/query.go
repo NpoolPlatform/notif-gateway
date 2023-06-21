@@ -2,6 +2,7 @@ package readstate
 
 import (
 	"context"
+	"fmt"
 
 	usermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
@@ -11,6 +12,21 @@ import (
 	mwpb "github.com/NpoolPlatform/message/npool/notif/mw/v1/notif/readstate"
 	mwcli "github.com/NpoolPlatform/notif-middleware/pkg/client/notif/readstate"
 )
+
+func (h *Handler) GetReadState(ctx context.Context) (*npool.ReadState, error) {
+	h.Offset = 0
+	h.Limit = 1
+	infos, _, err := h.GetReadStates(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(infos) == 0 {
+		return nil, fmt.Errorf("read state not found")
+	}
+
+	return infos[0], nil
+}
 
 func (h *Handler) GetReadStates(ctx context.Context) ([]*npool.ReadState, uint32, error) {
 	conds := &mwpb.Conds{

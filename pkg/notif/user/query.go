@@ -20,10 +20,10 @@ func (h *Handler) GetNotifUsers(ctx context.Context) ([]*npool.NotifUser, uint32
 			Value: *h.AppID,
 		},
 	}
-	if h.NotifID != nil {
-		conds.NotifID = &basetypes.StringVal{
+	if h.EventType != nil {
+		conds.EventType = &basetypes.Uint32Val{
 			Op:    cruder.EQ,
-			Value: *h.NotifID,
+			Value: uint32(*h.EventType),
 		}
 	}
 	if h.UserID != nil {
@@ -33,7 +33,7 @@ func (h *Handler) GetNotifUsers(ctx context.Context) ([]*npool.NotifUser, uint32
 		}
 	}
 
-	rows, total, err := mwcli.GetUsers(ctx, conds, h.Offset, h.Limit)
+	rows, total, err := mwcli.GetNotifUsers(ctx, conds, h.Offset, h.Limit)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -73,7 +73,7 @@ func (h *Handler) GetNotifUsers(ctx context.Context) ([]*npool.NotifUser, uint32
 		}
 		infos = append(infos, &npool.NotifUser{
 			ID:           val.ID,
-			NotifID:      val.NotifID,
+			EventType:    val.EventType,
 			AppID:        val.AppID,
 			UserID:       val.UserID,
 			EmailAddress: user.EmailAddress,
@@ -90,7 +90,7 @@ func (h *Handler) GetNotifUsers(ctx context.Context) ([]*npool.NotifUser, uint32
 }
 
 func (h *Handler) GetNotifUser(ctx context.Context) (*npool.NotifUser, error) {
-	row, err := mwcli.GetUser(ctx, *h.ID)
+	row, err := mwcli.GetNotifUser(ctx, *h.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -105,7 +105,7 @@ func (h *Handler) GetNotifUser(ctx context.Context) (*npool.NotifUser, error) {
 
 	info := &npool.NotifUser{
 		ID:           row.ID,
-		NotifID:      row.NotifID,
+		EventType:    row.EventType,
 		AppID:        row.AppID,
 		UserID:       row.UserID,
 		EmailAddress: user.EmailAddress,

@@ -15,7 +15,7 @@ func (s *Server) GetNotifUsers(ctx context.Context, in *npool.GetNotifUsersReque
 	handler, err := notifuser1.NewHandler(
 		ctx,
 		notifuser1.WithAppID(&in.AppID),
-		notifuser1.WithNotifID(&in.NotifID),
+		notifuser1.WithEventType(in.EventType),
 		notifuser1.WithOffset(in.Offset),
 		notifuser1.WithLimit(in.Limit),
 	)
@@ -47,7 +47,7 @@ func (s *Server) GetNotifUsers(ctx context.Context, in *npool.GetNotifUsersReque
 func (s *Server) GetAppNotifUsers(ctx context.Context, in *npool.GetAppNotifUsersRequest) (*npool.GetAppNotifUsersResponse, error) {
 	handler, err := notifuser1.NewHandler(
 		ctx,
-		notifuser1.WithAppID(&in.AppID),
+		notifuser1.WithAppID(&in.TargetAppID),
 		notifuser1.WithOffset(in.Offset),
 		notifuser1.WithLimit(in.Limit),
 	)
@@ -73,26 +73,5 @@ func (s *Server) GetAppNotifUsers(ctx context.Context, in *npool.GetAppNotifUser
 	return &npool.GetAppNotifUsersResponse{
 		Infos: infos,
 		Total: total,
-	}, nil
-}
-
-func (s *Server) GetNAppNotifUsers(ctx context.Context, in *npool.GetNAppNotifUsersRequest) (*npool.GetNAppNotifUsersResponse, error) {
-	resp, err := s.GetAppNotifUsers(ctx, &npool.GetAppNotifUsersRequest{
-		AppID:  in.TargetAppID,
-		Offset: in.Offset,
-		Limit:  in.Limit,
-	})
-
-	if err != nil {
-		logger.Sugar().Errorw(
-			"GetNAppNotifUsers",
-			"In", in,
-			"Error", err,
-		)
-		return &npool.GetNAppNotifUsersResponse{}, status.Error(codes.InvalidArgument, err.Error())
-	}
-	return &npool.GetNAppNotifUsersResponse{
-		Infos: resp.Infos,
-		Total: resp.Total,
 	}, nil
 }

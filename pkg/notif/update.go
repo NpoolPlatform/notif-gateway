@@ -2,6 +2,7 @@ package notif
 
 import (
 	"context"
+	"fmt"
 
 	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
 	usermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
@@ -19,6 +20,10 @@ import (
 )
 
 func (h *Handler) UpdateNotifs(ctx context.Context) ([]*npool.Notif, error) {
+	if h.IDs == nil || len(h.IDs) == 0 {
+		return nil, fmt.Errorf("invalid ids")
+	}
+
 	reqs := []*notifmwpb.NotifReq{}
 	for _, _id := range h.IDs {
 		notifID := _id

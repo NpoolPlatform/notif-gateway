@@ -84,6 +84,7 @@ func (h *Handler) GetSendStates(ctx context.Context) ([]*npool.SendState, uint32
 			EmailAddress: user.EmailAddress,
 			PhoneNO:      user.PhoneNO,
 			Username:     user.Username,
+			Channel:      val.Channel,
 			CreatedAt:    val.CreatedAt,
 			UpdatedAt:    val.UpdatedAt,
 		})

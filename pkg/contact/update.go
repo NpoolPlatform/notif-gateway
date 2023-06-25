@@ -4,40 +4,24 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
-	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	npool "github.com/NpoolPlatform/message/npool/notif/mw/v1/contact"
 	cli "github.com/NpoolPlatform/notif-middleware/pkg/client/contact"
 )
 
-type updateHandler struct {
-	*Handler
-}
-
 func (h *Handler) UpdateContact(ctx context.Context) (*npool.Contact, error) {
-	exist, err := cli.ExistContactConds(
-		ctx,
-		&npool.ExistContactCondsRequest{
-			Conds: &npool.Conds{
-				ID: &basetypes.StringVal{
-					Op:    cruder.EQ,
-					Value: *h.ID,
-				},
-				AppID: &basetypes.StringVal{
-					Op:    cruder.EQ,
-					Value: *h.AppID,
-				},
-			},
-		},
-	)
+	info, err := h.GetContact(ctx)
 	if err != nil {
 		return nil, err
 	}
-	if !exist {
-		return nil, fmt.Errorf("invalid id or app id")
+
+	if info == nil {
+		return nil, fmt.Errorf("contact not found")
+	}
+	if info.AppID != *h.AppID {
+		return nil, fmt.Errorf("permission denied")
 	}
 
-	_, err = cli.UpdateContact(ctx, &npool.ContactReq{
+	_info, err := cli.UpdateContact(ctx, &npool.ContactReq{
 		ID:          h.ID,
 		AppID:       h.AppID,
 		Account:     h.Account,
@@ -49,14 +33,5 @@ func (h *Handler) UpdateContact(ctx context.Context) (*npool.Contact, error) {
 		return nil, err
 	}
 
-	handler := &updateHandler{
-		Handler: h,
-	}
-
-	info, err := handler.GetContact(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	return info, nil
+	return _info, nil
 }

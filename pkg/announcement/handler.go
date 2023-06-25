@@ -176,7 +176,7 @@ func WithAnnouncementType(_type *basetypes.NotifType) func(context.Context, *Han
 	}
 }
 
-func WithStartAt(startAt *uint32) func(context.Context, *Handler) error {
+func WithStartAt(startAt, endAt *uint32) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if startAt == nil {
 			return nil
@@ -184,18 +184,28 @@ func WithStartAt(startAt *uint32) func(context.Context, *Handler) error {
 		if *startAt < uint32(time.Now().Unix()) {
 			return fmt.Errorf("invalid start at")
 		}
+		if endAt != nil {
+			if *startAt > *endAt {
+				return fmt.Errorf("start at less than end at")
+			}
+		}
 		h.StartAt = startAt
 		return nil
 	}
 }
 
-func WithEndAt(endAt *uint32) func(context.Context, *Handler) error {
+func WithEndAt(startAt, endAt *uint32) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if endAt == nil {
 			return nil
 		}
 		if *endAt < uint32(time.Now().Unix()) {
 			return fmt.Errorf("invalid end at")
+		}
+		if startAt != nil {
+			if *startAt > *endAt {
+				return fmt.Errorf("start at less than end at")
+			}
 		}
 		h.EndAt = endAt
 		return nil

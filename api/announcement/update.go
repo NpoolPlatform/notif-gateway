@@ -24,7 +24,8 @@ func (s *Server) UpdateAnnouncement(
 		amt1.WithTitle(in.Title),
 		amt1.WithContent(in.Content),
 		amt1.WithAnnouncementType(in.AnnouncementType),
-		amt1.WithEndAt(in.EndAt),
+		amt1.WithStartAt(in.StartAt, in.EndAt),
+		amt1.WithEndAt(in.StartAt, in.EndAt),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

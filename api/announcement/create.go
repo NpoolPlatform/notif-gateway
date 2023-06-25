@@ -26,8 +26,8 @@ func (s *Server) CreateAnnouncement(
 		amt1.WithLangID(&in.AppID, &in.TargetLangID),
 		amt1.WithChannel(&in.Channel),
 		amt1.WithAnnouncementType(&in.AnnouncementType),
-		amt1.WithStartAt(&in.StartAt),
-		amt1.WithEndAt(&in.EndAt),
+		amt1.WithStartAt(&in.StartAt, &in.StartAt),
+		amt1.WithEndAt(&in.StartAt, &in.EndAt),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

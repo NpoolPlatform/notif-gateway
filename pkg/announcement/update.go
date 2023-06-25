@@ -37,6 +37,7 @@ func (h *Handler) UpdateAnnouncement(ctx context.Context) (*npool.Announcement, 
 		Title:            h.Title,
 		Content:          h.Content,
 		EndAt:            h.EndAt,
+		StartAt:          h.StartAt,
 		AnnouncementType: h.Type,
 	},
 	)

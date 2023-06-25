@@ -10,9 +10,7 @@ import (
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	npool "github.com/NpoolPlatform/message/npool/notif/gw/v1/announcement"
 	mwpb "github.com/NpoolPlatform/message/npool/notif/mw/v1/announcement"
-	readpb "github.com/NpoolPlatform/message/npool/notif/mw/v1/announcement/readstate"
 	mwcli "github.com/NpoolPlatform/notif-middleware/pkg/client/announcement"
-	readcli "github.com/NpoolPlatform/notif-middleware/pkg/client/announcement/readstate"
 )
 
 func (h *Handler) GetAnnouncements(ctx context.Context) ([]*npool.Announcement, uint32, error) {
@@ -63,6 +61,7 @@ func (h *Handler) GetAnnouncements(ctx context.Context) ([]*npool.Announcement, 
 			LangID:           amt.LangID,
 			Title:            amt.Title,
 			Content:          amt.Content,
+			StartAt:          amt.StartAt,
 			EndAt:            amt.EndAt,
 			Notified:         false,
 			CreatedAt:        amt.CreatedAt,
@@ -94,6 +93,7 @@ func (h *Handler) GetAnnouncement(ctx context.Context) (*npool.Announcement, err
 		LangID:           amt.LangID,
 		Title:            amt.Title,
 		Content:          amt.Content,
+		StartAt:          amt.StartAt,
 		EndAt:            amt.EndAt,
 		Notified:         false,
 		CreatedAt:        amt.CreatedAt,
@@ -108,33 +108,6 @@ func (h *Handler) GetAnnouncement(ctx context.Context) (*npool.Announcement, err
 func formalize(ctx context.Context, appID, userID string, amts []*mwpb.Announcement) ([]*npool.Announcement, error) {
 	if len(amts) == 0 {
 		return nil, nil
-	}
-
-	amtIDs := []string{}
-	for _, amt := range amts {
-		amtIDs = append(amtIDs, amt.ID)
-	}
-	if len(amtIDs) == 0 {
-		return nil, nil
-	}
-
-	infos, _, err := readcli.GetReadStates(ctx, &readpb.Conds{
-		AppID: &basetypes.StringVal{
-			Op:    cruder.EQ,
-			Value: appID,
-		},
-		UserID: &basetypes.StringVal{
-			Op:    cruder.EQ,
-			Value: userID,
-		},
-	}, 0, int32(len(amts)))
-	if err != nil {
-		return nil, err
-	}
-
-	readMap := map[string]*readpb.ReadState{}
-	for _, info := range infos {
-		readMap[info.AnnouncementID] = info
 	}
 
 	// get users
@@ -160,11 +133,6 @@ func formalize(ctx context.Context, appID, userID string, amts []*mwpb.Announcem
 	}
 
 	for _, amt := range amts {
-		notified := true
-		_, ok := readMap[amt.ID]
-		if !ok {
-			notified = false
-		}
 
 		announcements = append(announcements, &npool.Announcement{
 			ID:               amt.ID,
@@ -177,11 +145,11 @@ func formalize(ctx context.Context, appID, userID string, amts []*mwpb.Announcem
 			Title:            amt.Title,
 			Content:          amt.Content,
 			EndAt:            amt.EndAt,
-			Notified:         notified,
-			CreatedAt:        amt.CreatedAt,
-			UpdatedAt:        amt.UpdatedAt,
+			Notified:         amt.Notified,
 			Channel:          amt.Channel,
 			AnnouncementType: amt.AnnouncementType,
+			CreatedAt:        amt.CreatedAt,
+			UpdatedAt:        amt.UpdatedAt,
 		})
 	}
 	return announcements, nil

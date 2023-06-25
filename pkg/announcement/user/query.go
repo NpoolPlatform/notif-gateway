@@ -72,18 +72,18 @@ func (h *Handler) GetAnnouncementUsers(ctx context.Context) ([]*npool.Announceme
 			continue
 		}
 		infos = append(infos, &npool.AnnouncementUser{
-			ID:             val.ID,
-			AnnouncementID: val.AnnouncementID,
-			AppID:          val.AppID,
-			UserID:         val.UserID,
-			EmailAddress:   user.EmailAddress,
-			PhoneNO:        user.PhoneNO,
-			Username:       user.Username,
-			// Title:            val.Title, // TODO
-			// Content:          val.Content,
-			// AnnouncementType: val.AnnouncementType,
-			CreatedAt: val.CreatedAt,
-			UpdatedAt: val.UpdatedAt,
+			ID:               val.ID,
+			AnnouncementID:   val.AnnouncementID,
+			AppID:            val.AppID,
+			UserID:           val.UserID,
+			EmailAddress:     user.EmailAddress,
+			PhoneNO:          user.PhoneNO,
+			Username:         user.Username,
+			Title:            val.Title,
+			Content:          val.Content,
+			AnnouncementType: basetypes.NotifType(basetypes.NotifType_value[val.AnnouncementType]),
+			CreatedAt:        val.CreatedAt,
+			UpdatedAt:        val.UpdatedAt,
 		})
 	}
 	return infos, total, nil
@@ -104,18 +104,18 @@ func (h *Handler) GetAnnouncementUser(ctx context.Context) (*npool.AnnouncementU
 	}
 
 	info := &npool.AnnouncementUser{
-		ID:             row.ID,
-		AnnouncementID: row.AnnouncementID,
-		AppID:          row.AppID,
-		UserID:         row.UserID,
-		EmailAddress:   user.EmailAddress,
-		PhoneNO:        user.PhoneNO,
-		Username:       user.Username,
-		// Title:            val.Title,
-		// Content:          val.Content,
-		// AnnouncementType: val.AnnouncementType, // TODO
-		CreatedAt: row.CreatedAt,
-		UpdatedAt: row.UpdatedAt,
+		ID:               row.ID,
+		AnnouncementID:   row.AnnouncementID,
+		AppID:            row.AppID,
+		UserID:           row.UserID,
+		EmailAddress:     user.EmailAddress,
+		PhoneNO:          user.PhoneNO,
+		Username:         user.Username,
+		Title:            row.Title,
+		Content:          row.Content,
+		AnnouncementType: basetypes.NotifType(basetypes.NotifType_value[row.AnnouncementType]),
+		CreatedAt:        row.CreatedAt,
+		UpdatedAt:        row.UpdatedAt,
 	}
 
 	return info, nil

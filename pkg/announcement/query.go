@@ -42,7 +42,7 @@ func (h *Handler) GetAnnouncements(ctx context.Context) ([]*npool.Announcement, 
 	}
 
 	if h.UserID != nil {
-		rows, err := formalize(ctx, *h.AppID, *h.UserID, infos)
+		rows, err := formalize(ctx, *h.UserID, infos)
 		if err != nil {
 			return nil, 0, err
 		}
@@ -105,7 +105,7 @@ func (h *Handler) GetAnnouncement(ctx context.Context) (*npool.Announcement, err
 	return info, nil
 }
 
-func formalize(ctx context.Context, appID, userID string, amts []*mwpb.Announcement) ([]*npool.Announcement, error) {
+func formalize(ctx context.Context, userID string, amts []*mwpb.Announcement) ([]*npool.Announcement, error) {
 	if len(amts) == 0 {
 		return nil, nil
 	}
@@ -133,7 +133,6 @@ func formalize(ctx context.Context, appID, userID string, amts []*mwpb.Announcem
 	}
 
 	for _, amt := range amts {
-
 		announcements = append(announcements, &npool.Announcement{
 			ID:               amt.ID,
 			AppID:            amt.AppID,

@@ -47,6 +47,7 @@ func (h *Handler) CreateAnnouncement(ctx context.Context) (*npool.Announcement, 
 			LangID:           h.LangID,
 			Channel:          h.Channel,
 			AnnouncementType: h.Type,
+			StartAt:          h.StartAt,
 			EndAt:            h.EndAt,
 		},
 	)

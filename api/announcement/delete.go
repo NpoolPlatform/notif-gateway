@@ -22,6 +22,7 @@ func (s *Server) DeleteAnnouncement(
 	handler, err := amt1.NewHandler(
 		ctx,
 		amt1.WithID(&in.ID),
+		amt1.WithAppID(&in.AppID),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

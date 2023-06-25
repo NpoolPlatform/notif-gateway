@@ -2,6 +2,7 @@ package announcement
 
 import (
 	"context"
+	"fmt"
 
 	npool "github.com/NpoolPlatform/message/npool/notif/gw/v1/announcement"
 	mwpb "github.com/NpoolPlatform/message/npool/notif/mw/v1/announcement"
@@ -9,7 +10,18 @@ import (
 )
 
 func (h *Handler) UpdateAnnouncement(ctx context.Context) (*npool.Announcement, error) {
-	_, err := cli.UpdateAnnouncement(ctx, &mwpb.AnnouncementReq{
+	info, err := h.GetAnnouncement(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if info == nil {
+		return nil, fmt.Errorf("announcement not found")
+	}
+	if info.AppID != *h.AppID {
+		return nil, fmt.Errorf("permission denied")
+	}
+
+	_, err = cli.UpdateAnnouncement(ctx, &mwpb.AnnouncementReq{
 		ID:               h.ID,
 		Title:            h.Title,
 		Content:          h.Content,

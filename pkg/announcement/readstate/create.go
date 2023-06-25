@@ -12,7 +12,7 @@ import (
 )
 
 func (h *Handler) CreateReadState(ctx context.Context) (*npool.ReadState, error) {
-	infos, _, err := cli.GetReadStates(ctx, &mwpb.Conds{
+	exist, err := cli.ExistReadStateConds(ctx, &mwpb.Conds{
 		AppID: &basetypes.StringVal{
 			Op:    cruder.EQ,
 			Value: *h.AppID,
@@ -25,11 +25,11 @@ func (h *Handler) CreateReadState(ctx context.Context) (*npool.ReadState, error)
 			Op:    cruder.EQ,
 			Value: *h.AnnouncementID,
 		},
-	}, 0, 1)
+	})
 	if err != nil {
 		return nil, err
 	}
-	if len(infos) > 0 {
+	if exist {
 		return nil, fmt.Errorf("read state exist")
 	}
 

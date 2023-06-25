@@ -20,6 +20,7 @@ func (s *Server) UpdateAnnouncement(
 	handler, err := amt1.NewHandler(
 		ctx,
 		amt1.WithID(&in.ID),
+		amt1.WithAppID(&in.AppID),
 		amt1.WithTitle(in.Title),
 		amt1.WithContent(in.Content),
 		amt1.WithAnnouncementType(in.AnnouncementType),

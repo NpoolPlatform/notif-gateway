@@ -11,33 +11,33 @@ import (
 	channel1 "github.com/NpoolPlatform/notif-gateway/pkg/notif/channel"
 )
 
-func (s *Server) CreateChannels(ctx context.Context, in *npool.CreateChannelsRequest) (*npool.CreateChannelsResponse, error) {
+func (s *Server) CreateChannel(ctx context.Context, in *npool.CreateChannelRequest) (*npool.CreateChannelResponse, error) {
 	handler, err := channel1.NewHandler(
 		ctx,
 		channel1.WithAppID(&in.AppID),
 		channel1.WithChannel(&in.Channel),
-		channel1.WithEventTypes(in.EventTypes),
+		channel1.WithEventType(&in.EventType),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"CreateChannels",
+			"CreateChannel",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.CreateChannelsResponse{}, status.Error(codes.InvalidArgument, err.Error())
+		return &npool.CreateChannelResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	info, err := handler.CreateChannels(ctx)
+	info, err := handler.CreateChannel(ctx)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"CreateChannels",
+			"CreateChannel",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.CreateChannelsResponse{}, status.Error(codes.Internal, err.Error())
+		return &npool.CreateChannelResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
-	return &npool.CreateChannelsResponse{
-		Infos: info,
+	return &npool.CreateChannelResponse{
+		Info: info,
 	}, nil
 }

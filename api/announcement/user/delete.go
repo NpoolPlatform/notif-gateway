@@ -48,3 +48,28 @@ func (s *Server) DeleteAnnouncementUser(
 		Info: info,
 	}, nil
 }
+
+func (s *Server) DeleteAppAnnouncementUser(
+	ctx context.Context,
+	in *npool.DeleteAppAnnouncementUserRequest,
+) (
+	*npool.DeleteAppAnnouncementUserResponse,
+	error,
+) {
+	resp, err := s.DeleteAnnouncementUser(ctx, &npool.DeleteAnnouncementUserRequest{
+		ID:    in.ID,
+		AppID: in.TargetAppID,
+	})
+	if err != nil {
+		logger.Sugar().Errorw(
+			"DeleteAnnouncementUser",
+			"In", in,
+			"Error", err,
+		)
+		return &npool.DeleteAppAnnouncementUserResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	return &npool.DeleteAppAnnouncementUserResponse{
+		Info: resp.Info,
+	}, nil
+}

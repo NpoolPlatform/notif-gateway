@@ -47,3 +47,30 @@ func (s *Server) CreateAnnouncementUser(
 		Info: info,
 	}, nil
 }
+
+func (s *Server) CreateAppAnnouncementUser(
+	ctx context.Context,
+	in *npool.CreateAppAnnouncementUserRequest,
+) (
+	*npool.CreateAppAnnouncementUserResponse,
+	error,
+) {
+	resp, err := s.CreateAnnouncementUser(ctx, &npool.CreateAnnouncementUserRequest{
+		AppID:          in.TargetAppID,
+		TargetUserID:   in.TargetUserID,
+		AnnouncementID: in.AnnouncementID,
+	})
+
+	if err != nil {
+		logger.Sugar().Errorw(
+			"CreateAnnouncementUser",
+			"In", in,
+			"Error", err,
+		)
+		return &npool.CreateAppAnnouncementUserResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	return &npool.CreateAppAnnouncementUserResponse{
+		Info: resp.Info,
+	}, nil
+}

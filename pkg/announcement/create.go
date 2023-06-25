@@ -23,8 +23,11 @@ func (h *createHandler) validate() error {
 	if h.Type == nil {
 		return fmt.Errorf("type is empty")
 	}
+	if h.StartAt == nil {
+		return fmt.Errorf("end at is empty")
+	}
 	if h.EndAt == nil {
-		return fmt.Errorf("endat is empty")
+		return fmt.Errorf("end at is empty")
 	}
 	return nil
 }

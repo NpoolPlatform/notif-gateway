@@ -21,6 +21,17 @@ func (h *Handler) UpdateAnnouncement(ctx context.Context) (*npool.Announcement, 
 		return nil, fmt.Errorf("permission denied")
 	}
 
+	if h.StartAt != nil && h.EndAt == nil {
+		if *h.StartAt > info.EndAt {
+			return nil, fmt.Errorf("start at less than end at")
+		}
+	}
+	if h.EndAt != nil && h.StartAt == nil {
+		if *h.EndAt > info.StartAt {
+			return nil, fmt.Errorf("start at less than end at")
+		}
+	}
+
 	_, err = cli.UpdateAnnouncement(ctx, &mwpb.AnnouncementReq{
 		ID:               h.ID,
 		Title:            h.Title,

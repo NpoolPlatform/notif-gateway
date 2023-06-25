@@ -100,7 +100,7 @@ func WithLangID(appID, langID *string) func(context.Context, *Handler) error {
 				Op:    cruder.EQ,
 				Value: *appID,
 			},
-			ID: &basetypes.StringVal{
+			LangID: &basetypes.StringVal{
 				Op:    cruder.EQ,
 				Value: *langID,
 			},

@@ -22,7 +22,7 @@ func (s *Server) CreateEmailTemplate(
 	handler, err := emailtemplate1.NewHandler(
 		ctx,
 		emailtemplate1.WithAppID(&in.AppID),
-		emailtemplate1.WithLangID(&in.TargetLangID),
+		emailtemplate1.WithLangID(&in.AppID, &in.TargetLangID),
 		emailtemplate1.WithUsedFor(&in.UsedFor),
 		emailtemplate1.WithSubject(&in.Subject),
 		emailtemplate1.WithDefaultToUsername(&in.DefaultToUsername),
@@ -66,7 +66,7 @@ func (s *Server) CreateAppEmailTemplate(
 	handler, err := emailtemplate1.NewHandler(
 		ctx,
 		emailtemplate1.WithAppID(&in.TargetAppID),
-		emailtemplate1.WithLangID(&in.TargetLangID),
+		emailtemplate1.WithLangID(&in.TargetAppID, &in.TargetLangID),
 		emailtemplate1.WithUsedFor(&in.UsedFor),
 		emailtemplate1.WithSubject(&in.Subject),
 		emailtemplate1.WithDefaultToUsername(&in.DefaultToUsername),

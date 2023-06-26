@@ -5,7 +5,10 @@ import (
 	"fmt"
 
 	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
+	g11nmwcli "github.com/NpoolPlatform/g11n-middleware/pkg/client/applang"
+	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
+	"github.com/NpoolPlatform/message/npool/g11n/mw/v1/applang"
 	constant "github.com/NpoolPlatform/notif-gateway/pkg/const"
 	"github.com/google/uuid"
 )
@@ -68,15 +71,35 @@ func WithAppID(appID *string) func(context.Context, *Handler) error {
 	}
 }
 
-func WithLangID(id *string) func(context.Context, *Handler) error {
+func WithLangID(appID, langID *string) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
-		if id == nil {
-			return nil
+		if langID == nil {
+			return fmt.Errorf("invalid lang id")
 		}
-		if _, err := uuid.Parse(*id); err != nil {
+		_, err := uuid.Parse(*langID)
+		if err != nil {
 			return err
 		}
-		h.LangID = id
+
+		exist, err := g11nmwcli.ExistAppLangConds(ctx, &applang.Conds{
+			AppID: &basetypes.StringVal{
+				Op:    cruder.EQ,
+				Value: *appID,
+			},
+			LangID: &basetypes.StringVal{
+				Op:    cruder.EQ,
+				Value: *langID,
+			},
+		})
+
+		if err != nil {
+			return err
+		}
+		if !exist {
+			return fmt.Errorf("invalid lang id")
+		}
+
+		h.LangID = langID
 		return nil
 	}
 }

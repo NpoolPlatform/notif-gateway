@@ -6,6 +6,7 @@ import (
 
 	appcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
 	appusercli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	constant "github.com/NpoolPlatform/notif-gateway/pkg/const"
 	cli "github.com/NpoolPlatform/notif-middleware/pkg/client/announcement"
 	"github.com/google/uuid"
@@ -93,22 +94,30 @@ func WithAnnouncementID(appID, amtID *string) func(context.Context, *Handler) er
 		if amtID == nil {
 			return fmt.Errorf("invalid announcement id")
 		}
-		exist, err := cli.ExistAnnouncement(ctx, *amtID)
+		_, err := uuid.Parse(*amtID)
 		if err != nil {
 			return err
-		}
-		if !exist {
-			return fmt.Errorf("announcement id not exist")
 		}
 
-		_, err = uuid.Parse(*amtID)
+		amt, err := cli.GetAnnouncement(ctx, *amtID)
 		if err != nil {
 			return err
+		}
+		if amt == nil {
+			return fmt.Errorf("announcement id not exist")
+		}
+		if amt.AppID != *appID {
+			return fmt.Errorf("wrong app id or announcement id")
+		}
+
+		if amt.AnnouncementType != basetypes.NotifType_NotifMulticast {
+			return fmt.Errorf("wrong announcement type %v", amt.AnnouncementType.String())
 		}
 		h.AnnouncementID = amtID
 		return nil
 	}
 }
+
 func WithOffset(offset int32) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		h.Offset = offset

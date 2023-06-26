@@ -39,6 +39,10 @@ func (s *Server) GetReadState(ctx context.Context, in *npool.GetReadStateRequest
 		return &npool.GetReadStateResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
+	if len(infos) == 0 {
+		return &npool.GetReadStateResponse{}, nil
+	}
+
 	return &npool.GetReadStateResponse{
 		Info: infos[0],
 	}, nil

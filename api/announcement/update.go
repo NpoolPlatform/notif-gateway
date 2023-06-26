@@ -5,7 +5,7 @@ import (
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	npool "github.com/NpoolPlatform/message/npool/notif/gw/v1/announcement"
-	amt1 "github.com/NpoolPlatform/notif-gateway/pkg/announcement"
+	announcement1 "github.com/NpoolPlatform/notif-gateway/pkg/announcement"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -17,15 +17,15 @@ func (s *Server) UpdateAnnouncement(
 	*npool.UpdateAnnouncementResponse,
 	error,
 ) {
-	handler, err := amt1.NewHandler(
+	handler, err := announcement1.NewHandler(
 		ctx,
-		amt1.WithID(&in.ID),
-		amt1.WithAppID(&in.AppID),
-		amt1.WithTitle(in.Title),
-		amt1.WithContent(in.Content),
-		amt1.WithAnnouncementType(in.AnnouncementType),
-		amt1.WithStartAt(in.StartAt, in.EndAt),
-		amt1.WithEndAt(in.StartAt, in.EndAt),
+		announcement1.WithID(&in.ID),
+		announcement1.WithAppID(&in.AppID),
+		announcement1.WithTitle(in.Title),
+		announcement1.WithContent(in.Content),
+		announcement1.WithAnnouncementType(in.AnnouncementType),
+		announcement1.WithStartAt(in.StartAt),
+		announcement1.WithEndAt(in.EndAt),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

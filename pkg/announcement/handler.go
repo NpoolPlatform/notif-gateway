@@ -6,6 +6,7 @@ import (
 	"time"
 
 	appcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
+	appusercli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
 	g11ncli "github.com/NpoolPlatform/g11n-middleware/pkg/client/applang"
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
@@ -49,7 +50,8 @@ func WithID(id *string) func(context.Context, *Handler) error {
 		return nil
 	}
 }
-func WithUserID(userID *string) func(context.Context, *Handler) error {
+
+func WithUserID(appID, userID *string) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if userID == nil {
 			return fmt.Errorf("invalid user id")
@@ -57,6 +59,14 @@ func WithUserID(userID *string) func(context.Context, *Handler) error {
 		_, err := uuid.Parse(*userID)
 		if err != nil {
 			return err
+		}
+
+		exist, err := appusercli.ExistUser(ctx, *appID, *userID)
+		if err != nil {
+			return err
+		}
+		if !exist {
+			return fmt.Errorf("invalid app id or user id")
 		}
 		h.UserID = userID
 		return nil
@@ -176,7 +186,7 @@ func WithAnnouncementType(_type *basetypes.NotifType) func(context.Context, *Han
 	}
 }
 
-func WithStartAt(startAt, endAt *uint32) func(context.Context, *Handler) error {
+func WithStartAt(startAt *uint32) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if startAt == nil {
 			return nil
@@ -184,28 +194,18 @@ func WithStartAt(startAt, endAt *uint32) func(context.Context, *Handler) error {
 		if *startAt < uint32(time.Now().Unix()) {
 			return fmt.Errorf("invalid start at")
 		}
-		if endAt != nil {
-			if *startAt > *endAt {
-				return fmt.Errorf("start at less than end at")
-			}
-		}
 		h.StartAt = startAt
 		return nil
 	}
 }
 
-func WithEndAt(startAt, endAt *uint32) func(context.Context, *Handler) error {
+func WithEndAt(endAt *uint32) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if endAt == nil {
 			return nil
 		}
 		if *endAt < uint32(time.Now().Unix()) {
 			return fmt.Errorf("invalid end at")
-		}
-		if startAt != nil {
-			if *startAt > *endAt {
-				return fmt.Errorf("start at less than end at")
-			}
 		}
 		h.EndAt = endAt
 		return nil

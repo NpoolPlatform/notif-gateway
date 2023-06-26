@@ -82,6 +82,7 @@ func (h *Handler) GetReadStates(ctx context.Context) ([]*npool.ReadState, uint32
 			Title:            val.Title,
 			Content:          val.Content,
 			AnnouncementType: basetypes.NotifType(basetypes.NotifType_value[val.AnnouncementType]),
+			Channel:          basetypes.NotifChannel(basetypes.NotifChannel_value[val.Channel]),
 			CreatedAt:        val.CreatedAt,
 			UpdatedAt:        val.UpdatedAt,
 		})

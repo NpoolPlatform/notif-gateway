@@ -29,6 +29,9 @@ func (h *createHandler) validate() error {
 	if h.EndAt == nil {
 		return fmt.Errorf("end at is empty")
 	}
+	if *h.StartAt > *h.EndAt {
+		return fmt.Errorf("start at less than end at")
+	}
 	return nil
 }
 

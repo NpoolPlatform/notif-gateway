@@ -22,7 +22,9 @@ func (h *Handler) UpdateAnnouncement(ctx context.Context) (*npool.Announcement, 
 	}
 
 	if h.StartAt != nil && h.EndAt != nil {
-		return nil, fmt.Errorf("start at less than end at")
+		if *h.StartAt >= *h.EndAt {
+			return nil, fmt.Errorf("start at less than end at")
+		}
 	}
 	if h.StartAt != nil && h.EndAt == nil {
 		if *h.StartAt > info.EndAt {

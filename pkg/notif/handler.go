@@ -10,6 +10,7 @@ import (
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	"github.com/NpoolPlatform/message/npool/g11n/mw/v1/applang"
+	notifmw "github.com/NpoolPlatform/message/npool/notif/mw/v1/notif"
 	templatemwpb "github.com/NpoolPlatform/message/npool/notif/mw/v1/template"
 	constant "github.com/NpoolPlatform/notif-gateway/pkg/const"
 
@@ -31,6 +32,7 @@ type Handler struct {
 	Extra       *string
 	NotifType   *basetypes.NotifType
 	Vars        *templatemwpb.TemplateVars
+	Reqs        []*notifmw.NotifReq
 	IDs         []string
 	Offset      int32
 	Limit       int32
@@ -272,6 +274,39 @@ func WithIDs(ids []string) func(context.Context, *Handler) error {
 				return err
 			}
 		}
+		h.IDs = ids
+		return nil
+	}
+}
+
+func WithReqs(reqs []*notifmw.NotifReq) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if len(reqs) == 0 {
+			return fmt.Errorf("infos is empty")
+		}
+		ids := []string{}
+		for _, req := range reqs {
+			if req.ID != nil {
+				_, err := uuid.Parse(*req.ID)
+				if err != nil {
+					return err
+				}
+				ids = append(ids, req.GetID())
+			}
+			if req.AppID != nil {
+				_, err := uuid.Parse(*req.AppID)
+				if err != nil {
+					return err
+				}
+			}
+			if req.UserID != nil {
+				_, err := uuid.Parse(*req.UserID)
+				if err != nil {
+					return err
+				}
+			}
+		}
+		h.Reqs = reqs
 		h.IDs = ids
 		return nil
 	}

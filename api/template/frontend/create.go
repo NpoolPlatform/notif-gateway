@@ -22,7 +22,7 @@ func (s *Server) CreateFrontendTemplate(
 	handler, err := frontendtemplate1.NewHandler(
 		ctx,
 		frontendtemplate1.WithAppID(&in.AppID),
-		frontendtemplate1.WithLangID(&in.TargetLangID),
+		frontendtemplate1.WithLangID(&in.AppID, &in.TargetLangID),
 		frontendtemplate1.WithUsedFor(&in.UsedFor),
 		frontendtemplate1.WithTitle(&in.Title),
 		frontendtemplate1.WithContent(&in.Content),
@@ -61,7 +61,7 @@ func (s *Server) CreateAppFrontendTemplate(
 	handler, err := frontendtemplate1.NewHandler(
 		ctx,
 		frontendtemplate1.WithAppID(&in.TargetAppID),
-		frontendtemplate1.WithLangID(&in.TargetLangID),
+		frontendtemplate1.WithLangID(&in.TargetAppID, &in.TargetLangID),
 		frontendtemplate1.WithUsedFor(&in.UsedFor),
 		frontendtemplate1.WithTitle(&in.Title),
 		frontendtemplate1.WithContent(&in.Content),

@@ -22,7 +22,7 @@ func (s *Server) CreateSMSTemplate(
 	handler, err := smstemplate1.NewHandler(
 		ctx,
 		smstemplate1.WithAppID(&in.AppID),
-		smstemplate1.WithLangID(&in.TargetLangID),
+		smstemplate1.WithLangID(&in.AppID, &in.TargetLangID),
 		smstemplate1.WithUsedFor(&in.UsedFor),
 		smstemplate1.WithSubject(&in.Subject),
 		smstemplate1.WithMessage(&in.Message),
@@ -61,7 +61,7 @@ func (s *Server) CreateAppSMSTemplate(
 	handler, err := smstemplate1.NewHandler(
 		ctx,
 		smstemplate1.WithAppID(&in.TargetAppID),
-		smstemplate1.WithLangID(&in.TargetLangID),
+		smstemplate1.WithLangID(&in.TargetAppID, &in.TargetLangID),
 		smstemplate1.WithUsedFor(&in.UsedFor),
 		smstemplate1.WithSubject(&in.Subject),
 		smstemplate1.WithMessage(&in.Message),

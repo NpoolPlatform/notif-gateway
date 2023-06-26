@@ -20,7 +20,7 @@ func (s *Server) SendCode(ctx context.Context, in *npool.SendCodeRequest) (*npoo
 	handler, err := usercode1.NewHandler(
 		ctx,
 		usercode1.WithAppID(&in.AppID),
-		usercode1.WithLangID(&in.LangID),
+		usercode1.WithLangID(&in.AppID, &in.LangID),
 		usercode1.WithUserID(&in.AppID, in.UserID),
 		usercode1.WithAccount(in.Account),
 		usercode1.WithAccountType(&in.AccountType),

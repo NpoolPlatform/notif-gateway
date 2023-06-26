@@ -2,7 +2,6 @@ package notif
 
 import (
 	"context"
-	"fmt"
 
 	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
 	usermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
@@ -16,50 +15,6 @@ import (
 	notifmwpb "github.com/NpoolPlatform/message/npool/notif/mw/v1/notif"
 	notifmwcli "github.com/NpoolPlatform/notif-middleware/pkg/client/notif"
 )
-
-func (h *Handler) GetNotif(ctx context.Context) (*npool.Notif, error) {
-	info, err := notifmwcli.GetNotifOnly(ctx, &notifmwpb.Conds{
-		ID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.ID},
-	})
-	if err != nil {
-		return nil, err
-	}
-	if info == nil {
-		return nil, nil
-	}
-
-	app, err := appmwcli.GetApp(ctx, info.AppID)
-	if err != nil {
-		return nil, err
-	}
-	if app == nil {
-		return nil, fmt.Errorf("app %s not found", info.AppID)
-	}
-	user, err := usermwcli.GetUser(ctx, info.AppID, info.UserID)
-	if err != nil {
-		return nil, err
-	}
-	if user == nil {
-		return nil, fmt.Errorf("user %s not found", info.UserID)
-	}
-	return &npool.Notif{
-		ID:           info.ID,
-		AppID:        info.AppID,
-		AppName:      app.Name,
-		UserID:       info.UserID,
-		EmailAddress: user.EmailAddress,
-		PhoneNO:      user.PhoneNO,
-		Username:     user.Username,
-		EventType:    info.EventType,
-		UseTemplate:  info.UseTemplate,
-		Title:        info.Title,
-		Content:      info.Content,
-		Channel:      info.Channel,
-		Notified:     info.Notified,
-		CreatedAt:    info.CreatedAt,
-		UpdatedAt:    info.UpdatedAt,
-	}, nil
-}
 
 func (h *Handler) setConds() *notifmwpb.Conds {
 	conds := &notifmwpb.Conds{}

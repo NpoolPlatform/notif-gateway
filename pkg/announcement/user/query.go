@@ -14,24 +14,7 @@ import (
 )
 
 func (h *Handler) GetAnnouncementUsers(ctx context.Context) ([]*npool.AnnouncementUser, uint32, error) {
-	conds := &mwpb.Conds{
-		AppID: &basetypes.StringVal{
-			Op:    cruder.EQ,
-			Value: *h.AppID,
-		},
-	}
-	if h.AnnouncementID != nil {
-		conds.AnnouncementID = &basetypes.StringVal{
-			Op:    cruder.EQ,
-			Value: *h.AnnouncementID,
-		}
-	}
-	if h.UserID != nil {
-		conds.UserID = &basetypes.StringVal{
-			Op:    cruder.EQ,
-			Value: *h.UserID,
-		}
-	}
+	conds := &mwpb.Conds{AppID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID}}
 
 	rows, total, err := mwcli.GetAnnouncementUsers(ctx, conds, h.Offset, h.Limit)
 	if err != nil {
@@ -42,7 +25,6 @@ func (h *Handler) GetAnnouncementUsers(ctx context.Context) ([]*npool.Announceme
 	}
 
 	userIDs := []string{}
-
 	for _, val := range rows {
 		if val.UserID != "" {
 			userIDs = append(userIDs, val.UserID)
@@ -82,6 +64,7 @@ func (h *Handler) GetAnnouncementUsers(ctx context.Context) ([]*npool.Announceme
 			Title:            val.Title,
 			Content:          val.Content,
 			AnnouncementType: basetypes.NotifType(basetypes.NotifType_value[val.AnnouncementType]),
+			Channel:          basetypes.NotifChannel(basetypes.NotifChannel_value[val.Channel]),
 			CreatedAt:        val.CreatedAt,
 			UpdatedAt:        val.UpdatedAt,
 		})
@@ -114,6 +97,7 @@ func (h *Handler) GetAnnouncementUser(ctx context.Context) (*npool.AnnouncementU
 		Title:            row.Title,
 		Content:          row.Content,
 		AnnouncementType: basetypes.NotifType(basetypes.NotifType_value[row.AnnouncementType]),
+		Channel:          basetypes.NotifChannel(basetypes.NotifChannel_value[row.Channel]),
 		CreatedAt:        row.CreatedAt,
 		UpdatedAt:        row.UpdatedAt,
 	}

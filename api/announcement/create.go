@@ -8,7 +8,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	amt1 "github.com/NpoolPlatform/notif-gateway/pkg/announcement"
+	announcement1 "github.com/NpoolPlatform/notif-gateway/pkg/announcement"
 )
 
 func (s *Server) CreateAnnouncement(
@@ -18,16 +18,16 @@ func (s *Server) CreateAnnouncement(
 	*npool.CreateAnnouncementResponse,
 	error,
 ) {
-	handler, err := amt1.NewHandler(
+	handler, err := announcement1.NewHandler(
 		ctx,
-		amt1.WithTitle(&in.Title),
-		amt1.WithContent(&in.Content),
-		amt1.WithAppID(&in.AppID),
-		amt1.WithLangID(&in.AppID, &in.TargetLangID),
-		amt1.WithChannel(&in.Channel),
-		amt1.WithAnnouncementType(&in.AnnouncementType),
-		amt1.WithStartAt(&in.StartAt, &in.StartAt),
-		amt1.WithEndAt(&in.StartAt, &in.EndAt),
+		announcement1.WithTitle(&in.Title),
+		announcement1.WithContent(&in.Content),
+		announcement1.WithAppID(&in.AppID),
+		announcement1.WithLangID(&in.AppID, &in.TargetLangID),
+		announcement1.WithChannel(&in.Channel),
+		announcement1.WithAnnouncementType(&in.AnnouncementType),
+		announcement1.WithStartAt(&in.StartAt, &in.StartAt),
+		announcement1.WithEndAt(&in.StartAt, &in.EndAt),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

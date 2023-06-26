@@ -9,7 +9,7 @@ import (
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	npool "github.com/NpoolPlatform/message/npool/notif/gw/v1/announcement"
 
-	amt1 "github.com/NpoolPlatform/notif-gateway/pkg/announcement"
+	announcement1 "github.com/NpoolPlatform/notif-gateway/pkg/announcement"
 )
 
 func (s *Server) DeleteAnnouncement(
@@ -19,10 +19,10 @@ func (s *Server) DeleteAnnouncement(
 	*npool.DeleteAnnouncementResponse,
 	error,
 ) {
-	handler, err := amt1.NewHandler(
+	handler, err := announcement1.NewHandler(
 		ctx,
-		amt1.WithID(&in.ID),
-		amt1.WithAppID(&in.AppID),
+		announcement1.WithID(&in.ID),
+		announcement1.WithAppID(&in.AppID),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

@@ -15,7 +15,7 @@ func (s *Server) GetAnnouncements(ctx context.Context, in *npool.GetAnnouncement
 	handler, err := amt1.NewHandler(
 		ctx,
 		amt1.WithAppID(&in.AppID),
-		amt1.WithUserID(&in.UserID),
+		amt1.WithUserID(&in.AppID, &in.UserID),
 		amt1.WithLangID(&in.AppID, &in.LangID),
 		amt1.WithOffset(in.Offset),
 		amt1.WithLimit(in.Limit),
@@ -45,8 +45,13 @@ func (s *Server) GetAnnouncements(ctx context.Context, in *npool.GetAnnouncement
 	}, nil
 }
 
-//nolint
-func (s *Server) GetAppAnnouncements(ctx context.Context, in *npool.GetAppAnnouncementsRequest) (*npool.GetAppAnnouncementsResponse, error) {
+func (s *Server) GetAppAnnouncements(
+	ctx context.Context,
+	in *npool.GetAppAnnouncementsRequest,
+) (
+	*npool.GetAppAnnouncementsResponse,
+	error,
+) {
 	handler, err := amt1.NewHandler(
 		ctx,
 		amt1.WithAppID(&in.AppID),
@@ -62,7 +67,7 @@ func (s *Server) GetAppAnnouncements(ctx context.Context, in *npool.GetAppAnnoun
 		return &npool.GetAppAnnouncementsResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	infos, total, err := handler.GetAnnouncements(ctx)
+	infos, total, err := handler.GetAppAnnouncements(ctx)
 	if err != nil {
 		logger.Sugar().Errorw(
 			"GetAppAnnouncements",
@@ -78,8 +83,13 @@ func (s *Server) GetAppAnnouncements(ctx context.Context, in *npool.GetAppAnnoun
 	}, nil
 }
 
-//nolint
-func (s *Server) GetNAppAnnouncements(ctx context.Context, in *npool.GetNAppAnnouncementsRequest) (*npool.GetNAppAnnouncementsResponse, error) {
+func (s *Server) GetNAppAnnouncements(
+	ctx context.Context,
+	in *npool.GetNAppAnnouncementsRequest,
+) (
+	*npool.GetNAppAnnouncementsResponse,
+	error,
+) {
 	resp, err := s.GetAppAnnouncements(ctx, &npool.GetAppAnnouncementsRequest{
 		AppID:  in.TargetAppID,
 		Offset: in.Offset,

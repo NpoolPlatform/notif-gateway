@@ -19,14 +19,25 @@ import (
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 )
 
+//nolint:gocyclo
 func (h *Handler) UpdateNotifs(ctx context.Context) ([]*npool.Notif, error) {
 	if h.IDs == nil || len(h.IDs) == 0 {
 		return nil, fmt.Errorf("invalid ids")
 	}
 
 	reqs := []*notifmwpb.NotifReq{}
-	for _, _id := range h.IDs {
-		notifID := _id
+	for _, _notif := range h.Reqs {
+		row, err := mwcli.GetNotif(ctx, *_notif.ID)
+		if err != nil {
+			return nil, err
+		}
+		if row == nil {
+			return nil, fmt.Errorf("notif not exist")
+		}
+		if row.AppID != *_notif.AppID || row.UserID != *_notif.UserID {
+			return nil, fmt.Errorf("permission denied")
+		}
+		notifID := *_notif.ID
 		_req := &notifmwpb.NotifReq{
 			ID:       &notifID,
 			Notified: h.Notified,

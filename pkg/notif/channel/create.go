@@ -38,8 +38,7 @@ func (h *Handler) CreateChannel(ctx context.Context) ([]*npool.Channel, error) {
 			AppID:     h.AppID,
 			EventType: h.EventType,
 			Channel:   h.Channel,
-		},
-		)
+		})
 		if err != nil {
 			return nil, err
 		}

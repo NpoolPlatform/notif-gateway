@@ -2,6 +2,7 @@ package channel
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
@@ -9,42 +10,40 @@ import (
 	cli "github.com/NpoolPlatform/notif-middleware/pkg/client/notif/channel"
 )
 
-func (h *Handler) CreateChannel(ctx context.Context) ([]*npool.Channel, error) {
-	infos := []*npool.Channel{}
-	for _, eventType := range h.EventTypes {
-		_channel, err := cli.GetChannelOnly(ctx, &npool.Conds{
+func (h *Handler) CreateChannel(ctx context.Context) (*npool.Channel, error) {
+	exist, err := cli.ExistChannelConds(ctx, &npool.ExistChannelCondsRequest{
+		Conds: &npool.Conds{
 			AppID: &basetypes.StringVal{
 				Op:    cruder.EQ,
 				Value: *h.AppID,
 			},
 			EventType: &basetypes.Uint32Val{
 				Op:    cruder.EQ,
-				Value: uint32(eventType),
+				Value: uint32(*h.EventType),
 			},
 			Channel: &basetypes.Uint32Val{
 				Op:    cruder.EQ,
 				Value: uint32(*h.Channel),
 			},
-		})
-		if err != nil {
-			return nil, err
-		}
-		if _channel != nil {
-			infos = append(infos, _channel)
-			continue
-		}
-
-		info, err := cli.CreateChannel(ctx, &npool.ChannelReq{
-			AppID:     h.AppID,
-			EventType: &eventType, //nolint
-			Channel:   h.Channel,
-		})
-		if err != nil {
-			return nil, err
-		}
-
-		infos = append(infos, info)
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	if exist {
+		return nil, fmt.Errorf("channel exist")
 	}
 
-	return infos, nil
+	info, err := cli.CreateChannel(ctx, &npool.ChannelReq{
+		AppID:     h.AppID,
+		EventType: h.EventType,
+		Channel:   h.Channel,
+	},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	h.ID = &info.ID
+	return h.GetChannel(ctx)
 }

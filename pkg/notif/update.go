@@ -109,7 +109,7 @@ func (h *Handler) UpdateNotifs(ctx context.Context) ([]*npool.Notif, error) {
 		if err != nil {
 			return nil, err
 		}
-		if row == nil {
+		if notifInfo == nil {
 			return nil, fmt.Errorf("notif not exist")
 		}
 		if notifInfo.AppID != *row.AppID || notifInfo.UserID != *row.UserID {

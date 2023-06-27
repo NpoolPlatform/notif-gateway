@@ -284,14 +284,12 @@ func WithReqs(reqs []*notifmw.NotifReq) func(context.Context, *Handler) error {
 		if len(reqs) == 0 {
 			return fmt.Errorf("infos is empty")
 		}
-		ids := []string{}
 		for _, req := range reqs {
 			if req.ID != nil {
 				_, err := uuid.Parse(*req.ID)
 				if err != nil {
 					return err
 				}
-				ids = append(ids, req.GetID())
 			}
 			if req.AppID != nil {
 				_, err := uuid.Parse(*req.AppID)
@@ -307,7 +305,6 @@ func WithReqs(reqs []*notifmw.NotifReq) func(context.Context, *Handler) error {
 			}
 		}
 		h.Reqs = reqs
-		h.IDs = ids
 		return nil
 	}
 }

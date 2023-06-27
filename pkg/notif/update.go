@@ -43,8 +43,20 @@ func (h *updateHandler) createNotifsResp(ctx context.Context, notifs []*notifmwp
 		return nil, err
 	}
 	appMap := map[string]*appmwpb.App{}
+	langMap := map[string]*applangmwpb.Lang{}
+
 	for _, val := range appInfos {
 		appMap[val.ID] = val
+		langs, _, err := applangmwcli.GetLangs(ctx, &applangmwpb.Conds{
+			AppID:   &basetypes.StringVal{Op: cruder.EQ, Value: val.ID},
+			LangIDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: langIDs},
+		}, 0, int32(len(langIDs)))
+		if err != nil {
+			return nil, err
+		}
+		for _, lang := range langs {
+			langMap[lang.AppID+"-"+lang.LangID] = lang
+		}
 	}
 
 	userInfos, _, err := usermwcli.GetUsers(ctx, &usermwpb.Conds{
@@ -56,17 +68,6 @@ func (h *updateHandler) createNotifsResp(ctx context.Context, notifs []*notifmwp
 	userMap := map[string]*usermwpb.User{}
 	for _, val := range userInfos {
 		userMap[val.ID] = val
-	}
-
-	langs, _, err := applangmwcli.GetLangs(ctx, &applangmwpb.Conds{
-		LangIDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: langIDs},
-	}, 0, int32(len(langIDs)))
-	if err != nil {
-		return nil, err
-	}
-	langMap := map[string]*applangmwpb.Lang{}
-	for _, lang := range langs {
-		langMap[lang.AppID+"-"+lang.LangID] = lang
 	}
 
 	infos := []*npool.Notif{}

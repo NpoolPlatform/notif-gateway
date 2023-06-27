@@ -19,44 +19,15 @@ import (
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 )
 
-//nolint:gocyclo
-func (h *Handler) UpdateNotifs(ctx context.Context) ([]*npool.Notif, error) {
-	if h.IDs == nil || len(h.IDs) == 0 {
-		return nil, fmt.Errorf("invalid ids")
-	}
+type updateHandler struct {
+	*Handler
+}
 
-	reqs := []*notifmwpb.NotifReq{}
-	for _, _notif := range h.Reqs {
-		row, err := mwcli.GetNotif(ctx, *_notif.ID)
-		if err != nil {
-			return nil, err
-		}
-		if row == nil {
-			return nil, fmt.Errorf("notif not exist")
-		}
-		if row.AppID != *_notif.AppID || row.UserID != *_notif.UserID {
-			return nil, fmt.Errorf("permission denied")
-		}
-		notifID := *_notif.ID
-		_req := &notifmwpb.NotifReq{
-			ID:       &notifID,
-			Notified: h.Notified,
-		}
-		reqs = append(reqs, _req)
-	}
-	rows, err := mwcli.UpdateNotifs(ctx, reqs)
-	if err != nil {
-		return nil, err
-	}
-
-	if len(rows) == 0 {
-		return nil, nil
-	}
-
+func (h *updateHandler) createNotifsResp(ctx context.Context, notifs []*notifmwpb.Notif) ([]*npool.Notif, error) {
 	appIDs := []string{}
 	userIDs := []string{}
 
-	for _, val := range rows {
+	for _, val := range notifs {
 		appIDs = append(appIDs, val.AppID)
 		userIDs = append(userIDs, val.UserID)
 	}
@@ -83,7 +54,7 @@ func (h *Handler) UpdateNotifs(ctx context.Context) ([]*npool.Notif, error) {
 	}
 
 	infos := []*npool.Notif{}
-	for _, val := range rows {
+	for _, val := range notifs {
 		app, ok := appMap[val.AppID]
 		if !ok {
 			continue
@@ -110,6 +81,62 @@ func (h *Handler) UpdateNotifs(ctx context.Context) ([]*npool.Notif, error) {
 			CreatedAt:    val.CreatedAt,
 			UpdatedAt:    val.UpdatedAt,
 		})
+	}
+	return infos, nil
+}
+
+func (h *Handler) UpdateNotifs(ctx context.Context) ([]*npool.Notif, error) {
+	reqs := []*notifmwpb.NotifReq{}
+	for _, row := range h.Reqs {
+		if row.ID == nil {
+			return nil, fmt.Errorf("invalid id")
+		}
+		if row.AppID == nil {
+			return nil, fmt.Errorf("invalid appid")
+		}
+		if row.UserID == nil {
+			return nil, fmt.Errorf("invalid userid")
+		}
+		if row.Notified == nil {
+			return nil, fmt.Errorf("invalid notified")
+		}
+		if !*row.Notified {
+			return nil, fmt.Errorf("invalid notified %v", *row.Notified)
+		}
+
+		notifID := *row.ID
+		notifInfo, err := mwcli.GetNotif(ctx, *row.ID)
+		if err != nil {
+			return nil, err
+		}
+		if row == nil {
+			return nil, fmt.Errorf("notif not exist")
+		}
+		if notifInfo.AppID != *row.AppID || notifInfo.UserID != *row.UserID {
+			return nil, fmt.Errorf("permission denied")
+		}
+
+		_req := &notifmwpb.NotifReq{
+			ID:       &notifID,
+			Notified: row.Notified,
+		}
+		reqs = append(reqs, _req)
+	}
+	rows, err := mwcli.UpdateNotifs(ctx, reqs)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(rows) == 0 {
+		return nil, nil
+	}
+
+	handler := &updateHandler{
+		Handler: h,
+	}
+	infos, err := handler.createNotifsResp(ctx, rows)
+	if err != nil {
+		return nil, err
 	}
 	return infos, nil
 }

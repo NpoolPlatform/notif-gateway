@@ -1,3 +1,4 @@
+//nolint:nolintlint,dupl
 package notif
 
 import (
@@ -6,9 +7,11 @@ import (
 
 	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
 	usermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
+	applangmwcli "github.com/NpoolPlatform/g11n-middleware/pkg/client/applang"
 
 	appmwpb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/app"
 	usermwpb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/user"
+	applangmwpb "github.com/NpoolPlatform/message/npool/g11n/mw/v1/applang"
 
 	mwcli "github.com/NpoolPlatform/notif-middleware/pkg/client/notif"
 
@@ -26,10 +29,12 @@ type updateHandler struct {
 func (h *updateHandler) createNotifsResp(ctx context.Context, notifs []*notifmwpb.Notif) ([]*npool.Notif, error) {
 	appIDs := []string{}
 	userIDs := []string{}
+	langIDs := []string{}
 
 	for _, val := range notifs {
 		appIDs = append(appIDs, val.AppID)
 		userIDs = append(userIDs, val.UserID)
+		langIDs = append(langIDs, val.LangID)
 	}
 	appInfos, _, err := appmwcli.GetApps(ctx, &appmwpb.Conds{
 		IDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: appIDs},
@@ -53,6 +58,17 @@ func (h *updateHandler) createNotifsResp(ctx context.Context, notifs []*notifmwp
 		userMap[val.ID] = val
 	}
 
+	langs, _, err := applangmwcli.GetLangs(ctx, &applangmwpb.Conds{
+		LangIDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: langIDs},
+	}, 0, int32(len(langIDs)))
+	if err != nil {
+		return nil, err
+	}
+	langMap := map[string]*applangmwpb.Lang{}
+	for _, lang := range langs {
+		langMap[lang.AppID+"-"+lang.LangID] = lang
+	}
+
 	infos := []*npool.Notif{}
 	for _, val := range notifs {
 		app, ok := appMap[val.AppID]
@@ -60,6 +76,10 @@ func (h *updateHandler) createNotifsResp(ctx context.Context, notifs []*notifmwp
 			continue
 		}
 		user, ok := userMap[val.UserID]
+		if !ok {
+			continue
+		}
+		lang, ok := langMap[val.AppID+"-"+val.LangID]
 		if !ok {
 			continue
 		}
@@ -72,11 +92,15 @@ func (h *updateHandler) createNotifsResp(ctx context.Context, notifs []*notifmwp
 			EmailAddress: user.EmailAddress,
 			PhoneNO:      user.PhoneNO,
 			Username:     user.Username,
+			EventID:      val.EventID,
 			EventType:    val.EventType,
 			UseTemplate:  val.UseTemplate,
 			Title:        val.Title,
 			Content:      val.Content,
 			Channel:      val.Channel,
+			LangID:       lang.LangID,
+			Lang:         lang.Lang,
+			NotifType:    val.NotifType,
 			Notified:     val.Notified,
 			CreatedAt:    val.CreatedAt,
 			UpdatedAt:    val.UpdatedAt,

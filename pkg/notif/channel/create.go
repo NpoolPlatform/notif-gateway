@@ -36,7 +36,7 @@ func (h *Handler) CreateChannel(ctx context.Context) ([]*npool.Channel, error) {
 
 		info, err := cli.CreateChannel(ctx, &npool.ChannelReq{
 			AppID:     h.AppID,
-			EventType: h.EventType,
+			EventType: &eventType,
 			Channel:   h.Channel,
 		})
 		if err != nil {

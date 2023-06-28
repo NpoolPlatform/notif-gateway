@@ -232,6 +232,7 @@ func WithEventType(eventtype *basetypes.UsedFor) func(context.Context, *Handler)
 		case basetypes.UsedFor_KYCApproved:
 		case basetypes.UsedFor_KYCRejected:
 		case basetypes.UsedFor_Announcement:
+		case basetypes.UsedFor_GoodBenefit:
 		default:
 			return fmt.Errorf("invalid eventtype")
 		}
@@ -246,7 +247,6 @@ func WithNotifType(_type *basetypes.NotifType) func(context.Context, *Handler) e
 			return nil
 		}
 		switch *_type {
-		case basetypes.NotifType_NotifBroadcast:
 		case basetypes.NotifType_NotifMulticast:
 		case basetypes.NotifType_NotifUnicast:
 			if h.UserID == nil {

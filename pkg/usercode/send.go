@@ -44,7 +44,10 @@ func (h *Handler) SendCode( //nolint
 	switch *h.UsedFor {
 	case basetypes.UsedFor_Signup:
 	case basetypes.UsedFor_Update:
-		if h.UserID != nil && *h.UserID != "" {
+		if h.Account == nil || *h.Account == "" {
+			if h.UserID == nil || *h.UserID == "" {
+				return fmt.Errorf("invalid userid")
+			}
 			err := h.validateUser(ctx)
 			if err != nil {
 				return err

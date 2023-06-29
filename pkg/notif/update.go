@@ -110,6 +110,7 @@ func (h *updateHandler) createNotifsResp(ctx context.Context, notifs []*notifmwp
 	return infos, nil
 }
 
+//nolint:gocyclo
 func (h *Handler) UpdateNotifs(ctx context.Context) ([]*npool.Notif, error) {
 	if h.AppID == nil || *h.AppID == "" {
 		return nil, fmt.Errorf("invalid appid")

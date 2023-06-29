@@ -28,6 +28,7 @@ func (h *Handler) GetAnnouncements(ctx context.Context) ([]*npool.Announcement, 
 	}
 
 	user, err := usermwcli.GetUser(ctx, *h.AppID, *h.UserID)
+    fmt.Println("=============User-----------", err)
 	if err != nil {
 		return nil, 0, err
 	}

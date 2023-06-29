@@ -1,3 +1,4 @@
+//nolint:nolintlint,dupl
 package notif
 
 import (
@@ -6,9 +7,11 @@ import (
 
 	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
 	usermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
+	applangmwcli "github.com/NpoolPlatform/g11n-middleware/pkg/client/applang"
 
 	appmwpb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/app"
 	usermwpb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/user"
+	applangmwpb "github.com/NpoolPlatform/message/npool/g11n/mw/v1/applang"
 
 	mwcli "github.com/NpoolPlatform/notif-middleware/pkg/client/notif"
 
@@ -26,10 +29,12 @@ type updateHandler struct {
 func (h *updateHandler) createNotifsResp(ctx context.Context, notifs []*notifmwpb.Notif) ([]*npool.Notif, error) {
 	appIDs := []string{}
 	userIDs := []string{}
+	langIDs := []string{}
 
 	for _, val := range notifs {
 		appIDs = append(appIDs, val.AppID)
 		userIDs = append(userIDs, val.UserID)
+		langIDs = append(langIDs, val.LangID)
 	}
 	appInfos, _, err := appmwcli.GetApps(ctx, &appmwpb.Conds{
 		IDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: appIDs},
@@ -38,8 +43,20 @@ func (h *updateHandler) createNotifsResp(ctx context.Context, notifs []*notifmwp
 		return nil, err
 	}
 	appMap := map[string]*appmwpb.App{}
+	langMap := map[string]*applangmwpb.Lang{}
+
 	for _, val := range appInfos {
 		appMap[val.ID] = val
+		langs, _, err := applangmwcli.GetLangs(ctx, &applangmwpb.Conds{
+			AppID:   &basetypes.StringVal{Op: cruder.EQ, Value: val.ID},
+			LangIDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: langIDs},
+		}, 0, int32(len(langIDs)))
+		if err != nil {
+			return nil, err
+		}
+		for _, lang := range langs {
+			langMap[lang.AppID+"-"+lang.LangID] = lang
+		}
 	}
 
 	userInfos, _, err := usermwcli.GetUsers(ctx, &usermwpb.Conds{
@@ -63,6 +80,10 @@ func (h *updateHandler) createNotifsResp(ctx context.Context, notifs []*notifmwp
 		if !ok {
 			continue
 		}
+		lang, ok := langMap[val.AppID+"-"+val.LangID]
+		if !ok {
+			continue
+		}
 
 		infos = append(infos, &npool.Notif{
 			ID:           val.ID,
@@ -72,11 +93,15 @@ func (h *updateHandler) createNotifsResp(ctx context.Context, notifs []*notifmwp
 			EmailAddress: user.EmailAddress,
 			PhoneNO:      user.PhoneNO,
 			Username:     user.Username,
+			EventID:      val.EventID,
 			EventType:    val.EventType,
 			UseTemplate:  val.UseTemplate,
 			Title:        val.Title,
 			Content:      val.Content,
 			Channel:      val.Channel,
+			LangID:       lang.LangID,
+			Lang:         lang.Lang,
+			NotifType:    val.NotifType,
 			Notified:     val.Notified,
 			CreatedAt:    val.CreatedAt,
 			UpdatedAt:    val.UpdatedAt,
@@ -85,17 +110,18 @@ func (h *updateHandler) createNotifsResp(ctx context.Context, notifs []*notifmwp
 	return infos, nil
 }
 
+//nolint:gocyclo
 func (h *Handler) UpdateNotifs(ctx context.Context) ([]*npool.Notif, error) {
+	if h.AppID == nil || *h.AppID == "" {
+		return nil, fmt.Errorf("invalid appid")
+	}
+	if h.UserID == nil || *h.UserID == "" {
+		return nil, fmt.Errorf("invalid userid")
+	}
 	reqs := []*notifmwpb.NotifReq{}
 	for _, row := range h.Reqs {
 		if row.ID == nil {
 			return nil, fmt.Errorf("invalid id")
-		}
-		if row.AppID == nil {
-			return nil, fmt.Errorf("invalid appid")
-		}
-		if row.UserID == nil {
-			return nil, fmt.Errorf("invalid userid")
 		}
 		if row.Notified == nil {
 			return nil, fmt.Errorf("invalid notified")
@@ -112,7 +138,7 @@ func (h *Handler) UpdateNotifs(ctx context.Context) ([]*npool.Notif, error) {
 		if notifInfo == nil {
 			return nil, fmt.Errorf("notif not exist")
 		}
-		if notifInfo.AppID != *row.AppID || notifInfo.UserID != *row.UserID {
+		if notifInfo.AppID != *h.AppID || notifInfo.UserID != *h.UserID {
 			return nil, fmt.Errorf("permission denied")
 		}
 

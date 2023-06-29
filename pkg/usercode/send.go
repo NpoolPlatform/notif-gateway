@@ -18,10 +18,43 @@ import (
 	usercodemwpb "github.com/NpoolPlatform/message/npool/basal/mw/v1/usercode"
 )
 
+func (h *Handler) validateUser(ctx context.Context) error {
+	user, err := usermwcli.GetUser(ctx, *h.AppID, *h.UserID)
+	if err != nil {
+		return err
+	}
+	if user == nil {
+		return fmt.Errorf("invalid user")
+	}
+	switch *h.AccountType {
+	case basetypes.SignMethod_Mobile:
+		h.Account = &user.PhoneNO
+	case basetypes.SignMethod_Email:
+		h.Account = &user.EmailAddress
+	}
+	if h.ToUsername == nil || *h.ToUsername == "" {
+		h.ToUsername = &user.Username
+	}
+	return nil
+}
+
 func (h *Handler) SendCode( //nolint
 	ctx context.Context,
 ) error {
 	switch *h.UsedFor {
+	case basetypes.UsedFor_Signup:
+	case basetypes.UsedFor_Update:
+		if h.Account == nil || *h.Account == "" {
+			if h.UserID == nil || *h.UserID == "" {
+				return fmt.Errorf("invalid userid")
+			}
+			err := h.validateUser(ctx)
+			if err != nil {
+				return err
+			}
+		}
+	case basetypes.UsedFor_Signin:
+		fallthrough //nolint
 	case basetypes.UsedFor_SetWithdrawAddress:
 		fallthrough //nolint
 	case basetypes.UsedFor_Withdraw:
@@ -33,23 +66,12 @@ func (h *Handler) SendCode( //nolint
 	case basetypes.UsedFor_SetTransferTargetUser:
 		fallthrough //nolint
 	case basetypes.UsedFor_Transfer:
-		if h.UserID != nil && *h.UserID != "" {
-			user, err := usermwcli.GetUser(ctx, *h.AppID, *h.UserID)
-			if err != nil {
-				return err
-			}
-			if user == nil {
-				return fmt.Errorf("invalid user")
-			}
-			switch *h.AccountType {
-			case basetypes.SignMethod_Mobile:
-				h.Account = &user.PhoneNO
-			case basetypes.SignMethod_Email:
-				h.Account = &user.EmailAddress
-			}
-			if h.ToUsername == nil || *h.ToUsername == "" {
-				h.ToUsername = &user.Username
-			}
+		if h.UserID == nil || *h.UserID == "" {
+			return fmt.Errorf("invalid userid")
+		}
+		err := h.validateUser(ctx)
+		if err != nil {
+			return err
 		}
 	}
 

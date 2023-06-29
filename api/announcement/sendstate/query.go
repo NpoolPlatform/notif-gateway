@@ -80,6 +80,7 @@ func (s *Server) GetAppSendStates(ctx context.Context, in *npool.GetAppSendState
 	handler, err := amtsend1.NewHandler(
 		ctx,
 		handler1.WithAppID(&in.AppID),
+		amtsend1.WithChannel(in.Channel),
 		handler1.WithOffset(in.Offset),
 		handler1.WithLimit(in.Limit),
 	)

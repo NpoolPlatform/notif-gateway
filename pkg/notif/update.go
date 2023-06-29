@@ -111,16 +111,16 @@ func (h *updateHandler) createNotifsResp(ctx context.Context, notifs []*notifmwp
 }
 
 func (h *Handler) UpdateNotifs(ctx context.Context) ([]*npool.Notif, error) {
+	if h.AppID == nil || *h.AppID == "" {
+		return nil, fmt.Errorf("invalid appid")
+	}
+	if h.UserID == nil || *h.UserID == "" {
+		return nil, fmt.Errorf("invalid userid")
+	}
 	reqs := []*notifmwpb.NotifReq{}
 	for _, row := range h.Reqs {
 		if row.ID == nil {
 			return nil, fmt.Errorf("invalid id")
-		}
-		if row.AppID == nil {
-			return nil, fmt.Errorf("invalid appid")
-		}
-		if row.UserID == nil {
-			return nil, fmt.Errorf("invalid userid")
 		}
 		if row.Notified == nil {
 			return nil, fmt.Errorf("invalid notified")
@@ -137,7 +137,7 @@ func (h *Handler) UpdateNotifs(ctx context.Context) ([]*npool.Notif, error) {
 		if notifInfo == nil {
 			return nil, fmt.Errorf("notif not exist")
 		}
-		if notifInfo.AppID != *row.AppID || notifInfo.UserID != *row.UserID {
+		if notifInfo.AppID != *h.AppID || notifInfo.UserID != *h.UserID {
 			return nil, fmt.Errorf("permission denied")
 		}
 

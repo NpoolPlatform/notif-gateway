@@ -3,7 +3,7 @@ package announcement
 import (
 	"context"
 	"fmt"
-    "time"
+	"time"
 
 	usermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
@@ -34,11 +34,11 @@ func (h *Handler) GetAnnouncements(ctx context.Context) ([]*npool.Announcement, 
 	}
 
 	announcements := []*npool.Announcement{}
-    now := uint32(time.Now().Unix())
+	now := uint32(time.Now().Unix())
 	for _, amt := range infos {
-            if amt.StartAt >= now {
-            continue
-        }
+		if amt.StartAt >= now {
+			continue
+		}
 		announcements = append(announcements, &npool.Announcement{
 			ID:               amt.ID,
 			AppID:            amt.AppID,

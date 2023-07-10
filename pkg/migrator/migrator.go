@@ -18,7 +18,6 @@ import (
 
 	"github.com/NpoolPlatform/notif-middleware/pkg/db"
 	"github.com/NpoolPlatform/notif-middleware/pkg/db/ent"
-	entnotif "github.com/NpoolPlatform/notif-middleware/pkg/db/ent/notif"
 	entuser "github.com/NpoolPlatform/notif-middleware/pkg/db/ent/notifuser"
 
 	_ "github.com/NpoolPlatform/notif-middleware/pkg/db/ent/runtime"
@@ -81,20 +80,6 @@ func lockKey() string {
 	return fmt.Sprintf("migrator:%v", serviceID)
 }
 
-func migrateNotif(ctx context.Context) error {
-	return db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
-		_, err := cli.
-			Notif.
-			Update().
-			Where(
-				entnotif.CreatedAtLT(1685030400),
-			).
-			SetNotified(true).
-			Save(_ctx)
-		return err
-	})
-}
-
 func migrateNotifUser(ctx context.Context) error {
 	return db.WithTx(ctx, func(_ctx context.Context, tx *ent.Tx) error {
 		oldEventType := "GoodBenefit"
@@ -135,11 +120,6 @@ func Migrate(ctx context.Context) error {
 	logger.Sugar().Infow("Migrate", "Start", "...")
 
 	if err := db.Init(); err != nil {
-		logger.Sugar().Errorw("Migrate", "error", err)
-		return err
-	}
-
-	if err := migrateNotif(ctx); err != nil {
 		logger.Sugar().Errorw("Migrate", "error", err)
 		return err
 	}

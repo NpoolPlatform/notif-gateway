@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"time"
 
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
+
 	"github.com/NpoolPlatform/go-service-framework/pkg/config"
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	redis2 "github.com/NpoolPlatform/go-service-framework/pkg/redis"
@@ -17,6 +19,7 @@ import (
 	"github.com/NpoolPlatform/notif-middleware/pkg/db"
 	"github.com/NpoolPlatform/notif-middleware/pkg/db/ent"
 	entnotif "github.com/NpoolPlatform/notif-middleware/pkg/db/ent/notif"
+	entuser "github.com/NpoolPlatform/notif-middleware/pkg/db/ent/notifuser"
 
 	_ "github.com/NpoolPlatform/notif-middleware/pkg/db/ent/runtime"
 )
@@ -92,6 +95,35 @@ func migrateNotif(ctx context.Context) error {
 	})
 }
 
+func migrateNotifUser(ctx context.Context) error {
+	return db.WithTx(ctx, func(_ctx context.Context, tx *ent.Tx) error {
+		oldEventType := "GoodBenefit"
+		infos, err := tx.
+			NotifUser.
+			Query().
+			Where(
+				entuser.EventType(oldEventType),
+			).
+			All(_ctx)
+		if err != nil {
+			return err
+		}
+
+		for _, info := range infos {
+			_, err = tx.
+				NotifUser.
+				UpdateOneID(info.ID).
+				SetEventType(basetypes.UsedFor_GoodBenefit1.String()).
+				Save(_ctx)
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+}
+
 func Migrate(ctx context.Context) error {
 	if err := redis2.TryLock(lockKey(), 0); err != nil {
 		return err
@@ -108,6 +140,11 @@ func Migrate(ctx context.Context) error {
 	}
 
 	if err := migrateNotif(ctx); err != nil {
+		logger.Sugar().Errorw("Migrate", "error", err)
+		return err
+	}
+
+	if err := migrateNotifUser(ctx); err != nil {
 		logger.Sugar().Errorw("Migrate", "error", err)
 		return err
 	}

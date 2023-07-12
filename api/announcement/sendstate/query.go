@@ -52,7 +52,7 @@ func (s *Server) GetSendStates(
 	}, nil
 }
 
-func (s *Server) GetAppUserSendStates(ctx context.Context, in *npool.GetAppUserSendStatesRequest) (*npool.GetAppUserSendStatesResponse, error) { //nolint
+func (s *Server) GetAppUserSendStates(ctx context.Context, in *npool.GetAppUserSendStatesRequest) (*npool.GetAppUserSendStatesResponse, error) {
 	resp, err := s.GetSendStates(ctx, &npool.GetSendStatesRequest{
 		AppID:   in.TargetAppID,
 		UserID:  in.TargetUserID,

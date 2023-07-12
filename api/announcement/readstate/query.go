@@ -84,7 +84,7 @@ func (s *Server) GetReadStates(ctx context.Context, in *npool.GetReadStatesReque
 	}, nil
 }
 
-func (s *Server) GetAppUserReadStates(ctx context.Context, in *npool.GetAppUserReadStatesRequest) (*npool.GetAppUserReadStatesResponse, error) { //nolint
+func (s *Server) GetAppUserReadStates(ctx context.Context, in *npool.GetAppUserReadStatesRequest) (*npool.GetAppUserReadStatesResponse, error) {
 	resp, err := s.GetReadStates(ctx, &npool.GetReadStatesRequest{
 		AppID:  in.TargetAppID,
 		UserID: in.TargetUserID,

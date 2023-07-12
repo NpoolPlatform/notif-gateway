@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"time"
 
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
+
 	"github.com/NpoolPlatform/go-service-framework/pkg/config"
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	redis2 "github.com/NpoolPlatform/go-service-framework/pkg/redis"
@@ -16,7 +18,12 @@ import (
 
 	"github.com/NpoolPlatform/notif-middleware/pkg/db"
 	"github.com/NpoolPlatform/notif-middleware/pkg/db/ent"
+	entemailtmpl "github.com/NpoolPlatform/notif-middleware/pkg/db/ent/emailtemplate"
+	entfrontendtmpl "github.com/NpoolPlatform/notif-middleware/pkg/db/ent/frontendtemplate"
 	entnotif "github.com/NpoolPlatform/notif-middleware/pkg/db/ent/notif"
+	entchannel "github.com/NpoolPlatform/notif-middleware/pkg/db/ent/notifchannel"
+	entuser "github.com/NpoolPlatform/notif-middleware/pkg/db/ent/notifuser"
+	entsmstmpl "github.com/NpoolPlatform/notif-middleware/pkg/db/ent/smstemplate"
 
 	_ "github.com/NpoolPlatform/notif-middleware/pkg/db/ent/runtime"
 )
@@ -79,16 +86,116 @@ func lockKey() string {
 }
 
 func migrateNotif(ctx context.Context) error {
-	return db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
-		_, err := cli.
+	return db.WithTx(ctx, func(_ctx context.Context, tx *ent.Tx) error {
+		oldEventType := "GoodBenefit"
+		_, err := tx.
 			Notif.
 			Update().
 			Where(
-				entnotif.CreatedAtLT(1685030400),
+				entnotif.EventType(oldEventType),
 			).
-			SetNotified(true).
+			SetEventType(basetypes.UsedFor_GoodBenefit1.String()).
 			Save(_ctx)
-		return err
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+}
+
+func migrateNotifChannel(ctx context.Context) error {
+	return db.WithTx(ctx, func(_ctx context.Context, tx *ent.Tx) error {
+		oldEventType := "GoodBenefit"
+		_, err := tx.
+			NotifChannel.
+			Update().
+			Where(
+				entchannel.EventType(oldEventType),
+			).
+			SetEventType(basetypes.UsedFor_GoodBenefit1.String()).
+			Save(_ctx)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+}
+
+func migrateEmailTmpl(ctx context.Context) error {
+	return db.WithTx(ctx, func(_ctx context.Context, tx *ent.Tx) error {
+		oldEventType := "GoodBenefit"
+		_, err := tx.
+			EmailTemplate.
+			Update().
+			Where(
+				entemailtmpl.UsedFor(oldEventType),
+			).
+			SetUsedFor(basetypes.UsedFor_GoodBenefit1.String()).
+			Save(_ctx)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+}
+
+func migrateFrontendTmpl(ctx context.Context) error {
+	return db.WithTx(ctx, func(_ctx context.Context, tx *ent.Tx) error {
+		oldEventType := "GoodBenefit"
+		_, err := tx.
+			FrontendTemplate.
+			Update().
+			Where(
+				entfrontendtmpl.UsedFor(oldEventType),
+			).
+			SetUsedFor(basetypes.UsedFor_GoodBenefit1.String()).
+			Save(_ctx)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+}
+
+func migrateSMSTmpl(ctx context.Context) error {
+	return db.WithTx(ctx, func(_ctx context.Context, tx *ent.Tx) error {
+		oldEventType := "GoodBenefit"
+		_, err := tx.
+			SMSTemplate.
+			Update().
+			Where(
+				entsmstmpl.UsedFor(oldEventType),
+			).
+			SetUsedFor(basetypes.UsedFor_GoodBenefit1.String()).
+			Save(_ctx)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+}
+
+func migrateNotifUser(ctx context.Context) error {
+	return db.WithTx(ctx, func(_ctx context.Context, tx *ent.Tx) error {
+		oldEventType := "GoodBenefit"
+		_, err := tx.
+			NotifUser.
+			Update().
+			Where(
+				entuser.EventType(oldEventType),
+			).
+			SetEventType(basetypes.UsedFor_GoodBenefit1.String()).
+			Save(_ctx)
+		if err != nil {
+			return err
+		}
+
+		return nil
 	})
 }
 
@@ -108,6 +215,26 @@ func Migrate(ctx context.Context) error {
 	}
 
 	if err := migrateNotif(ctx); err != nil {
+		logger.Sugar().Errorw("Migrate", "error", err)
+		return err
+	}
+	if err := migrateNotifUser(ctx); err != nil {
+		logger.Sugar().Errorw("Migrate", "error", err)
+		return err
+	}
+	if err := migrateNotifChannel(ctx); err != nil {
+		logger.Sugar().Errorw("Migrate", "error", err)
+		return err
+	}
+	if err := migrateEmailTmpl(ctx); err != nil {
+		logger.Sugar().Errorw("Migrate", "error", err)
+		return err
+	}
+	if err := migrateFrontendTmpl(ctx); err != nil {
+		logger.Sugar().Errorw("Migrate", "error", err)
+		return err
+	}
+	if err := migrateSMSTmpl(ctx); err != nil {
 		logger.Sugar().Errorw("Migrate", "error", err)
 		return err
 	}

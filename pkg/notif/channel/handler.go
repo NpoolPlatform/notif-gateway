@@ -89,7 +89,7 @@ func WithEventType(_type *basetypes.UsedFor) func(context.Context, *Handler) err
 		case basetypes.UsedFor_KYCApproved:
 		case basetypes.UsedFor_KYCRejected:
 		case basetypes.UsedFor_Announcement:
-		case basetypes.UsedFor_GoodBenefit:
+		case basetypes.UsedFor_GoodBenefit1:
 		default:
 			return fmt.Errorf("EventType is invalid")
 		}

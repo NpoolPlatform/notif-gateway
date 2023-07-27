@@ -94,7 +94,7 @@ func WithEventType(_type *basetypes.UsedFor) func(context.Context, *Handler) err
 		case basetypes.UsedFor_UpdateMobile:
 		case basetypes.UsedFor_UpdatePassword:
 		case basetypes.UsedFor_UpdateGoogleAuth:
-		case basetypes.UsedFor_NewDeviceDetected:
+		case basetypes.UsedFor_NewLogin:
 		case basetypes.UsedFor_OrderCompleted:
 		default:
 			return fmt.Errorf("EventType is invalid")
@@ -122,7 +122,7 @@ func WithEventTypes(_types []basetypes.UsedFor) func(context.Context, *Handler) 
 			case basetypes.UsedFor_UpdateMobile:
 			case basetypes.UsedFor_UpdatePassword:
 			case basetypes.UsedFor_UpdateGoogleAuth:
-			case basetypes.UsedFor_NewDeviceDetected:
+			case basetypes.UsedFor_NewLogin:
 			case basetypes.UsedFor_OrderCompleted:
 			default:
 				return fmt.Errorf("event type is invalid")

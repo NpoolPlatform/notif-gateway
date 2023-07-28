@@ -233,6 +233,12 @@ func WithEventType(eventtype *basetypes.UsedFor) func(context.Context, *Handler)
 		case basetypes.UsedFor_KYCRejected:
 		case basetypes.UsedFor_Announcement:
 		case basetypes.UsedFor_GoodBenefit1:
+		case basetypes.UsedFor_UpdateEmail:
+		case basetypes.UsedFor_UpdateMobile:
+		case basetypes.UsedFor_UpdatePassword:
+		case basetypes.UsedFor_UpdateGoogleAuth:
+		case basetypes.UsedFor_NewLogin:
+		case basetypes.UsedFor_OrderCompleted:
 		default:
 			return fmt.Errorf("invalid eventtype")
 		}

@@ -5,14 +5,6 @@ import (
 	"context"
 	"fmt"
 
-	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
-	usermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
-	applangmwcli "github.com/NpoolPlatform/g11n-middleware/pkg/client/applang"
-
-	appmwpb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/app"
-	usermwpb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/user"
-	applangmwpb "github.com/NpoolPlatform/message/npool/g11n/mw/v1/applang"
-
 	mwcli "github.com/NpoolPlatform/notif-middleware/pkg/client/notif"
 
 	npool "github.com/NpoolPlatform/message/npool/notif/gw/v1/notif"
@@ -22,94 +14,6 @@ import (
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	constant "github.com/NpoolPlatform/notif-gateway/pkg/const"
 )
-
-type updateHandler struct {
-	*Handler
-}
-
-func (h *updateHandler) createNotifsResp(ctx context.Context, notifs []*notifmwpb.Notif) ([]*npool.Notif, error) {
-	appIDs := []string{}
-	userIDs := []string{}
-	langIDs := []string{}
-
-	for _, val := range notifs {
-		appIDs = append(appIDs, val.AppID)
-		userIDs = append(userIDs, val.UserID)
-		langIDs = append(langIDs, val.LangID)
-	}
-	appInfos, _, err := appmwcli.GetApps(ctx, &appmwpb.Conds{
-		IDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: appIDs},
-	}, 0, int32(len(appIDs)))
-	if err != nil {
-		return nil, err
-	}
-	appMap := map[string]*appmwpb.App{}
-	langMap := map[string]*applangmwpb.Lang{}
-
-	for _, val := range appInfos {
-		appMap[val.ID] = val
-		langs, _, err := applangmwcli.GetLangs(ctx, &applangmwpb.Conds{
-			AppID:   &basetypes.StringVal{Op: cruder.EQ, Value: val.ID},
-			LangIDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: langIDs},
-		}, 0, int32(len(langIDs)))
-		if err != nil {
-			return nil, err
-		}
-		for _, lang := range langs {
-			langMap[lang.AppID+"-"+lang.LangID] = lang
-		}
-	}
-
-	userInfos, _, err := usermwcli.GetUsers(ctx, &usermwpb.Conds{
-		IDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: userIDs},
-	}, 0, int32(len(userIDs)))
-	if err != nil {
-		return nil, err
-	}
-	userMap := map[string]*usermwpb.User{}
-	for _, val := range userInfos {
-		userMap[val.ID] = val
-	}
-
-	infos := []*npool.Notif{}
-	for _, val := range notifs {
-		app, ok := appMap[val.AppID]
-		if !ok {
-			continue
-		}
-		user, ok := userMap[val.UserID]
-		if !ok {
-			continue
-		}
-		lang, ok := langMap[val.AppID+"-"+val.LangID]
-		if !ok {
-			continue
-		}
-
-		infos = append(infos, &npool.Notif{
-			ID:           val.ID,
-			AppID:        val.AppID,
-			AppName:      app.Name,
-			UserID:       val.UserID,
-			EmailAddress: user.EmailAddress,
-			PhoneNO:      user.PhoneNO,
-			Username:     user.Username,
-			EventID:      val.EventID,
-			EventType:    val.EventType,
-			UseTemplate:  val.UseTemplate,
-			Title:        val.Title,
-			Content:      val.Content,
-			Channel:      val.Channel,
-			LangID:       lang.LangID,
-			Lang:         lang.Lang,
-			NotifType:    val.NotifType,
-			Notified:     val.Notified,
-			CreatedAt:    val.CreatedAt,
-			UpdatedAt:    val.UpdatedAt,
-		})
-	}
-	return infos, nil
-}
 
 //nolint:gocyclo
 func (h *Handler) UpdateNotifs(ctx context.Context) ([]*npool.Notif, error) {

@@ -178,22 +178,18 @@ func (h *Handler) UpdateNotifs(ctx context.Context) ([]*npool.Notif, error) {
 			Notified: row.Notified,
 		}
 		reqs = append(reqs, _req)
+		h.IDs = append(h.IDs, *row.ID)
 	}
-	rows, err := mwcli.UpdateNotifs(ctx, reqs)
+
+	_, err := mwcli.UpdateNotifs(ctx, reqs)
 	if err != nil {
 		return nil, err
 	}
 
-	if len(rows) == 0 {
-		return nil, nil
-	}
-
-	handler := &updateHandler{
-		Handler: h,
-	}
-	infos, err := handler.createNotifsResp(ctx, rows)
+	infos, _, err := h.GetNotifs(ctx)
 	if err != nil {
 		return nil, err
 	}
+
 	return infos, nil
 }

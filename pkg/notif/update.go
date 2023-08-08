@@ -20,6 +20,7 @@ import (
 
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
+	constant "github.com/NpoolPlatform/notif-gateway/pkg/const"
 )
 
 type updateHandler struct {
@@ -140,6 +141,36 @@ func (h *Handler) UpdateNotifs(ctx context.Context) ([]*npool.Notif, error) {
 		}
 		if notifInfo.AppID != *h.AppID || notifInfo.UserID != *h.UserID {
 			return nil, fmt.Errorf("permission denied")
+		}
+
+		// notif state of frontend channel need to keep consistent in multi language
+		if notifInfo.Channel == basetypes.NotifChannel_ChannelFrontend {
+			notifs, _, err := mwcli.GetNotifs(ctx, &notifmwpb.Conds{
+				AppID: &basetypes.StringVal{
+					Op: cruder.EQ, Value: *h.AppID,
+				},
+				UserID: &basetypes.StringVal{
+					Op: cruder.EQ, Value: *h.UserID,
+				},
+				EventID: &basetypes.StringVal{
+					Op: cruder.EQ, Value: notifInfo.EventID,
+				},
+				Channel: &basetypes.Uint32Val{
+					Op: cruder.EQ, Value: uint32(basetypes.NotifChannel_ChannelFrontend),
+				},
+			}, 0, constant.DefaultRowLimit)
+			if err != nil {
+				return nil, err
+			}
+
+			for _, _notif := range notifs {
+				if _notif.ID != *row.ID {
+					reqs = append(reqs, &notifmwpb.NotifReq{
+						ID:       &_notif.ID,
+						Notified: row.Notified,
+					})
+				}
+			}
 		}
 
 		_req := &notifmwpb.NotifReq{

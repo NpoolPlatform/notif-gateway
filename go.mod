@@ -6,7 +6,7 @@ require (
 	github.com/NpoolPlatform/appuser-middleware v0.0.0-20230629025850-a26352bf1002
 	github.com/NpoolPlatform/basal-middleware v0.0.0-20230518061816-62bd589c0f63
 	github.com/NpoolPlatform/g11n-middleware v0.0.0-20230629111059-d8280578df85
-	github.com/NpoolPlatform/go-service-framework v0.0.0-20230602083207-1c0e6203556b
+	github.com/NpoolPlatform/go-service-framework v0.0.0-20230812113554-9fa7285b9d16
 	github.com/NpoolPlatform/libent-cruder v0.0.0-20221109023947-366125b690fb
 	github.com/NpoolPlatform/message v0.0.0-20230727114034-eb9a4bbee9de
 	github.com/NpoolPlatform/notif-middleware v0.0.0-20230727114741-62bdd2215742

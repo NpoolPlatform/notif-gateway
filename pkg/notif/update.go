@@ -17,29 +17,18 @@ import (
 
 type updateHandler struct {
 	*Handler
-	notifs     []*notifmwpb.Notif
-	updateReqs []*notifmwpb.NotifReq
-	idMap      map[string]*string
-}
-
-func (h *updateHandler) InitReqs() error {
-	reqs := []*notifmwpb.NotifReq{}
-	idMap := make(map[string]*string)
-	for _, row := range h.Reqs {
-		_req := &notifmwpb.NotifReq{
-			ID:       row.ID,
-			Notified: row.Notified,
-		}
-		reqs = append(reqs, _req)
-		h.IDs = append(h.IDs, *row.ID)
-		idMap[*row.ID] = row.ID
-	}
-	h.idMap = idMap
-	h.updateReqs = append(h.updateReqs, reqs...)
-	return nil
+	notifs   []*notifmwpb.Notif
+	reqIDMap map[string]*string
 }
 
 func (h *updateHandler) validateNotifs(ctx context.Context) error {
+	idMap := make(map[string]*string)
+	for _, row := range h.Reqs {
+		h.IDs = append(h.IDs, *row.ID)
+		idMap[*row.ID] = row.ID
+	}
+	h.reqIDMap = idMap
+
 	limit := int32(len(h.IDs))
 	notifs, _, err := mwcli.GetNotifs(ctx, &notifmwpb.Conds{
 		IDs: &basetypes.StringSliceVal{
@@ -70,6 +59,7 @@ func (h *updateHandler) updateNotifs(ctx context.Context) error {
 			eventIDs = append(eventIDs, row.EventID)
 		}
 	}
+
 	offset := int32(0)
 	for {
 		notifs, _, err := mwcli.GetNotifs(ctx, &notifmwpb.Conds{
@@ -93,7 +83,7 @@ func (h *updateHandler) updateNotifs(ctx context.Context) error {
 		reqs := []*notifmwpb.NotifReq{}
 		notified := true
 		for _, _notif := range notifs {
-			reqNotifID := h.idMap[_notif.ID]
+			reqNotifID := h.reqIDMap[_notif.ID]
 			if reqNotifID == nil {
 				reqs = append(reqs, &notifmwpb.NotifReq{
 					ID:       &_notif.ID,
@@ -101,14 +91,14 @@ func (h *updateHandler) updateNotifs(ctx context.Context) error {
 				})
 			}
 		}
-		h.updateReqs = append(h.updateReqs, reqs...)
+		h.Reqs = append(h.Reqs, reqs...)
 		if int32(len(notifs)) < constant.DefaultRowLimit {
 			break
 		}
-		offset += 1
+		offset += constant.DefaultRowLimit
 	}
 
-	_, err := mwcli.UpdateNotifs(ctx, h.updateReqs)
+	_, err := mwcli.UpdateNotifs(ctx, h.Reqs)
 	if err != nil {
 		return err
 	}
@@ -129,9 +119,6 @@ func (h *Handler) UpdateNotifs(ctx context.Context) ([]*npool.Notif, error) {
 		Handler: h,
 	}
 
-	if err := handler.InitReqs(); err != nil {
-		return nil, err
-	}
 	if err := handler.validateNotifs(ctx); err != nil {
 		return nil, err
 	}

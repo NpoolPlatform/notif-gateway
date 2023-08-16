@@ -15,6 +15,97 @@ import (
 	constant "github.com/NpoolPlatform/notif-gateway/pkg/const"
 )
 
+type updateHandler struct {
+	*Handler
+	notifs   []*notifmwpb.Notif
+	reqIDMap map[string]*string
+}
+
+func (h *updateHandler) validateNotifs(ctx context.Context) error {
+	idMap := make(map[string]*string)
+	for _, row := range h.Reqs {
+		h.IDs = append(h.IDs, *row.ID)
+		idMap[*row.ID] = row.ID
+	}
+	h.reqIDMap = idMap
+
+	limit := int32(len(h.IDs))
+	notifs, _, err := mwcli.GetNotifs(ctx, &notifmwpb.Conds{
+		IDs: &basetypes.StringSliceVal{
+			Op: cruder.IN, Value: h.IDs,
+		},
+	}, 0, limit)
+	if err != nil {
+		return err
+	}
+	if len(notifs) != len(h.IDs) {
+		return fmt.Errorf("notif not exist")
+	}
+
+	for _, row := range notifs {
+		if row.AppID != *h.AppID || row.UserID != *h.UserID {
+			return fmt.Errorf("permission denied")
+		}
+	}
+
+	h.notifs = notifs
+	return nil
+}
+
+func (h *updateHandler) updateNotifs(ctx context.Context) error {
+	eventIDs := []string{}
+	for _, row := range h.notifs {
+		if row.Channel == basetypes.NotifChannel_ChannelFrontend {
+			eventIDs = append(eventIDs, row.EventID)
+		}
+	}
+
+	offset := int32(0)
+	for {
+		notifs, _, err := mwcli.GetNotifs(ctx, &notifmwpb.Conds{
+			AppID: &basetypes.StringVal{
+				Op: cruder.EQ, Value: *h.AppID,
+			},
+			UserID: &basetypes.StringVal{
+				Op: cruder.EQ, Value: *h.UserID,
+			},
+			EventIDs: &basetypes.StringSliceVal{
+				Op: cruder.IN, Value: eventIDs,
+			},
+			Channel: &basetypes.Uint32Val{
+				Op: cruder.EQ, Value: uint32(basetypes.NotifChannel_ChannelFrontend),
+			},
+		}, offset, constant.DefaultRowLimit)
+		if err != nil {
+			return err
+		}
+
+		reqs := []*notifmwpb.NotifReq{}
+		notified := true
+		for _, _notif := range notifs {
+			reqNotifID := h.reqIDMap[_notif.ID]
+			if reqNotifID == nil {
+				reqs = append(reqs, &notifmwpb.NotifReq{
+					ID:       &_notif.ID,
+					Notified: &notified,
+				})
+			}
+		}
+		h.Reqs = append(h.Reqs, reqs...)
+		if int32(len(notifs)) < constant.DefaultRowLimit {
+			break
+		}
+		offset += constant.DefaultRowLimit
+	}
+
+	_, err := mwcli.UpdateNotifs(ctx, h.Reqs)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 //nolint:gocyclo
 func (h *Handler) UpdateNotifs(ctx context.Context) ([]*npool.Notif, error) {
 	if h.AppID == nil || *h.AppID == "" {
@@ -23,70 +114,15 @@ func (h *Handler) UpdateNotifs(ctx context.Context) ([]*npool.Notif, error) {
 	if h.UserID == nil || *h.UserID == "" {
 		return nil, fmt.Errorf("invalid userid")
 	}
-	reqs := []*notifmwpb.NotifReq{}
-	for _, row := range h.Reqs {
-		if row.ID == nil {
-			return nil, fmt.Errorf("invalid id")
-		}
-		if row.Notified == nil {
-			return nil, fmt.Errorf("invalid notified")
-		}
-		if !*row.Notified {
-			return nil, fmt.Errorf("invalid notified %v", *row.Notified)
-		}
 
-		notifID := *row.ID
-		notifInfo, err := mwcli.GetNotif(ctx, *row.ID)
-		if err != nil {
-			return nil, err
-		}
-		if notifInfo == nil {
-			return nil, fmt.Errorf("notif not exist")
-		}
-		if notifInfo.AppID != *h.AppID || notifInfo.UserID != *h.UserID {
-			return nil, fmt.Errorf("permission denied")
-		}
-
-		// notif state of frontend channel need to keep consistent in multi language
-		if notifInfo.Channel == basetypes.NotifChannel_ChannelFrontend {
-			notifs, _, err := mwcli.GetNotifs(ctx, &notifmwpb.Conds{
-				AppID: &basetypes.StringVal{
-					Op: cruder.EQ, Value: *h.AppID,
-				},
-				UserID: &basetypes.StringVal{
-					Op: cruder.EQ, Value: *h.UserID,
-				},
-				EventID: &basetypes.StringVal{
-					Op: cruder.EQ, Value: notifInfo.EventID,
-				},
-				Channel: &basetypes.Uint32Val{
-					Op: cruder.EQ, Value: uint32(basetypes.NotifChannel_ChannelFrontend),
-				},
-			}, 0, constant.DefaultRowLimit)
-			if err != nil {
-				return nil, err
-			}
-
-			for _, _notif := range notifs {
-				if _notif.ID != *row.ID {
-					reqs = append(reqs, &notifmwpb.NotifReq{
-						ID:       &_notif.ID,
-						Notified: row.Notified,
-					})
-				}
-			}
-		}
-
-		_req := &notifmwpb.NotifReq{
-			ID:       &notifID,
-			Notified: row.Notified,
-		}
-		reqs = append(reqs, _req)
-		h.IDs = append(h.IDs, *row.ID)
+	handler := &updateHandler{
+		Handler: h,
 	}
 
-	_, err := mwcli.UpdateNotifs(ctx, reqs)
-	if err != nil {
+	if err := handler.validateNotifs(ctx); err != nil {
+		return nil, err
+	}
+	if err := handler.updateNotifs(ctx); err != nil {
 		return nil, err
 	}
 

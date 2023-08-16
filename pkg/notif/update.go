@@ -39,7 +39,7 @@ func (h *updateHandler) InitReqs() error {
 	return nil
 }
 
-func (h *updateHandler) getNotifs(ctx context.Context) error {
+func (h *updateHandler) validateNotifs(ctx context.Context) error {
 	limit := int32(len(h.IDs))
 	notifs, _, err := mwcli.GetNotifs(ctx, &notifmwpb.Conds{
 		IDs: &basetypes.StringSliceVal{
@@ -132,7 +132,7 @@ func (h *Handler) UpdateNotifs(ctx context.Context) ([]*npool.Notif, error) {
 	if err := handler.InitReqs(); err != nil {
 		return nil, err
 	}
-	if err := handler.getNotifs(ctx); err != nil {
+	if err := handler.validateNotifs(ctx); err != nil {
 		return nil, err
 	}
 	if err := handler.updateNotifs(ctx); err != nil {

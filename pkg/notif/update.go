@@ -22,20 +22,10 @@ type updateHandler struct {
 	idMap      map[string]*string
 }
 
-func (h *updateHandler) validateReqs() error {
+func (h *updateHandler) InitReqs() error {
 	reqs := []*notifmwpb.NotifReq{}
 	idMap := make(map[string]*string)
 	for _, row := range h.Reqs {
-		if row.ID == nil {
-			return fmt.Errorf("invalid id")
-		}
-		if row.Notified == nil {
-			return fmt.Errorf("invalid notified")
-		}
-		if !*row.Notified {
-			return fmt.Errorf("invalid notified %v", *row.Notified)
-		}
-
 		_req := &notifmwpb.NotifReq{
 			ID:       row.ID,
 			Notified: row.Notified,
@@ -50,11 +40,12 @@ func (h *updateHandler) validateReqs() error {
 }
 
 func (h *updateHandler) getNotifs(ctx context.Context) error {
+	limit := int32(len(h.IDs))
 	notifs, _, err := mwcli.GetNotifs(ctx, &notifmwpb.Conds{
 		IDs: &basetypes.StringSliceVal{
 			Op: cruder.IN, Value: h.IDs,
 		},
-	}, 0, constant.DefaultRowLimit)
+	}, 0, limit)
 	if err != nil {
 		return err
 	}
@@ -72,7 +63,7 @@ func (h *updateHandler) getNotifs(ctx context.Context) error {
 	return nil
 }
 
-func (h *updateHandler) getSameEventIDNotifReqs(ctx context.Context) error {
+func (h *updateHandler) updateNotifs(ctx context.Context) error {
 	eventIDs := []string{}
 	for _, row := range h.notifs {
 		if row.Channel == basetypes.NotifChannel_ChannelFrontend {
@@ -117,6 +108,11 @@ func (h *updateHandler) getSameEventIDNotifReqs(ctx context.Context) error {
 		offset += 1
 	}
 
+	_, err := mwcli.UpdateNotifs(ctx, h.updateReqs)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -133,18 +129,13 @@ func (h *Handler) UpdateNotifs(ctx context.Context) ([]*npool.Notif, error) {
 		Handler: h,
 	}
 
-	if err := handler.validateReqs(); err != nil {
+	if err := handler.InitReqs(); err != nil {
 		return nil, err
 	}
 	if err := handler.getNotifs(ctx); err != nil {
 		return nil, err
 	}
-	if err := handler.getSameEventIDNotifReqs(ctx); err != nil {
-		return nil, err
-	}
-
-	_, err := mwcli.UpdateNotifs(ctx, handler.updateReqs)
-	if err != nil {
+	if err := handler.updateNotifs(ctx); err != nil {
 		return nil, err
 	}
 

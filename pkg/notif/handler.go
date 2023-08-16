@@ -291,23 +291,17 @@ func WithReqs(reqs []*notifmw.NotifReq) func(context.Context, *Handler) error {
 			return fmt.Errorf("infos is empty")
 		}
 		for _, req := range reqs {
-			if req.ID != nil {
-				_, err := uuid.Parse(*req.ID)
-				if err != nil {
-					return err
-				}
+			if req.ID == nil {
+				return fmt.Errorf("invalid id")
 			}
-			if req.AppID != nil {
-				_, err := uuid.Parse(*req.AppID)
-				if err != nil {
-					return err
-				}
+			if _, err := uuid.Parse(*req.ID); err != nil {
+				return err
 			}
-			if req.UserID != nil {
-				_, err := uuid.Parse(*req.UserID)
-				if err != nil {
-					return err
-				}
+			if req.Notified == nil {
+				return fmt.Errorf("invalid notified")
+			}
+			if !*req.Notified {
+				return fmt.Errorf("invalid notified %v", *req.Notified)
 			}
 		}
 		h.Reqs = reqs

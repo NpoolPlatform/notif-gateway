@@ -1,55 +1,54 @@
 package main
 
 import (
-	"github.com/NpoolPlatform/notif-gateway/api"
-	"github.com/NpoolPlatform/notif-gateway/pkg/migrator"
-	"github.com/NpoolPlatform/notif-middleware/pkg/db"
-
-	grpc2 "github.com/NpoolPlatform/go-service-framework/pkg/grpc"
-	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
+	"context"
 
 	apicli "github.com/NpoolPlatform/basal-middleware/pkg/client/api"
-
+	"github.com/NpoolPlatform/go-service-framework/pkg/action"
+	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
+	"github.com/NpoolPlatform/notif-gateway/api"
+	"github.com/NpoolPlatform/notif-gateway/pkg/migrator"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-
 	cli "github.com/urfave/cli/v2"
-
 	"google.golang.org/grpc"
 )
-
-// const MsgInterval = 3 * time.Second
 
 var runCmd = &cli.Command{
 	Name:    "run",
 	Aliases: []string{"s"},
 	Usage:   "Run the daemon",
-	After: func(c *cli.Context) error {
-		if err := grpc2.HShutdown(); err != nil {
-			logger.Sugar().Warnf("graceful shutdown http server error: %v", err)
-		}
-
-		migrator.Abort(c.Context)
-
-		grpc2.GShutdown()
-		return logger.Sync()
-	},
 	Action: func(c *cli.Context) error {
-		if err := migrator.Migrate(c.Context); err != nil {
-			return err
-		}
+		err := action.Run(
+			c.Context,
+			run,
+			rpcRegister,
+			rpcGatewayRegister,
+			watch,
+		)
 
-		if err := db.Init(); err != nil {
-			return err
-		}
-
-		go func() {
-			if err := grpc2.RunGRPC(rpcRegister); err != nil {
-				logger.Sugar().Errorf("fail to run grpc server: %v", err)
-			}
-		}()
-
-		return grpc2.RunGRPCGateWay(rpcGatewayRegister)
+		return err
 	},
+}
+
+func run(ctx context.Context) error {
+	if err := migrator.Migrate(ctx); err != nil {
+		return err
+	}
+	return nil
+}
+
+func shutdown(ctx context.Context) {
+	<-ctx.Done()
+	logger.Sugar().Infow(
+		"Watch",
+		"State", "Done",
+		"Error", ctx.Err(),
+	)
+}
+
+func watch(ctx context.Context, cancel context.CancelFunc) error {
+	go shutdown(ctx)
+	return nil
 }
 
 func rpcRegister(server grpc.ServiceRegistrar) error {
@@ -65,8 +64,5 @@ func rpcGatewayRegister(mux *runtime.ServeMux, endpoint string, opts []grpc.Dial
 	if err != nil {
 		return err
 	}
-
-	_ = apicli.Register(mux)
-
 	return nil
 }

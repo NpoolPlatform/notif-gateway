@@ -27,6 +27,10 @@ spec:
             backend:
               serviceName: notif-gateway
               servicePort: 50700
+          - path: /api/notif/v1/get/announcements
+            backend:
+              serviceName: notif-gateway
+              servicePort: 50700
     - host: api.procyon.vip
       http: *http_rules
     - host: api.xpool.top

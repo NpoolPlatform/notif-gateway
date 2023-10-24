@@ -22,8 +22,8 @@ func (s *Server) DeleteAnnouncementUser(
 ) {
 	handler, err := amtuser1.NewHandler(
 		ctx,
-		handler1.WithID(&in.ID),
-		handler1.WithAppID(&in.AppID),
+		handler1.WithID(&in.ID, true),
+		handler1.WithAppID(&in.AppID, true),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

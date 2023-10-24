@@ -21,7 +21,7 @@ func (s *Server) GetAnnouncementUsers(
 ) {
 	handler, err := amtuser1.NewHandler(
 		ctx,
-		handler1.WithAppID(&in.AppID),
+		handler1.WithAppID(&in.AppID, true),
 		handler1.WithOffset(in.Offset),
 		handler1.WithLimit(in.Limit),
 	)

@@ -20,9 +20,9 @@ func (s *Server) CreateAnnouncementUser(
 ) {
 	handler, err := amtuser1.NewHandler(
 		ctx,
-		handler1.WithAppID(&in.AppID),
-		handler1.WithUserID(&in.AppID, &in.TargetUserID),
-		handler1.WithAnnouncementID(&in.AppID, &in.AnnouncementID),
+		handler1.WithAppID(&in.AppID, true),
+		handler1.WithUserID(&in.TargetUserID, true),
+		handler1.WithAnnouncementID(&in.AppID, &in.AnnouncementID, true),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

@@ -55,6 +55,7 @@ func (h *Handler) GetAnnouncementUsers(ctx context.Context) ([]*npool.Announceme
 		}
 		infos = append(infos, &npool.AnnouncementUser{
 			ID:               val.ID,
+			EntID:            val.EntID,
 			AnnouncementID:   val.AnnouncementID,
 			AppID:            val.AppID,
 			UserID:           val.UserID,
@@ -73,7 +74,7 @@ func (h *Handler) GetAnnouncementUsers(ctx context.Context) ([]*npool.Announceme
 }
 
 func (h *Handler) GetAnnouncementUser(ctx context.Context) (*npool.AnnouncementUser, error) {
-	row, err := mwcli.GetAnnouncementUser(ctx, *h.AppID, *h.ID)
+	row, err := mwcli.GetAnnouncementUser(ctx, *h.AppID, *h.EntID)
 	if err != nil {
 		return nil, err
 	}
@@ -88,6 +89,7 @@ func (h *Handler) GetAnnouncementUser(ctx context.Context) (*npool.AnnouncementU
 
 	info := &npool.AnnouncementUser{
 		ID:               row.ID,
+		EntID:            row.EntID,
 		AnnouncementID:   row.AnnouncementID,
 		AppID:            row.AppID,
 		UserID:           row.UserID,

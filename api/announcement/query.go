@@ -14,9 +14,9 @@ import (
 func (s *Server) GetAnnouncements(ctx context.Context, in *npool.GetAnnouncementsRequest) (*npool.GetAnnouncementsResponse, error) {
 	handler, err := announcement1.NewHandler(
 		ctx,
-		announcement1.WithAppID(&in.AppID),
-		announcement1.WithUserID(&in.AppID, &in.UserID),
-		announcement1.WithLangID(&in.AppID, &in.LangID),
+		announcement1.WithAppID(&in.AppID, true),
+		announcement1.WithUserID(&in.UserID, true),
+		announcement1.WithLangID(&in.LangID, true),
 		announcement1.WithOffset(in.Offset),
 		announcement1.WithLimit(in.Limit),
 	)
@@ -54,7 +54,7 @@ func (s *Server) GetAppAnnouncements(
 ) {
 	handler, err := announcement1.NewHandler(
 		ctx,
-		announcement1.WithAppID(&in.AppID),
+		announcement1.WithAppID(&in.AppID, true),
 		announcement1.WithOffset(in.Offset),
 		announcement1.WithLimit(in.Limit),
 	)

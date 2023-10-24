@@ -19,13 +19,13 @@ func (s *Server) UpdateAnnouncement(
 ) {
 	handler, err := announcement1.NewHandler(
 		ctx,
-		announcement1.WithID(&in.ID),
-		announcement1.WithAppID(&in.AppID),
-		announcement1.WithTitle(in.Title),
-		announcement1.WithContent(in.Content),
-		announcement1.WithAnnouncementType(in.AnnouncementType),
-		announcement1.WithStartAt(in.StartAt),
-		announcement1.WithEndAt(in.EndAt),
+		announcement1.WithID(&in.ID, true),
+		announcement1.WithAppID(&in.AppID, true),
+		announcement1.WithTitle(in.Title, false),
+		announcement1.WithContent(in.Content, false),
+		announcement1.WithAnnouncementType(in.AnnouncementType, false),
+		announcement1.WithStartAt(in.StartAt, false),
+		announcement1.WithEndAt(in.EndAt, false),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

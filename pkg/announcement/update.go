@@ -50,5 +50,7 @@ func (h *Handler) UpdateAnnouncement(ctx context.Context) (*npool.Announcement, 
 		return nil, err
 	}
 
+	h.EntID = &info.EntID
+
 	return h.GetAnnouncement(ctx)
 }

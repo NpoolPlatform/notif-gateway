@@ -20,14 +20,14 @@ func (s *Server) CreateAnnouncement(
 ) {
 	handler, err := announcement1.NewHandler(
 		ctx,
-		announcement1.WithTitle(&in.Title),
-		announcement1.WithContent(&in.Content),
-		announcement1.WithAppID(&in.AppID),
-		announcement1.WithLangID(&in.AppID, &in.TargetLangID),
-		announcement1.WithChannel(&in.Channel),
-		announcement1.WithAnnouncementType(&in.AnnouncementType),
-		announcement1.WithStartAt(&in.StartAt),
-		announcement1.WithEndAt(&in.EndAt),
+		announcement1.WithTitle(&in.Title, true),
+		announcement1.WithContent(&in.Content, true),
+		announcement1.WithAppID(&in.AppID, true),
+		announcement1.WithLangID(&in.TargetLangID, true),
+		announcement1.WithChannel(&in.Channel, true),
+		announcement1.WithAnnouncementType(&in.AnnouncementType, true),
+		announcement1.WithStartAt(&in.StartAt, true),
+		announcement1.WithEndAt(&in.EndAt, true),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

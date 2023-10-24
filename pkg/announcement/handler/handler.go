@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	appcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
-	appusercli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	constant "github.com/NpoolPlatform/notif-gateway/pkg/const"
 	cli "github.com/NpoolPlatform/notif-middleware/pkg/client/announcement"
@@ -13,7 +12,8 @@ import (
 )
 
 type Handler struct {
-	ID             *string
+	ID             *uint32
+	EntID          *string
 	AppID          *string
 	UserID         *string
 	AnnouncementID *string
@@ -35,25 +35,50 @@ func NewHandler(ctx context.Context, options ...interface{}) (*Handler, error) {
 	return handler, nil
 }
 
-func WithID(id *string) func(context.Context, *Handler) error {
+func WithID(id *uint32, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
-		_, err := uuid.Parse(*id)
-		if err != nil {
-			return err
+		if id == nil {
+			if must {
+				return fmt.Errorf("invalid id")
+			}
+			return nil
 		}
 		h.ID = id
 		return nil
 	}
 }
 
-func WithAppID(appID *string) func(context.Context, *Handler) error {
+func WithEntID(id *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
-		_, err := uuid.Parse(*appID)
+		if id == nil {
+			if must {
+				return fmt.Errorf("invalid entid")
+			}
+			return nil
+		}
+		_, err := uuid.Parse(*id)
+		if err != nil {
+			return err
+		}
+		h.EntID = id
+		return nil
+	}
+}
+
+func WithAppID(id *string, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if id == nil {
+			if must {
+				return fmt.Errorf("invalid appid")
+			}
+			return nil
+		}
+		_, err := uuid.Parse(*id)
 		if err != nil {
 			return err
 		}
 
-		exist, err := appcli.ExistApp(ctx, *appID)
+		exist, err := appcli.ExistApp(ctx, *id)
 		if err != nil {
 			return err
 		}
@@ -61,38 +86,34 @@ func WithAppID(appID *string) func(context.Context, *Handler) error {
 			return fmt.Errorf("invalid app")
 		}
 
-		h.AppID = appID
+		h.AppID = id
 		return nil
 	}
 }
 
-func WithUserID(appID, userID *string) func(context.Context, *Handler) error {
+func WithUserID(id *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
-		if userID == nil {
-			return fmt.Errorf("invalid userid")
+		if id == nil {
+			if must {
+				return fmt.Errorf("invalid userid")
+			}
+			return nil
 		}
-		_, err := uuid.Parse(*userID)
-		if err != nil {
+		if _, err := uuid.Parse(*id); err != nil {
 			return err
 		}
-
-		exist, err := appusercli.ExistUser(ctx, *appID, *userID)
-		if err != nil {
-			return err
-		}
-		if !exist {
-			return fmt.Errorf("invalid user")
-		}
-
-		h.UserID = userID
+		h.UserID = id
 		return nil
 	}
 }
 
-func WithAnnouncementID(appID, amtID *string) func(context.Context, *Handler) error {
+func WithAnnouncementID(appID, amtID *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if amtID == nil {
-			return fmt.Errorf("invalid announcement id")
+			if must {
+				return fmt.Errorf("invalid announcement id")
+			}
+			return nil
 		}
 		_, err := uuid.Parse(*amtID)
 		if err != nil {

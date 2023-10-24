@@ -13,11 +13,11 @@ import (
 func (s *Server) UpdateContact(ctx context.Context, in *npool.UpdateContactRequest) (*npool.UpdateContactResponse, error) {
 	handler, err := contact1.NewHandler(
 		ctx,
-		contact1.WithID(&in.ID),
-		contact1.WithAppID(&in.AppID),
-		contact1.WithSender(in.Sender),
-		contact1.WithAccount(in.Account),
-		contact1.WithAccountType(in.AccountType),
+		contact1.WithID(&in.ID, true),
+		contact1.WithAppID(&in.AppID, true),
+		contact1.WithSender(in.Sender, false),
+		contact1.WithAccount(in.Account, false),
+		contact1.WithAccountType(in.AccountType, false),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

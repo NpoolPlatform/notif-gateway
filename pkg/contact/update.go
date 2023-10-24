@@ -21,7 +21,7 @@ func (h *Handler) UpdateContact(ctx context.Context) (*npool.Contact, error) {
 		return nil, fmt.Errorf("permission denied")
 	}
 
-	_info, err := cli.UpdateContact(ctx, &npool.ContactReq{
+	_, err = cli.UpdateContact(ctx, &npool.ContactReq{
 		ID:          h.ID,
 		AppID:       h.AppID,
 		Account:     h.Account,
@@ -32,6 +32,7 @@ func (h *Handler) UpdateContact(ctx context.Context) (*npool.Contact, error) {
 	if err != nil {
 		return nil, err
 	}
+	h.EntID = &info.EntID
 
-	return _info, nil
+	return h.GetContact(ctx)
 }

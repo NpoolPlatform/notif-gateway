@@ -14,11 +14,11 @@ import (
 func (s *Server) CreateContact(ctx context.Context, in *npool.CreateContactRequest) (*npool.CreateContactResponse, error) {
 	handler, err := contact1.NewHandler(
 		ctx,
-		contact1.WithAppID(&in.AppID),
-		contact1.WithAccount(&in.Account),
-		contact1.WithAccountType(&in.AccountType),
-		contact1.WithUsedFor(&in.UsedFor),
-		contact1.WithSender(&in.Sender),
+		contact1.WithAppID(&in.AppID, true),
+		contact1.WithAccount(&in.Account, true),
+		contact1.WithAccountType(&in.AccountType, true),
+		contact1.WithUsedFor(&in.UsedFor, true),
+		contact1.WithSender(&in.Sender, true),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

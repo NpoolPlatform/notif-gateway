@@ -21,9 +21,9 @@ func (s *Server) GetReadState(
 ) {
 	handler, err := amtread1.NewHandler(
 		ctx,
-		handler1.WithAppID(&in.AppID),
-		handler1.WithUserID(&in.AppID, &in.UserID),
-		handler1.WithAnnouncementID(&in.AppID, &in.AnnouncementID),
+		handler1.WithAppID(&in.AppID, true),
+		handler1.WithUserID(&in.UserID, true),
+		handler1.WithAnnouncementID(&in.AppID, &in.AnnouncementID, true),
 		handler1.WithOffset(0),
 		handler1.WithLimit(1),
 	)
@@ -54,8 +54,8 @@ func (s *Server) GetReadState(
 func (s *Server) GetReadStates(ctx context.Context, in *npool.GetReadStatesRequest) (*npool.GetReadStatesResponse, error) {
 	handler, err := amtread1.NewHandler(
 		ctx,
-		handler1.WithAppID(&in.AppID),
-		handler1.WithUserID(&in.AppID, &in.UserID),
+		handler1.WithAppID(&in.AppID, true),
+		handler1.WithUserID(&in.UserID, true),
 		handler1.WithOffset(in.Offset),
 		handler1.WithLimit(in.Limit),
 	)
@@ -110,7 +110,7 @@ func (s *Server) GetAppUserReadStates(ctx context.Context, in *npool.GetAppUserR
 func (s *Server) GetAppReadStates(ctx context.Context, in *npool.GetAppReadStatesRequest) (*npool.GetAppReadStatesResponse, error) {
 	handler, err := amtread1.NewHandler(
 		ctx,
-		handler1.WithAppID(&in.AppID),
+		handler1.WithAppID(&in.AppID, true),
 		handler1.WithOffset(in.Offset),
 		handler1.WithLimit(in.Limit),
 	)

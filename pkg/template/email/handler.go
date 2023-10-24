@@ -5,16 +5,14 @@ import (
 	"fmt"
 
 	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
-	g11nmwcli "github.com/NpoolPlatform/g11n-middleware/pkg/client/applang"
-	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
-	"github.com/NpoolPlatform/message/npool/g11n/mw/v1/applang"
 	constant "github.com/NpoolPlatform/notif-gateway/pkg/const"
 	"github.com/google/uuid"
 )
 
 type Handler struct {
-	ID                *string
+	ID                *uint32
+	EntID             *string
 	AppID             *string
 	LangID            *string
 	UsedFor           *basetypes.UsedFor
@@ -38,74 +36,82 @@ func NewHandler(ctx context.Context, options ...func(context.Context, *Handler) 
 	return handler, nil
 }
 
-func WithID(id *string) func(context.Context, *Handler) error {
+func WithID(id *uint32, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if id == nil {
+			if must {
+				return fmt.Errorf("invalid id")
+			}
 			return nil
-		}
-		if _, err := uuid.Parse(*id); err != nil {
-			return err
 		}
 		h.ID = id
 		return nil
 	}
 }
 
-func WithAppID(appID *string) func(context.Context, *Handler) error {
+func WithEntID(id *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
-		if appID == nil {
+		if id == nil {
+			if must {
+				return fmt.Errorf("invalid entid")
+			}
 			return nil
 		}
-		if _, err := uuid.Parse(*appID); err != nil {
+		_, err := uuid.Parse(*id)
+		if err != nil {
 			return err
 		}
-		exist, err := appmwcli.ExistApp(ctx, *appID)
+		h.EntID = id
+		return nil
+	}
+}
+
+func WithAppID(id *string, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if id == nil {
+			if must {
+				return fmt.Errorf("invalid appid")
+			}
+			return nil
+		}
+		exist, err := appmwcli.ExistApp(ctx, *id)
 		if err != nil {
 			return err
 		}
 		if !exist {
 			return fmt.Errorf("invalid app")
 		}
-		h.AppID = appID
+		h.AppID = id
 		return nil
 	}
 }
 
-func WithLangID(appID, langID *string) func(context.Context, *Handler) error {
+func WithLangID(id *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
-		if langID == nil {
-			return fmt.Errorf("invalid lang id")
+		if id == nil {
+			if must {
+				return fmt.Errorf("invalid langid")
+			}
+			return nil
 		}
-		_, err := uuid.Parse(*langID)
+		_, err := uuid.Parse(*id)
 		if err != nil {
 			return err
 		}
 
-		exist, err := g11nmwcli.ExistAppLangConds(ctx, &applang.Conds{
-			AppID: &basetypes.StringVal{
-				Op:    cruder.EQ,
-				Value: *appID,
-			},
-			LangID: &basetypes.StringVal{
-				Op:    cruder.EQ,
-				Value: *langID,
-			},
-		})
-
-		if err != nil {
-			return err
-		}
-		if !exist {
-			return fmt.Errorf("invalid lang id")
-		}
-
-		h.LangID = langID
+		h.LangID = id
 		return nil
 	}
 }
 
-func WithUsedFor(usedFor *basetypes.UsedFor) func(context.Context, *Handler) error {
+func WithUsedFor(usedFor *basetypes.UsedFor, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
+		if usedFor == nil {
+			if must {
+				return fmt.Errorf("invalid usedfor")
+			}
+			return nil
+		}
 		_usedFor := false
 		for key := range basetypes.UsedFor_value {
 			if key == usedFor.String() && *usedFor != basetypes.UsedFor_DefaultUsedFor {
@@ -120,9 +126,12 @@ func WithUsedFor(usedFor *basetypes.UsedFor) func(context.Context, *Handler) err
 	}
 }
 
-func WithSender(sender *string) func(context.Context, *Handler) error {
+func WithSender(sender *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if sender == nil {
+			if must {
+				return fmt.Errorf("invalid sender")
+			}
 			return nil
 		}
 		if *sender == "" {
@@ -133,9 +142,12 @@ func WithSender(sender *string) func(context.Context, *Handler) error {
 	}
 }
 
-func WithSubject(subject *string) func(context.Context, *Handler) error {
+func WithSubject(subject *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if subject == nil {
+			if must {
+				return fmt.Errorf("invalid subject")
+			}
 			return nil
 		}
 		if *subject == "" {
@@ -146,9 +158,12 @@ func WithSubject(subject *string) func(context.Context, *Handler) error {
 	}
 }
 
-func WithDefaultToUsername(defaultToUsername *string) func(context.Context, *Handler) error {
+func WithDefaultToUsername(defaultToUsername *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if defaultToUsername == nil {
+			if must {
+				return fmt.Errorf("invalid defaulttousername")
+			}
 			return nil
 		}
 		if *defaultToUsername == "" {
@@ -158,9 +173,12 @@ func WithDefaultToUsername(defaultToUsername *string) func(context.Context, *Han
 		return nil
 	}
 }
-func WithBody(body *string) func(context.Context, *Handler) error {
+func WithBody(body *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if body == nil {
+			if must {
+				return fmt.Errorf("invalid body")
+			}
 			return nil
 		}
 		h.Body = body
@@ -168,14 +186,14 @@ func WithBody(body *string) func(context.Context, *Handler) error {
 	}
 }
 
-func WithReplyTos(replyTos []string) func(context.Context, *Handler) error {
+func WithReplyTos(replyTos []string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		h.ReplyTos = replyTos
 		return nil
 	}
 }
 
-func WithCCTos(cCTos []string) func(context.Context, *Handler) error {
+func WithCCTos(cCTos []string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		h.CCTos = cCTos
 		return nil

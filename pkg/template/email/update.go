@@ -9,9 +9,6 @@ import (
 )
 
 func (h *Handler) UpdateEmailTemplate(ctx context.Context) (*emailtemplatemwpb.EmailTemplate, error) {
-	if h.ID == nil || *h.ID == "" {
-		return nil, fmt.Errorf("id invalid")
-	}
 	emailInfo, err := h.GetEmailTemplate(ctx)
 	if err != nil {
 		return nil, err
@@ -19,14 +16,11 @@ func (h *Handler) UpdateEmailTemplate(ctx context.Context) (*emailtemplatemwpb.E
 	if emailInfo == nil {
 		return nil, fmt.Errorf("email template not exist")
 	}
-	if h.AppID == nil || *h.AppID == "" {
-		return nil, fmt.Errorf("appid invalid")
-	}
 	if emailInfo.AppID != *h.AppID {
 		return nil, fmt.Errorf("permission denied")
 	}
 
-	info, err := emailtemplatemwcli.UpdateEmailTemplate(ctx, &emailtemplatemwpb.EmailTemplateReq{
+	_, err = emailtemplatemwcli.UpdateEmailTemplate(ctx, &emailtemplatemwpb.EmailTemplateReq{
 		ID:                h.ID,
 		Sender:            h.Sender,
 		ReplyTos:          h.ReplyTos,
@@ -39,5 +33,7 @@ func (h *Handler) UpdateEmailTemplate(ctx context.Context) (*emailtemplatemwpb.E
 		return nil, err
 	}
 
-	return info, nil
+	h.EntID = &emailInfo.EntID
+
+	return h.GetEmailTemplate(ctx)
 }

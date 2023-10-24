@@ -22,14 +22,14 @@ func (s *Server) UpdateEmailTemplate(
 ) {
 	handler, err := emailtemplate1.NewHandler(
 		ctx,
-		emailtemplate1.WithID(&in.ID),
-		emailtemplate1.WithAppID(&in.AppID),
-		emailtemplate1.WithSender(in.Sender),
-		emailtemplate1.WithReplyTos(in.ReplyTos),
-		emailtemplate1.WithCCTos(in.CCTos),
-		emailtemplate1.WithSubject(in.Subject),
-		emailtemplate1.WithBody(in.Body),
-		emailtemplate1.WithDefaultToUsername(in.DefaultToUsername),
+		emailtemplate1.WithID(&in.ID, true),
+		emailtemplate1.WithAppID(&in.AppID, true),
+		emailtemplate1.WithSender(in.Sender, false),
+		emailtemplate1.WithReplyTos(in.ReplyTos, false),
+		emailtemplate1.WithCCTos(in.CCTos, false),
+		emailtemplate1.WithSubject(in.Subject, false),
+		emailtemplate1.WithBody(in.Body, false),
+		emailtemplate1.WithDefaultToUsername(in.DefaultToUsername, false),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
@@ -64,14 +64,14 @@ func (s *Server) UpdateAppEmailTemplate(
 ) {
 	handler, err := emailtemplate1.NewHandler(
 		ctx,
-		emailtemplate1.WithID(&in.ID),
-		emailtemplate1.WithAppID(&in.TargetAppID),
-		emailtemplate1.WithSender(in.Sender),
-		emailtemplate1.WithReplyTos(in.ReplyTos),
-		emailtemplate1.WithCCTos(in.CCTos),
-		emailtemplate1.WithSubject(in.Subject),
-		emailtemplate1.WithBody(in.Body),
-		emailtemplate1.WithDefaultToUsername(in.DefaultToUsername),
+		emailtemplate1.WithID(&in.ID, true),
+		emailtemplate1.WithAppID(&in.TargetAppID, true),
+		emailtemplate1.WithSender(in.Sender, false),
+		emailtemplate1.WithReplyTos(in.ReplyTos, false),
+		emailtemplate1.WithCCTos(in.CCTos, false),
+		emailtemplate1.WithSubject(in.Subject, false),
+		emailtemplate1.WithBody(in.Body, false),
+		emailtemplate1.WithDefaultToUsername(in.DefaultToUsername, false),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

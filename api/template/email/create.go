@@ -21,16 +21,16 @@ func (s *Server) CreateEmailTemplate(
 ) {
 	handler, err := emailtemplate1.NewHandler(
 		ctx,
-		emailtemplate1.WithAppID(&in.AppID),
-		emailtemplate1.WithLangID(&in.AppID, &in.TargetLangID),
-		emailtemplate1.WithUsedFor(&in.UsedFor),
-		emailtemplate1.WithSubject(&in.Subject),
-		emailtemplate1.WithDefaultToUsername(&in.DefaultToUsername),
-		emailtemplate1.WithUsedFor(&in.UsedFor),
-		emailtemplate1.WithSender(&in.Sender),
-		emailtemplate1.WithReplyTos(in.ReplyTos),
-		emailtemplate1.WithCCTos(in.CCTos),
-		emailtemplate1.WithBody(&in.Body),
+		emailtemplate1.WithAppID(&in.AppID, true),
+		emailtemplate1.WithLangID(&in.TargetLangID, true),
+		emailtemplate1.WithUsedFor(&in.UsedFor, true),
+		emailtemplate1.WithSubject(&in.Subject, true),
+		emailtemplate1.WithDefaultToUsername(&in.DefaultToUsername, true),
+		emailtemplate1.WithUsedFor(&in.UsedFor, true),
+		emailtemplate1.WithSender(&in.Sender, true),
+		emailtemplate1.WithReplyTos(in.ReplyTos, true),
+		emailtemplate1.WithCCTos(in.CCTos, true),
+		emailtemplate1.WithBody(&in.Body, true),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
@@ -65,16 +65,16 @@ func (s *Server) CreateAppEmailTemplate(
 ) {
 	handler, err := emailtemplate1.NewHandler(
 		ctx,
-		emailtemplate1.WithAppID(&in.TargetAppID),
-		emailtemplate1.WithLangID(&in.TargetAppID, &in.TargetLangID),
-		emailtemplate1.WithUsedFor(&in.UsedFor),
-		emailtemplate1.WithSubject(&in.Subject),
-		emailtemplate1.WithDefaultToUsername(&in.DefaultToUsername),
-		emailtemplate1.WithUsedFor(&in.UsedFor),
-		emailtemplate1.WithSender(&in.Sender),
-		emailtemplate1.WithReplyTos(in.ReplyTos),
-		emailtemplate1.WithCCTos(in.CCTos),
-		emailtemplate1.WithBody(&in.Body),
+		emailtemplate1.WithAppID(&in.TargetAppID, true),
+		emailtemplate1.WithLangID(&in.TargetLangID, true),
+		emailtemplate1.WithUsedFor(&in.UsedFor, true),
+		emailtemplate1.WithSubject(&in.Subject, true),
+		emailtemplate1.WithDefaultToUsername(&in.DefaultToUsername, true),
+		emailtemplate1.WithUsedFor(&in.UsedFor, true),
+		emailtemplate1.WithSender(&in.Sender, true),
+		emailtemplate1.WithReplyTos(in.ReplyTos, false),
+		emailtemplate1.WithCCTos(in.CCTos, false),
+		emailtemplate1.WithBody(&in.Body, true),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

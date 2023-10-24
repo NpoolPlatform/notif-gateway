@@ -5,11 +5,7 @@ import (
 	"fmt"
 
 	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
-	appusermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
-	g11nmwcli "github.com/NpoolPlatform/g11n-middleware/pkg/client/applang"
-	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
-	"github.com/NpoolPlatform/message/npool/g11n/mw/v1/applang"
 	notifmw "github.com/NpoolPlatform/message/npool/notif/mw/v1/notif"
 	templatemwpb "github.com/NpoolPlatform/message/npool/notif/mw/v1/template"
 	constant "github.com/NpoolPlatform/notif-gateway/pkg/const"
@@ -18,7 +14,8 @@ import (
 )
 
 type Handler struct {
-	ID          *string
+	ID          *uint32
+	EntID       *string
 	AppID       *string
 	UserID      *string
 	LangID      *string
@@ -33,7 +30,8 @@ type Handler struct {
 	NotifType   *basetypes.NotifType
 	Vars        *templatemwpb.TemplateVars
 	Reqs        []*notifmw.NotifReq
-	IDs         []string
+	EntIDs      []string
+	IDs         []uint32
 	Offset      int32
 	Limit       int32
 }
@@ -48,97 +46,93 @@ func NewHandler(ctx context.Context, options ...func(context.Context, *Handler) 
 	return handler, nil
 }
 
-func WithID(id *string) func(context.Context, *Handler) error {
+func WithID(id *uint32, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if id == nil {
+			if must {
+				return fmt.Errorf("invalid id")
+			}
 			return nil
-		}
-		if _, err := uuid.Parse(*id); err != nil {
-			return err
 		}
 		h.ID = id
 		return nil
 	}
 }
 
-func WithAppID(appID *string) func(context.Context, *Handler) error {
+func WithEntID(id *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
-		if appID == nil {
+		if id == nil {
+			if must {
+				return fmt.Errorf("invalid entid")
+			}
 			return nil
 		}
-		if _, err := uuid.Parse(*appID); err != nil {
+		_, err := uuid.Parse(*id)
+		if err != nil {
 			return err
 		}
-		exist, err := appmwcli.ExistApp(ctx, *appID)
+		h.EntID = id
+		return nil
+	}
+}
+
+func WithAppID(id *string, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if id == nil {
+			if must {
+				return fmt.Errorf("invalid appid")
+			}
+			return nil
+		}
+		exist, err := appmwcli.ExistApp(ctx, *id)
 		if err != nil {
 			return err
 		}
 		if !exist {
 			return fmt.Errorf("invalid app")
 		}
-		h.AppID = appID
+		h.AppID = id
 		return nil
 	}
 }
 
-func WithUserID(appID, userID *string) func(context.Context, *Handler) error {
+func WithUserID(id *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
-		if appID == nil || userID == nil {
+		if id == nil {
+			if must {
+				return fmt.Errorf("invalid userid")
+			}
 			return nil
 		}
-		_, err := uuid.Parse(*userID)
-		if err != nil {
+		if _, err := uuid.Parse(*id); err != nil {
 			return err
 		}
-		exist, err := appusermwcli.ExistUser(ctx, *appID, *userID)
-		if err != nil {
-			return err
-		}
-		if !exist {
-			return fmt.Errorf("invalid user")
-		}
-
-		h.UserID = userID
+		h.UserID = id
 		return nil
 	}
 }
 
-func WithLangID(appID, langID *string) func(context.Context, *Handler) error {
+func WithLangID(id *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
-		if langID == nil {
+		if id == nil {
 			return fmt.Errorf("invalid lang id")
 		}
-		_, err := uuid.Parse(*langID)
+		_, err := uuid.Parse(*id)
 		if err != nil {
 			return err
 		}
 
-		exist, err := g11nmwcli.ExistAppLangConds(ctx, &applang.Conds{
-			AppID: &basetypes.StringVal{
-				Op:    cruder.EQ,
-				Value: *appID,
-			},
-			LangID: &basetypes.StringVal{
-				Op:    cruder.EQ,
-				Value: *langID,
-			},
-		})
-
-		if err != nil {
-			return err
-		}
-		if !exist {
-			return fmt.Errorf("invalid lang id")
-		}
-
-		h.LangID = langID
+		h.LangID = id
 		return nil
 	}
 }
 
-func WithEventID(eventid *string) func(context.Context, *Handler) error {
+func WithEventID(eventid *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if eventid == nil {
+			if must {
+				return fmt.Errorf("invalid eventid")
+			}
 			return nil
 		}
 		_, err := uuid.Parse(*eventid)
@@ -150,23 +144,38 @@ func WithEventID(eventid *string) func(context.Context, *Handler) error {
 	}
 }
 
-func WithNotified(notified *bool) func(context.Context, *Handler) error {
+func WithNotified(notified *bool, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
+		if notified == nil {
+			if must {
+				return fmt.Errorf("invalid notified")
+			}
+			return nil
+		}
 		h.Notified = notified
 		return nil
 	}
 }
 
-func WithUseTemplate(usetemplate *bool) func(context.Context, *Handler) error {
+func WithUseTemplate(usetemplate *bool, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
+		if usetemplate == nil {
+			if must {
+				return fmt.Errorf("invalid usetemplate")
+			}
+			return nil
+		}
 		h.UseTemplate = usetemplate
 		return nil
 	}
 }
 
-func WithTitle(title *string) func(context.Context, *Handler) error {
+func WithTitle(title *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if title == nil {
+			if must {
+				return fmt.Errorf("invalid title")
+			}
 			return nil
 		}
 		if *title == "" {
@@ -177,9 +186,12 @@ func WithTitle(title *string) func(context.Context, *Handler) error {
 	}
 }
 
-func WithContent(content *string) func(context.Context, *Handler) error {
+func WithContent(content *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if content == nil {
+			if must {
+				return fmt.Errorf("invalid content")
+			}
 			return nil
 		}
 		if *content == "" {
@@ -190,9 +202,12 @@ func WithContent(content *string) func(context.Context, *Handler) error {
 	}
 }
 
-func WithChannel(_channel *basetypes.NotifChannel) func(context.Context, *Handler) error {
+func WithChannel(_channel *basetypes.NotifChannel, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if _channel == nil {
+			if must {
+				return fmt.Errorf("invalid channel")
+			}
 			return nil
 		}
 		switch *_channel {
@@ -207,9 +222,12 @@ func WithChannel(_channel *basetypes.NotifChannel) func(context.Context, *Handle
 	}
 }
 
-func WithExtra(extra *string) func(context.Context, *Handler) error {
+func WithExtra(extra *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if extra == nil {
+			if must {
+				return fmt.Errorf("invalid extra")
+			}
 			return nil
 		}
 		if *extra == "" {
@@ -220,9 +238,13 @@ func WithExtra(extra *string) func(context.Context, *Handler) error {
 	}
 }
 
-func WithEventType(eventtype *basetypes.UsedFor) func(context.Context, *Handler) error {
+//nolint:gocyclo
+func WithEventType(eventtype *basetypes.UsedFor, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if eventtype == nil {
+			if must {
+				return fmt.Errorf("invalid eventtype")
+			}
 			return nil
 		}
 		switch *eventtype {
@@ -247,9 +269,12 @@ func WithEventType(eventtype *basetypes.UsedFor) func(context.Context, *Handler)
 	}
 }
 
-func WithNotifType(_type *basetypes.NotifType) func(context.Context, *Handler) error {
+func WithNotifType(_type *basetypes.NotifType, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if _type == nil {
+			if must {
+				return fmt.Errorf("invalid notiftype")
+			}
 			return nil
 		}
 		switch *_type {
@@ -266,20 +291,33 @@ func WithNotifType(_type *basetypes.NotifType) func(context.Context, *Handler) e
 	}
 }
 
-func WithVars(vars *templatemwpb.TemplateVars) func(context.Context, *Handler) error {
+func WithVars(vars *templatemwpb.TemplateVars, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
+		if vars == nil {
+			if must {
+				return fmt.Errorf("invalid vars")
+			}
+			return nil
+		}
 		h.Vars = vars
 		return nil
 	}
 }
 
-func WithIDs(ids []string) func(context.Context, *Handler) error {
+func WithEntIDs(ids []string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		for _, id := range ids {
 			if _, err := uuid.Parse(id); err != nil {
 				return err
 			}
 		}
+		h.EntIDs = ids
+		return nil
+	}
+}
+
+func WithIDs(ids []uint32, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
 		h.IDs = ids
 		return nil
 	}
@@ -293,9 +331,6 @@ func WithReqs(reqs []*notifmw.NotifReq) func(context.Context, *Handler) error {
 		for _, req := range reqs {
 			if req.ID == nil {
 				return fmt.Errorf("invalid id")
-			}
-			if _, err := uuid.Parse(*req.ID); err != nil {
-				return err
 			}
 			if req.Notified == nil {
 				return fmt.Errorf("invalid notified")

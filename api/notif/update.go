@@ -17,8 +17,8 @@ func (s *Server) UpdateNotifs(ctx context.Context, in *npool.UpdateNotifsRequest
 	reqs := in.GetInfos()
 	handler, err := notif1.NewHandler(
 		ctx,
-		notif1.WithAppID(&in.AppID),
-		notif1.WithUserID(&in.AppID, &in.UserID),
+		notif1.WithAppID(&in.AppID, true),
+		notif1.WithUserID(&in.UserID, true),
 		notif1.WithReqs(reqs),
 	)
 	if err != nil {

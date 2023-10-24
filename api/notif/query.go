@@ -16,10 +16,10 @@ func (s *Server) GetNotifs(ctx context.Context, in *npool.GetNotifsRequest) (*np
 	channel := basetypes.NotifChannel_ChannelFrontend
 	hangler, err := notif1.NewHandler(
 		ctx,
-		notif1.WithAppID(&in.AppID),
-		notif1.WithUserID(&in.AppID, &in.UserID),
-		notif1.WithLangID(&in.AppID, &in.LangID),
-		notif1.WithChannel(&channel),
+		notif1.WithAppID(&in.AppID, true),
+		notif1.WithUserID(&in.UserID, true),
+		notif1.WithLangID(&in.LangID, true),
+		notif1.WithChannel(&channel, true),
 		notif1.WithOffset(in.GetOffset()),
 		notif1.WithLimit(in.GetLimit()),
 	)
@@ -51,7 +51,7 @@ func (s *Server) GetNotifs(ctx context.Context, in *npool.GetNotifsRequest) (*np
 func (s *Server) GetAppNotifs(ctx context.Context, in *npool.GetAppNotifsRequest) (*npool.GetAppNotifsResponse, error) {
 	hangler, err := notif1.NewHandler(
 		ctx,
-		notif1.WithAppID(&in.AppID),
+		notif1.WithAppID(&in.AppID, true),
 		notif1.WithOffset(in.GetOffset()),
 		notif1.WithLimit(in.GetLimit()),
 	)

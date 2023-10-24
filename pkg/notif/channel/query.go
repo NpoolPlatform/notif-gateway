@@ -2,7 +2,6 @@ package channel
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
@@ -14,10 +13,7 @@ func (h *Handler) GetChannels(ctx context.Context) ([]*npool.Channel, uint32, er
 	infos, total, err := cli.GetChannels(
 		ctx,
 		&npool.Conds{
-			AppID: &basetypes.StringVal{
-				Op:    cruder.EQ,
-				Value: *h.AppID,
-			},
+			AppID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
 		},
 		h.Offset,
 		h.Limit,
@@ -30,14 +26,7 @@ func (h *Handler) GetChannels(ctx context.Context) ([]*npool.Channel, uint32, er
 }
 
 func (h *Handler) GetChannel(ctx context.Context) (*npool.Channel, error) {
-	if h.ID == nil {
-		return nil, fmt.Errorf("invalid channel id")
-	}
-	if h.AppID == nil {
-		return nil, fmt.Errorf("invalid channel id")
-	}
-
-	info, err := cli.GetChannel(ctx, *h.AppID, *h.ID)
+	info, err := cli.GetChannel(ctx, *h.AppID, *h.EntID)
 	if err != nil {
 		return nil, err
 	}

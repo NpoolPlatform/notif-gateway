@@ -4,14 +4,15 @@ import (
 	"context"
 	"fmt"
 
-	appcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
+	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	constant "github.com/NpoolPlatform/notif-middleware/pkg/const"
 	"github.com/google/uuid"
 )
 
 type Handler struct {
-	ID         *string
+	ID         *uint32
+	EntID      *string
 	AppID      *string
 	Channel    *basetypes.NotifChannel
 	EventType  *basetypes.UsedFor
@@ -30,40 +31,63 @@ func NewHandler(ctx context.Context, options ...func(context.Context, *Handler) 
 	return handler, nil
 }
 
-func WithID(id *string) func(context.Context, *Handler) error {
+func WithID(id *uint32, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
-		_, err := uuid.Parse(*id)
-		if err != nil {
-			return err
+		if id == nil {
+			if must {
+				return fmt.Errorf("invalid id")
+			}
+			return nil
 		}
 		h.ID = id
 		return nil
 	}
 }
 
-func WithAppID(appID *string) func(context.Context, *Handler) error {
+func WithEntID(id *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
-		_, err := uuid.Parse(*appID)
+		if id == nil {
+			if must {
+				return fmt.Errorf("invalid entid")
+			}
+			return nil
+		}
+		_, err := uuid.Parse(*id)
 		if err != nil {
 			return err
 		}
-		exist, err := appcli.ExistApp(ctx, *appID)
+		h.EntID = id
+		return nil
+	}
+}
+
+func WithAppID(id *string, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if id == nil {
+			if must {
+				return fmt.Errorf("invalid appid")
+			}
+			return nil
+		}
+		exist, err := appmwcli.ExistApp(ctx, *id)
 		if err != nil {
 			return err
 		}
 		if !exist {
 			return fmt.Errorf("invalid app")
 		}
-
-		h.AppID = appID
+		h.AppID = id
 		return nil
 	}
 }
 
-func WithChannel(channel *basetypes.NotifChannel) func(context.Context, *Handler) error {
+func WithChannel(channel *basetypes.NotifChannel, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if channel == nil {
-			return fmt.Errorf("invalid channel")
+			if must {
+				return fmt.Errorf("invalid channel")
+			}
+			return nil
 		}
 		switch *channel {
 		case basetypes.NotifChannel_ChannelEmail:
@@ -77,9 +101,13 @@ func WithChannel(channel *basetypes.NotifChannel) func(context.Context, *Handler
 	}
 }
 
-func WithEventType(_type *basetypes.UsedFor) func(context.Context, *Handler) error {
+//nolint:gocyclo
+func WithEventType(_type *basetypes.UsedFor, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if _type == nil {
+			if must {
+				return fmt.Errorf("invalid eventtype")
+			}
 			return nil
 		}
 		switch *_type {
@@ -105,10 +133,14 @@ func WithEventType(_type *basetypes.UsedFor) func(context.Context, *Handler) err
 	}
 }
 
-func WithEventTypes(_types []basetypes.UsedFor) func(context.Context, *Handler) error {
+//nolint:gocyclo
+func WithEventTypes(_types []basetypes.UsedFor, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if len(_types) == 0 {
-			return fmt.Errorf("invalid event types")
+			if must {
+				return fmt.Errorf("invalid eventtypes")
+			}
+			return nil
 		}
 		for _, _type := range _types {
 			switch _type {

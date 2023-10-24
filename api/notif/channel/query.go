@@ -14,7 +14,7 @@ import (
 func (s *Server) GetAppChannels(ctx context.Context, in *npool.GetAppChannelsRequest) (*npool.GetAppChannelsResponse, error) {
 	handler, err := channel1.NewHandler(
 		ctx,
-		channel1.WithAppID(&in.AppID),
+		channel1.WithAppID(&in.AppID, true),
 		channel1.WithOffset(in.Offset),
 		channel1.WithLimit(in.Limit),
 	)

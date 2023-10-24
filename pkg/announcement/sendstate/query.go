@@ -2,6 +2,7 @@ package sendstate
 
 import (
 	"context"
+	"fmt"
 
 	usermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
@@ -12,30 +13,29 @@ import (
 	mwcli "github.com/NpoolPlatform/notif-middleware/pkg/client/announcement/sendstate"
 )
 
+//nolint:gocyclo
 func (h *Handler) GetSendStates(ctx context.Context) ([]*npool.SendState, uint32, error) {
+	if h.UserID != nil {
+		exist, err := usermwcli.ExistUser(ctx, *h.AppID, *h.UserID)
+		if err != nil {
+			return nil, 0, err
+		}
+		if !exist {
+			return nil, 0, fmt.Errorf("invalid user")
+		}
+	}
+
 	conds := &mwpb.Conds{
-		AppID: &basetypes.StringVal{
-			Op:    cruder.EQ,
-			Value: *h.AppID,
-		},
+		AppID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
 	}
 	if h.UserID != nil {
-		conds.UserID = &basetypes.StringVal{
-			Op:    cruder.EQ,
-			Value: *h.UserID,
-		}
+		conds.UserID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.UserID}
 	}
 	if h.AnnouncementID != nil {
-		conds.AnnouncementID = &basetypes.StringVal{
-			Op:    cruder.EQ,
-			Value: *h.AnnouncementID,
-		}
+		conds.AnnouncementID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.AnnouncementID}
 	}
 	if h.Channel != nil {
-		conds.Channel = &basetypes.Uint32Val{
-			Op:    cruder.EQ,
-			Value: uint32(*h.Channel),
-		}
+		conds.Channel = &basetypes.Uint32Val{Op: cruder.EQ, Value: uint32(*h.Channel)}
 	}
 
 	rows, total, err := mwcli.GetSendStates(ctx, conds, h.Offset, h.Limit)
@@ -78,6 +78,7 @@ func (h *Handler) GetSendStates(ctx context.Context) ([]*npool.SendState, uint32
 		}
 		infos = append(infos, &npool.SendState{
 			ID:               val.ID,
+			EntID:            val.EntID,
 			AnnouncementID:   val.AnnouncementID,
 			AppID:            val.AppID,
 			UserID:           val.UserID,

@@ -21,8 +21,8 @@ func (s *Server) GetSendStates(
 ) {
 	handler, err := amtsend1.NewHandler(
 		ctx,
-		handler1.WithAppID(&in.AppID),
-		handler1.WithUserID(&in.AppID, &in.UserID),
+		handler1.WithAppID(&in.AppID, true),
+		handler1.WithUserID(&in.UserID, true),
 		amtsend1.WithChannel(in.Channel),
 		handler1.WithOffset(in.Offset),
 		handler1.WithLimit(in.Limit),
@@ -79,7 +79,7 @@ func (s *Server) GetAppUserSendStates(ctx context.Context, in *npool.GetAppUserS
 func (s *Server) GetAppSendStates(ctx context.Context, in *npool.GetAppSendStatesRequest) (*npool.GetAppSendStatesResponse, error) {
 	handler, err := amtsend1.NewHandler(
 		ctx,
-		handler1.WithAppID(&in.AppID),
+		handler1.WithAppID(&in.AppID, true),
 		amtsend1.WithChannel(in.Channel),
 		handler1.WithOffset(in.Offset),
 		handler1.WithLimit(in.Limit),

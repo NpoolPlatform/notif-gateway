@@ -15,7 +15,7 @@ import (
 func (s *Server) GetSMSTemplate(ctx context.Context, in *npool.GetSMSTemplateRequest) (*npool.GetSMSTemplateResponse, error) {
 	handler, err := smstemplate1.NewHandler(
 		ctx,
-		smstemplate1.WithID(&in.ID),
+		smstemplate1.WithEntID(&in.EntID, true),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
@@ -44,7 +44,7 @@ func (s *Server) GetSMSTemplate(ctx context.Context, in *npool.GetSMSTemplateReq
 func (s *Server) GetSMSTemplates(ctx context.Context, in *npool.GetSMSTemplatesRequest) (*npool.GetSMSTemplatesResponse, error) {
 	handler, err := smstemplate1.NewHandler(
 		ctx,
-		smstemplate1.WithAppID(&in.AppID),
+		smstemplate1.WithAppID(&in.AppID, true),
 		smstemplate1.WithOffset(in.GetOffset()),
 		smstemplate1.WithLimit(in.GetLimit()),
 	)
@@ -76,7 +76,7 @@ func (s *Server) GetSMSTemplates(ctx context.Context, in *npool.GetSMSTemplatesR
 func (s *Server) GetAppSMSTemplates(ctx context.Context, in *npool.GetAppSMSTemplatesRequest) (*npool.GetAppSMSTemplatesResponse, error) {
 	handler, err := smstemplate1.NewHandler(
 		ctx,
-		smstemplate1.WithAppID(&in.TargetAppID),
+		smstemplate1.WithAppID(&in.TargetAppID, true),
 		smstemplate1.WithOffset(in.GetOffset()),
 		smstemplate1.WithLimit(in.GetLimit()),
 	)

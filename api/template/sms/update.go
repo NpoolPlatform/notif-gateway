@@ -21,10 +21,10 @@ func (s *Server) UpdateSMSTemplate(
 ) {
 	handler, err := smstemplate1.NewHandler(
 		ctx,
-		smstemplate1.WithID(&in.ID),
-		smstemplate1.WithAppID(&in.AppID),
-		smstemplate1.WithSubject(in.Subject),
-		smstemplate1.WithMessage(in.Message),
+		smstemplate1.WithID(&in.ID, true),
+		smstemplate1.WithAppID(&in.AppID, true),
+		smstemplate1.WithSubject(in.Subject, false),
+		smstemplate1.WithMessage(in.Message, false),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
@@ -59,10 +59,10 @@ func (s *Server) UpdateAppSMSTemplate(
 ) {
 	handler, err := smstemplate1.NewHandler(
 		ctx,
-		smstemplate1.WithID(&in.ID),
-		smstemplate1.WithAppID(&in.TargetAppID),
-		smstemplate1.WithSubject(in.Subject),
-		smstemplate1.WithMessage(in.Message),
+		smstemplate1.WithID(&in.ID, true),
+		smstemplate1.WithAppID(&in.TargetAppID, true),
+		smstemplate1.WithSubject(in.Subject, false),
+		smstemplate1.WithMessage(in.Message, false),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

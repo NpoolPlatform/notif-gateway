@@ -10,7 +10,7 @@ import (
 )
 
 func (h *Handler) GetSMSTemplate(ctx context.Context) (*smstemplatemwpb.SMSTemplate, error) {
-	return smstemplatemwcli.GetSMSTemplate(ctx, *h.ID)
+	return smstemplatemwcli.GetSMSTemplate(ctx, *h.EntID)
 }
 
 func (h *Handler) GetSMSTemplates(ctx context.Context) ([]*smstemplatemwpb.SMSTemplate, uint32, error) {

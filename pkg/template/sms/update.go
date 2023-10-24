@@ -9,9 +9,6 @@ import (
 )
 
 func (h *Handler) UpdateSMSTemplate(ctx context.Context) (*smstemplatemwpb.SMSTemplate, error) {
-	if h.ID == nil || *h.ID == "" {
-		return nil, fmt.Errorf("id invalid")
-	}
 	smsInfo, err := h.GetSMSTemplate(ctx)
 	if err != nil {
 		return nil, err
@@ -19,14 +16,11 @@ func (h *Handler) UpdateSMSTemplate(ctx context.Context) (*smstemplatemwpb.SMSTe
 	if smsInfo == nil {
 		return nil, fmt.Errorf("sms template not exist")
 	}
-	if h.AppID == nil || *h.AppID == "" {
-		return nil, fmt.Errorf("appid invalid")
-	}
 	if smsInfo.AppID != *h.AppID {
 		return nil, fmt.Errorf("permission denied")
 	}
 
-	info, err := smstemplatemwcli.UpdateSMSTemplate(ctx, &smstemplatemwpb.SMSTemplateReq{
+	_, err = smstemplatemwcli.UpdateSMSTemplate(ctx, &smstemplatemwpb.SMSTemplateReq{
 		ID:      h.ID,
 		AppID:   h.AppID,
 		Subject: h.Subject,
@@ -36,5 +30,7 @@ func (h *Handler) UpdateSMSTemplate(ctx context.Context) (*smstemplatemwpb.SMSTe
 		return nil, err
 	}
 
-	return info, nil
+	h.EntID = &smsInfo.EntID
+
+	return h.GetSMSTemplate(ctx)
 }

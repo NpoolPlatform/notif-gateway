@@ -14,8 +14,8 @@ import (
 func (s *Server) GetNotifUsers(ctx context.Context, in *npool.GetNotifUsersRequest) (*npool.GetNotifUsersResponse, error) {
 	handler, err := notifuser1.NewHandler(
 		ctx,
-		notifuser1.WithAppID(&in.AppID),
-		notifuser1.WithEventType(in.EventType),
+		notifuser1.WithAppID(&in.AppID, true),
+		notifuser1.WithEventType(in.EventType, true),
 		notifuser1.WithOffset(in.Offset),
 		notifuser1.WithLimit(in.Limit),
 	)
@@ -47,7 +47,7 @@ func (s *Server) GetNotifUsers(ctx context.Context, in *npool.GetNotifUsersReque
 func (s *Server) GetAppNotifUsers(ctx context.Context, in *npool.GetAppNotifUsersRequest) (*npool.GetAppNotifUsersResponse, error) {
 	handler, err := notifuser1.NewHandler(
 		ctx,
-		notifuser1.WithAppID(&in.TargetAppID),
+		notifuser1.WithAppID(&in.TargetAppID, true),
 		notifuser1.WithOffset(in.Offset),
 		notifuser1.WithLimit(in.Limit),
 	)

@@ -13,9 +13,9 @@ import (
 func (s *Server) CreateNotifUser(ctx context.Context, in *npool.CreateNotifUserRequest) (*npool.CreateNotifUserResponse, error) {
 	handler, err := notifuser1.NewHandler(
 		ctx,
-		notifuser1.WithAppID(&in.AppID),
-		notifuser1.WithUserID(&in.AppID, &in.TargetUserID),
-		notifuser1.WithEventType(&in.EventType),
+		notifuser1.WithAppID(&in.AppID, true),
+		notifuser1.WithUserID(&in.TargetUserID, true),
+		notifuser1.WithEventType(&in.EventType, true),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

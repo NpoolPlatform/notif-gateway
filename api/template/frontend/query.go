@@ -21,7 +21,7 @@ func (s *Server) GetFrontendTemplate(
 ) {
 	handler, err := frontendtemplate1.NewHandler(
 		ctx,
-		frontendtemplate1.WithID(&in.ID),
+		frontendtemplate1.WithEntID(&in.EntID, true),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
@@ -56,7 +56,7 @@ func (s *Server) GetFrontendTemplates(
 ) {
 	handler, err := frontendtemplate1.NewHandler(
 		ctx,
-		frontendtemplate1.WithAppID(&in.AppID),
+		frontendtemplate1.WithAppID(&in.AppID, true),
 		frontendtemplate1.WithOffset(in.GetOffset()),
 		frontendtemplate1.WithLimit(in.GetLimit()),
 	)
@@ -94,7 +94,7 @@ func (s *Server) GetAppFrontendTemplates(
 ) {
 	handler, err := frontendtemplate1.NewHandler(
 		ctx,
-		frontendtemplate1.WithAppID(&in.TargetAppID),
+		frontendtemplate1.WithAppID(&in.TargetAppID, true),
 		frontendtemplate1.WithOffset(in.GetOffset()),
 		frontendtemplate1.WithLimit(in.GetLimit()),
 	)

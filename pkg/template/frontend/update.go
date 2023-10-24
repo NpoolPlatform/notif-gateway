@@ -9,9 +9,6 @@ import (
 )
 
 func (h *Handler) UpdateFrontendTemplate(ctx context.Context) (*frontendtemplatemwpb.FrontendTemplate, error) {
-	if h.ID == nil || *h.ID == "" {
-		return nil, fmt.Errorf("id invalid")
-	}
 	frontendInfo, err := h.GetFrontendTemplate(ctx)
 	if err != nil {
 		return nil, err
@@ -19,14 +16,11 @@ func (h *Handler) UpdateFrontendTemplate(ctx context.Context) (*frontendtemplate
 	if frontendInfo == nil {
 		return nil, fmt.Errorf("frontend template not exist")
 	}
-	if h.AppID == nil || *h.AppID == "" {
-		return nil, fmt.Errorf("appid invalid")
-	}
 	if frontendInfo.AppID != *h.AppID {
 		return nil, fmt.Errorf("permission denied")
 	}
 
-	info, err := frontendtemplatemwcli.UpdateFrontendTemplate(ctx, &frontendtemplatemwpb.FrontendTemplateReq{
+	_, err = frontendtemplatemwcli.UpdateFrontendTemplate(ctx, &frontendtemplatemwpb.FrontendTemplateReq{
 		ID:      h.ID,
 		AppID:   h.AppID,
 		Title:   h.Title,
@@ -36,5 +30,7 @@ func (h *Handler) UpdateFrontendTemplate(ctx context.Context) (*frontendtemplate
 		return nil, err
 	}
 
-	return info, nil
+	h.EntID = &frontendInfo.EntID
+
+	return h.GetFrontendTemplate(ctx)
 }

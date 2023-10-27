@@ -4,23 +4,25 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	emailtemplatemwpb "github.com/NpoolPlatform/message/npool/notif/mw/v1/template/email"
 	emailtemplatemwcli "github.com/NpoolPlatform/notif-middleware/pkg/client/template/email"
 )
 
 func (h *Handler) UpdateEmailTemplate(ctx context.Context) (*emailtemplatemwpb.EmailTemplate, error) {
-	emailInfo, err := h.GetEmailTemplate(ctx)
+	exist, err := emailtemplatemwcli.ExistEmailTemplateConds(ctx, &emailtemplatemwpb.Conds{
+		ID:    &basetypes.Uint32Val{Op: cruder.EQ, Value: *h.ID},
+		AppID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
+	})
 	if err != nil {
 		return nil, err
 	}
-	if emailInfo == nil {
+	if !exist {
 		return nil, fmt.Errorf("email template not exist")
 	}
-	if emailInfo.AppID != *h.AppID {
-		return nil, fmt.Errorf("permission denied")
-	}
 
-	_, err = emailtemplatemwcli.UpdateEmailTemplate(ctx, &emailtemplatemwpb.EmailTemplateReq{
+	info, err := emailtemplatemwcli.UpdateEmailTemplate(ctx, &emailtemplatemwpb.EmailTemplateReq{
 		ID:                h.ID,
 		Sender:            h.Sender,
 		ReplyTos:          h.ReplyTos,
@@ -33,7 +35,7 @@ func (h *Handler) UpdateEmailTemplate(ctx context.Context) (*emailtemplatemwpb.E
 		return nil, err
 	}
 
-	h.EntID = &emailInfo.EntID
+	h.EntID = &info.EntID
 
 	return h.GetEmailTemplate(ctx)
 }

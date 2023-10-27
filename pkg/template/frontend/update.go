@@ -4,23 +4,25 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	frontendtemplatemwpb "github.com/NpoolPlatform/message/npool/notif/mw/v1/template/frontend"
 	frontendtemplatemwcli "github.com/NpoolPlatform/notif-middleware/pkg/client/template/frontend"
 )
 
 func (h *Handler) UpdateFrontendTemplate(ctx context.Context) (*frontendtemplatemwpb.FrontendTemplate, error) {
-	frontendInfo, err := h.GetFrontendTemplate(ctx)
+	exist, err := frontendtemplatemwcli.ExistFrontendTemplateConds(ctx, &frontendtemplatemwpb.Conds{
+		ID:    &basetypes.Uint32Val{Op: cruder.EQ, Value: *h.ID},
+		AppID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
+	})
 	if err != nil {
 		return nil, err
 	}
-	if frontendInfo == nil {
+	if !exist {
 		return nil, fmt.Errorf("frontend template not exist")
 	}
-	if frontendInfo.AppID != *h.AppID {
-		return nil, fmt.Errorf("permission denied")
-	}
 
-	_, err = frontendtemplatemwcli.UpdateFrontendTemplate(ctx, &frontendtemplatemwpb.FrontendTemplateReq{
+	info, err := frontendtemplatemwcli.UpdateFrontendTemplate(ctx, &frontendtemplatemwpb.FrontendTemplateReq{
 		ID:      h.ID,
 		AppID:   h.AppID,
 		Title:   h.Title,
@@ -30,7 +32,7 @@ func (h *Handler) UpdateFrontendTemplate(ctx context.Context) (*frontendtemplate
 		return nil, err
 	}
 
-	h.EntID = &frontendInfo.EntID
+	h.EntID = &info.EntID
 
 	return h.GetFrontendTemplate(ctx)
 }

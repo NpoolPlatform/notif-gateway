@@ -98,6 +98,7 @@ func (h *Handler) GetAppAnnouncements(ctx context.Context) ([]*npool.Announcemen
 	for _, amt := range infos {
 		row := &npool.Announcement{
 			ID:               amt.ID,
+			EntID:            amt.EntID,
 			AppID:            amt.AppID,
 			LangID:           amt.LangID,
 			Title:            amt.Title,
@@ -132,10 +133,29 @@ func (h *Handler) GetAnnouncement(ctx context.Context) (*npool.Announcement, err
 		Content:          amt.Content,
 		StartAt:          amt.StartAt,
 		EndAt:            amt.EndAt,
-		CreatedAt:        amt.CreatedAt,
-		UpdatedAt:        amt.UpdatedAt,
 		Channel:          amt.Channel,
 		AnnouncementType: amt.AnnouncementType,
+		CreatedAt:        amt.CreatedAt,
+		UpdatedAt:        amt.UpdatedAt,
+	}
+
+	return info, nil
+}
+
+func (h *Handler) GetAnnouncementExt(amt *mwpb.Announcement) (*npool.Announcement, error) {
+	info := &npool.Announcement{
+		ID:               amt.ID,
+		EntID:            amt.EntID,
+		AppID:            amt.AppID,
+		LangID:           amt.LangID,
+		Title:            amt.Title,
+		Content:          amt.Content,
+		StartAt:          amt.StartAt,
+		EndAt:            amt.EndAt,
+		Channel:          amt.Channel,
+		AnnouncementType: amt.AnnouncementType,
+		CreatedAt:        amt.CreatedAt,
+		UpdatedAt:        amt.UpdatedAt,
 	}
 
 	return info, nil

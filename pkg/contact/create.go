@@ -11,12 +11,10 @@ import (
 )
 
 func (h *Handler) CreateContact(ctx context.Context) (*npool.Contact, error) {
-	exist, err := cli.ExistContactConds(ctx, &npool.ExistContactCondsRequest{
-		Conds: &npool.Conds{
-			AppID:       &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
-			AccountType: &basetypes.Uint32Val{Op: cruder.EQ, Value: uint32(*h.AccountType)},
-			UsedFor:     &basetypes.Uint32Val{Op: cruder.EQ, Value: uint32(*h.UsedFor)},
-		},
+	exist, err := cli.ExistContactConds(ctx, &npool.Conds{
+		AppID:       &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
+		AccountType: &basetypes.Uint32Val{Op: cruder.EQ, Value: uint32(*h.AccountType)},
+		UsedFor:     &basetypes.Uint32Val{Op: cruder.EQ, Value: uint32(*h.UsedFor)},
 	})
 	if err != nil {
 		return nil, err

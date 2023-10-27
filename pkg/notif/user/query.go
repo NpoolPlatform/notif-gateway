@@ -109,3 +109,25 @@ func (h *Handler) GetNotifUser(ctx context.Context) (*npool.NotifUser, error) {
 
 	return info, nil
 }
+
+func (h *Handler) GetNotifUserExt(ctx context.Context, row *mwpb.NotifUser) (*npool.NotifUser, error) {
+	user, err := usermwcli.GetUser(ctx, row.AppID, row.UserID)
+	if err != nil {
+		return nil, err
+	}
+
+	info := &npool.NotifUser{
+		ID:           row.ID,
+		EntID:        row.EntID,
+		EventType:    row.EventType,
+		AppID:        row.AppID,
+		UserID:       row.UserID,
+		EmailAddress: user.EmailAddress,
+		PhoneNO:      user.PhoneNO,
+		Username:     user.Username,
+		CreatedAt:    row.CreatedAt,
+		UpdatedAt:    row.UpdatedAt,
+	}
+
+	return info, nil
+}

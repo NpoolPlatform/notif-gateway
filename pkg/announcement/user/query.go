@@ -106,3 +106,29 @@ func (h *Handler) GetAnnouncementUser(ctx context.Context) (*npool.AnnouncementU
 
 	return info, nil
 }
+
+func (h *Handler) GetAnnouncementUserExt(ctx context.Context, row *mwpb.AnnouncementUser) (*npool.AnnouncementUser, error) {
+	user, err := usermwcli.GetUser(ctx, row.AppID, row.UserID)
+	if err != nil {
+		return nil, err
+	}
+
+	info := &npool.AnnouncementUser{
+		ID:               row.ID,
+		EntID:            row.EntID,
+		AnnouncementID:   row.AnnouncementID,
+		AppID:            row.AppID,
+		UserID:           row.UserID,
+		EmailAddress:     user.EmailAddress,
+		PhoneNO:          user.PhoneNO,
+		Username:         user.Username,
+		Title:            row.Title,
+		Content:          row.Content,
+		AnnouncementType: basetypes.NotifType(basetypes.NotifType_value[row.AnnouncementType]),
+		Channel:          basetypes.NotifChannel(basetypes.NotifChannel_value[row.Channel]),
+		CreatedAt:        row.CreatedAt,
+		UpdatedAt:        row.UpdatedAt,
+	}
+
+	return info, nil
+}

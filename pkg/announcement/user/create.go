@@ -23,12 +23,10 @@ func (h *Handler) CreateAnnouncementUser(ctx context.Context) (*npool.Announceme
 
 	exist, err := cli.ExistAnnouncementUserConds(
 		ctx,
-		&mwpb.ExistAnnouncementUserCondsRequest{
-			Conds: &mwpb.Conds{
-				AppID:          &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
-				UserID:         &basetypes.StringVal{Op: cruder.EQ, Value: *h.UserID},
-				AnnouncementID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AnnouncementID},
-			},
+		&mwpb.Conds{
+			AppID:          &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
+			UserID:         &basetypes.StringVal{Op: cruder.EQ, Value: *h.UserID},
+			AnnouncementID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AnnouncementID},
 		},
 	)
 	if err != nil {

@@ -46,12 +46,14 @@ func (h *Handler) GetNotifs(
 	uint32,
 	error,
 ) {
-	existUser, err := usermwcli.ExistUser(ctx, *h.AppID, *h.UserID)
-	if err != nil {
-		return nil, 0, err
-	}
-	if !existUser {
-		return nil, 0, fmt.Errorf("invalid user")
+	if h.UserID != nil {
+		existUser, err := usermwcli.ExistUser(ctx, *h.AppID, *h.UserID)
+		if err != nil {
+			return nil, 0, err
+		}
+		if !existUser {
+			return nil, 0, fmt.Errorf("invalid user")
+		}
 	}
 
 	if h.LangID != nil {

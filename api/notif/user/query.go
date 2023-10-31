@@ -15,7 +15,7 @@ func (s *Server) GetNotifUsers(ctx context.Context, in *npool.GetNotifUsersReque
 	handler, err := notifuser1.NewHandler(
 		ctx,
 		notifuser1.WithAppID(&in.AppID, true),
-		notifuser1.WithEventType(in.EventType, true),
+		notifuser1.WithEventType(in.EventType, false),
 		notifuser1.WithOffset(in.Offset),
 		notifuser1.WithLimit(in.Limit),
 	)

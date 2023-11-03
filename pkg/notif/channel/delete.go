@@ -12,6 +12,7 @@ import (
 func (h *Handler) DeleteChannel(ctx context.Context) (*mwpb.Channel, error) {
 	exist, err := mwcli.ExistChannelConds(ctx, &mwpb.Conds{
 		ID:    &basetypes.Uint32Val{Op: cruder.EQ, Value: *h.ID},
+		EntID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.EntID},
 		AppID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
 	})
 	if err != nil {

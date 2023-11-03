@@ -13,6 +13,7 @@ import (
 func (h *Handler) DeleteAnnouncement(ctx context.Context) (*npool.Announcement, error) {
 	exist, err := mwcli.ExistAnnouncementConds(ctx, &mwpb.Conds{
 		ID:    &basetypes.Uint32Val{Op: cruder.EQ, Value: *h.ID},
+		EntID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.EntID},
 		AppID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
 	})
 	if err != nil {

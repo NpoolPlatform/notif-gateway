@@ -13,6 +13,7 @@ import (
 func (h *Handler) DeleteNotifUser(ctx context.Context) (*npool.NotifUser, error) {
 	exist, err := mwcli.ExistNotifUserConds(ctx, &mwpb.Conds{
 		ID:    &basetypes.Uint32Val{Op: cruder.EQ, Value: *h.ID},
+		EntID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.EntID},
 		AppID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
 	})
 	if err != nil {

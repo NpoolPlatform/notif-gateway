@@ -332,6 +332,9 @@ func WithReqs(reqs []*notifmw.NotifReq) func(context.Context, *Handler) error {
 			if req.ID == nil {
 				return fmt.Errorf("invalid id")
 			}
+			if req.EntID == nil {
+				return fmt.Errorf("invalid entid")
+			}
 			if req.Notified == nil {
 				return fmt.Errorf("invalid notified")
 			}

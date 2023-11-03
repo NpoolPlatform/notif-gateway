@@ -14,6 +14,7 @@ import (
 func (h *Handler) UpdateAnnouncement(ctx context.Context) (*npool.Announcement, error) {
 	info, err := cli.GetAnnouncementOnly(ctx, &mwpb.Conds{
 		ID:    &basetypes.Uint32Val{Op: cruder.EQ, Value: *h.ID},
+		EntID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.EntID},
 		AppID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
 	})
 	if err != nil {

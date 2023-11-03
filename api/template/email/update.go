@@ -23,6 +23,7 @@ func (s *Server) UpdateEmailTemplate(
 	handler, err := emailtemplate1.NewHandler(
 		ctx,
 		emailtemplate1.WithID(&in.ID, true),
+		emailtemplate1.WithEntID(&in.EntID, true),
 		emailtemplate1.WithAppID(&in.AppID, true),
 		emailtemplate1.WithSender(in.Sender, false),
 		emailtemplate1.WithReplyTos(in.ReplyTos, false),
@@ -65,6 +66,7 @@ func (s *Server) UpdateAppEmailTemplate(
 	handler, err := emailtemplate1.NewHandler(
 		ctx,
 		emailtemplate1.WithID(&in.ID, true),
+		emailtemplate1.WithEntID(&in.EntID, true),
 		emailtemplate1.WithAppID(&in.TargetAppID, true),
 		emailtemplate1.WithSender(in.Sender, false),
 		emailtemplate1.WithReplyTos(in.ReplyTos, false),

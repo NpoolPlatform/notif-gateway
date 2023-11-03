@@ -13,6 +13,7 @@ import (
 func (h *Handler) UpdateContact(ctx context.Context) (*npool.Contact, error) {
 	exist, err := cli.ExistContactConds(ctx, &npool.Conds{
 		ID:    &basetypes.Uint32Val{Op: cruder.EQ, Value: *h.ID},
+		EntID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.EntID},
 		AppID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
 	})
 	if err != nil {

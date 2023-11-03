@@ -48,6 +48,7 @@ func (s *Server) CreateAnnouncementUser(
 	}, nil
 }
 
+//nolint:dupl
 func (s *Server) CreateAppAnnouncementUser(
 	ctx context.Context,
 	in *npool.CreateAppAnnouncementUserRequest,

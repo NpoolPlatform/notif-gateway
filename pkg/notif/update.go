@@ -30,16 +30,21 @@ func (h *updateHandler) validateNotifs(ctx context.Context) error {
 	if !exist {
 		return fmt.Errorf("invalid user")
 	}
+	entIDs := []string{}
 	idMap := make(map[uint32]*uint32)
 	for _, row := range h.Reqs {
 		h.IDs = append(h.IDs, *row.ID)
+		entIDs = append(entIDs, *row.EntID)
 		idMap[*row.ID] = row.ID
 	}
 	h.reqIDMap = idMap
 
 	limit := int32(len(h.IDs))
 	notifs, _, err := mwcli.GetNotifs(ctx, &notifmwpb.Conds{
-		IDs: &basetypes.Uint32SliceVal{Op: cruder.IN, Value: h.IDs},
+		AppID:  &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
+		UserID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.UserID},
+		IDs:    &basetypes.Uint32SliceVal{Op: cruder.IN, Value: h.IDs},
+		EntIDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: entIDs},
 	}, 0, limit)
 	if err != nil {
 		return err

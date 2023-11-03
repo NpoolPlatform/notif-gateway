@@ -23,6 +23,7 @@ func (s *Server) DeleteAnnouncementUser(
 	handler, err := amtuser1.NewHandler(
 		ctx,
 		handler1.WithID(&in.ID, true),
+		handler1.WithEntID(&in.EntID, true),
 		handler1.WithAppID(&in.AppID, true),
 	)
 	if err != nil {
@@ -49,6 +50,7 @@ func (s *Server) DeleteAnnouncementUser(
 	}, nil
 }
 
+//nolint:dupl
 func (s *Server) DeleteAppAnnouncementUser(
 	ctx context.Context,
 	in *npool.DeleteAppAnnouncementUserRequest,
@@ -58,6 +60,7 @@ func (s *Server) DeleteAppAnnouncementUser(
 ) {
 	resp, err := s.DeleteAnnouncementUser(ctx, &npool.DeleteAnnouncementUserRequest{
 		ID:    in.ID,
+		EntID: in.EntID,
 		AppID: in.TargetAppID,
 	})
 	if err != nil {

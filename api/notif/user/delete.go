@@ -1,3 +1,4 @@
+//nolint:dupl
 package user
 
 import (
@@ -16,6 +17,7 @@ func (s *Server) DeleteNotifUser(ctx context.Context, in *npool.DeleteNotifUserR
 	handler, err := notifuser1.NewHandler(
 		ctx,
 		notifuser1.WithID(&in.ID, true),
+		notifuser1.WithEntID(&in.EntID, true),
 		notifuser1.WithAppID(&in.AppID, true),
 	)
 	if err != nil {

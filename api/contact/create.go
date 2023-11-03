@@ -44,7 +44,6 @@ func (s *Server) CreateContact(ctx context.Context, in *npool.CreateContactReque
 	}, nil
 }
 
-//nolint
 func (s *Server) CreateAppContact(ctx context.Context, in *npool.CreateAppContactRequest) (*npool.CreateAppContactResponse, error) {
 	resp, err := s.CreateContact(ctx, &npool.CreateContactRequest{
 		AppID:       in.TargetAppID,

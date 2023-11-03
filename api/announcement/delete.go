@@ -22,6 +22,7 @@ func (s *Server) DeleteAnnouncement(
 	handler, err := announcement1.NewHandler(
 		ctx,
 		announcement1.WithID(&in.ID, true),
+		announcement1.WithEntID(&in.EntID, true),
 		announcement1.WithAppID(&in.AppID, true),
 	)
 	if err != nil {

@@ -23,6 +23,7 @@ func (s *Server) UpdateFrontendTemplate(
 	handler, err := frontendtemplate1.NewHandler(
 		ctx,
 		frontendtemplate1.WithID(&in.ID, true),
+		frontendtemplate1.WithEntID(&in.EntID, true),
 		frontendtemplate1.WithAppID(&in.AppID, true),
 		frontendtemplate1.WithTitle(in.Title, false),
 		frontendtemplate1.WithContent(in.Content, false),
@@ -61,6 +62,7 @@ func (s *Server) UpdateAppFrontendTemplate(
 	handler, err := frontendtemplate1.NewHandler(
 		ctx,
 		frontendtemplate1.WithID(&in.ID, true),
+		frontendtemplate1.WithEntID(&in.EntID, true),
 		frontendtemplate1.WithAppID(&in.TargetAppID, true),
 		frontendtemplate1.WithTitle(in.Title, false),
 		frontendtemplate1.WithContent(in.Content, false),

@@ -14,6 +14,7 @@ func (s *Server) UpdateContact(ctx context.Context, in *npool.UpdateContactReque
 	handler, err := contact1.NewHandler(
 		ctx,
 		contact1.WithID(&in.ID, true),
+		contact1.WithEntID(&in.EntID, true),
 		contact1.WithAppID(&in.AppID, true),
 		contact1.WithSender(in.Sender, false),
 		contact1.WithAccount(in.Account, false),
@@ -43,10 +44,10 @@ func (s *Server) UpdateContact(ctx context.Context, in *npool.UpdateContactReque
 	}, nil
 }
 
-//nolint
 func (s *Server) UpdateAppContact(ctx context.Context, in *npool.UpdateAppContactRequest) (*npool.UpdateAppContactResponse, error) {
 	resp, err := s.UpdateContact(ctx, &npool.UpdateContactRequest{
 		ID:          in.ID,
+		EntID:       in.EntID,
 		AppID:       in.TargetAppID,
 		Account:     in.Account,
 		AccountType: in.AccountType,

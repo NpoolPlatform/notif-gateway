@@ -22,6 +22,7 @@ func (s *Server) UpdateSMSTemplate(
 	handler, err := smstemplate1.NewHandler(
 		ctx,
 		smstemplate1.WithID(&in.ID, true),
+		smstemplate1.WithEntID(&in.EntID, true),
 		smstemplate1.WithAppID(&in.AppID, true),
 		smstemplate1.WithSubject(in.Subject, false),
 		smstemplate1.WithMessage(in.Message, false),
@@ -60,6 +61,7 @@ func (s *Server) UpdateAppSMSTemplate(
 	handler, err := smstemplate1.NewHandler(
 		ctx,
 		smstemplate1.WithID(&in.ID, true),
+		smstemplate1.WithEntID(&in.EntID, true),
 		smstemplate1.WithAppID(&in.TargetAppID, true),
 		smstemplate1.WithSubject(in.Subject, false),
 		smstemplate1.WithMessage(in.Message, false),

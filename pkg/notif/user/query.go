@@ -64,6 +64,7 @@ func (h *Handler) GetNotifUsers(ctx context.Context) ([]*npool.NotifUser, uint32
 		}
 		infos = append(infos, &npool.NotifUser{
 			ID:           val.ID,
+			EntID:        val.EntID,
 			EventType:    val.EventType,
 			AppID:        val.AppID,
 			UserID:       val.UserID,

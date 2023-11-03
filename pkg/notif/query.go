@@ -136,6 +136,7 @@ func (h *Handler) GetNotifs(
 
 		infos = append(infos, &npool.Notif{
 			ID:           val.ID,
+			EntID:        val.EntID,
 			AppID:        val.AppID,
 			AppName:      app.Name,
 			UserID:       val.UserID,

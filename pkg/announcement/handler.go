@@ -70,7 +70,10 @@ func WithEntID(id *string, must bool) func(context.Context, *Handler) error {
 func WithUserID(id *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if id == nil {
-			return fmt.Errorf("invalid user id")
+			if must {
+				return fmt.Errorf("invalid userid")
+			}
+			return nil
 		}
 		_, err := uuid.Parse(*id)
 		if err != nil {
@@ -85,7 +88,10 @@ func WithUserID(id *string, must bool) func(context.Context, *Handler) error {
 func WithAppID(appID *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if appID == nil {
-			return fmt.Errorf("invalid app id")
+			if must {
+				return fmt.Errorf("invalid appid")
+			}
+			return nil
 		}
 		_, err := uuid.Parse(*appID)
 		if err != nil {

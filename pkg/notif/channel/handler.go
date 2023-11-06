@@ -69,6 +69,11 @@ func WithAppID(id *string, must bool) func(context.Context, *Handler) error {
 			}
 			return nil
 		}
+		_, err := uuid.Parse(*id)
+		if err != nil {
+			return err
+		}
+
 		exist, err := appmwcli.ExistApp(ctx, *id)
 		if err != nil {
 			return err

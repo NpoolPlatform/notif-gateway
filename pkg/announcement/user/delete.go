@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
@@ -20,7 +21,7 @@ func (h *Handler) DeleteAnnouncementUser(ctx context.Context) (*npool.Announceme
 		return nil, err
 	}
 	if !exist {
-		return nil, nil
+		return nil, fmt.Errorf("announcementuser not exist")
 	}
 
 	info, err := mwcli.DeleteAnnouncementUser(ctx, *h.ID)

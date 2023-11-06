@@ -2,6 +2,7 @@ package announcement
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
@@ -20,7 +21,7 @@ func (h *Handler) DeleteAnnouncement(ctx context.Context) (*npool.Announcement, 
 		return nil, err
 	}
 	if !exist {
-		return nil, nil
+		return nil, fmt.Errorf("announcement not exist")
 	}
 
 	info, err := mwcli.DeleteAnnouncement(ctx, *h.ID)

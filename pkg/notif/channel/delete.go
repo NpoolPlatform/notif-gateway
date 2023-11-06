@@ -2,6 +2,7 @@ package channel
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
@@ -19,7 +20,7 @@ func (h *Handler) DeleteChannel(ctx context.Context) (*mwpb.Channel, error) {
 		return nil, err
 	}
 	if !exist {
-		return nil, nil
+		return nil, fmt.Errorf("notif channel not exist")
 	}
 
 	return mwcli.DeleteChannel(ctx, *h.ID)

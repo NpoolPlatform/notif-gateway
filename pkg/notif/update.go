@@ -30,11 +30,10 @@ func (h *updateHandler) validateNotifs(ctx context.Context) error {
 	if !exist {
 		return fmt.Errorf("invalid user")
 	}
-	entIDs := []string{}
 	idMap := make(map[uint32]*uint32)
 	for _, row := range h.Reqs {
 		h.IDs = append(h.IDs, *row.ID)
-		entIDs = append(entIDs, *row.EntID)
+		h.EntIDs = append(h.EntIDs, *row.EntID)
 		idMap[*row.ID] = row.ID
 	}
 	h.reqIDMap = idMap
@@ -44,7 +43,7 @@ func (h *updateHandler) validateNotifs(ctx context.Context) error {
 		AppID:  &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
 		UserID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.UserID},
 		IDs:    &basetypes.Uint32SliceVal{Op: cruder.IN, Value: h.IDs},
-		EntIDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: entIDs},
+		EntIDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: h.EntIDs},
 	}, 0, limit)
 	if err != nil {
 		return err

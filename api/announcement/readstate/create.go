@@ -20,9 +20,9 @@ func (s *Server) CreateReadState(
 ) {
 	handler, err := amtreadstate1.NewHandler(
 		ctx,
-		handler1.WithAppID(&in.AppID),
-		handler1.WithUserID(&in.AppID, &in.UserID),
-		handler1.WithAnnouncementID(&in.AppID, &in.AnnouncementID),
+		handler1.WithAppID(&in.AppID, true),
+		handler1.WithUserID(&in.UserID, true),
+		handler1.WithAnnouncementID(&in.AppID, &in.AnnouncementID, true),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

@@ -10,7 +10,7 @@ import (
 )
 
 func (h *Handler) GetFrontendTemplate(ctx context.Context) (*frontendtemplatemwpb.FrontendTemplate, error) {
-	return frontendtemplatemwcli.GetFrontendTemplate(ctx, *h.ID)
+	return frontendtemplatemwcli.GetFrontendTemplate(ctx, *h.EntID)
 }
 
 func (h *Handler) GetFrontendTemplates(ctx context.Context) ([]*frontendtemplatemwpb.FrontendTemplate, uint32, error) {

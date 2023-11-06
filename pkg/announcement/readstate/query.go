@@ -14,23 +14,24 @@ import (
 )
 
 func (h *Handler) GetReadStates(ctx context.Context) ([]*npool.ReadState, uint32, error) {
+	if h.UserID != nil {
+		exist, err := usermwcli.ExistUser(ctx, *h.AppID, *h.UserID)
+		if err != nil {
+			return nil, 0, err
+		}
+		if !exist {
+			return nil, 0, fmt.Errorf("invalid user")
+		}
+	}
+
 	conds := &mwpb.Conds{
-		AppID: &basetypes.StringVal{
-			Op:    cruder.EQ,
-			Value: *h.AppID,
-		},
+		AppID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
 	}
 	if h.UserID != nil {
-		conds.UserID = &basetypes.StringVal{
-			Op:    cruder.EQ,
-			Value: *h.UserID,
-		}
+		conds.UserID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.UserID}
 	}
 	if h.AnnouncementID != nil {
-		conds.AnnouncementID = &basetypes.StringVal{
-			Op:    cruder.EQ,
-			Value: *h.AnnouncementID,
-		}
+		conds.AnnouncementID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.AnnouncementID}
 	}
 
 	rows, total, err := mwcli.GetReadStates(ctx, conds, h.Offset, h.Limit)
@@ -73,6 +74,7 @@ func (h *Handler) GetReadStates(ctx context.Context) ([]*npool.ReadState, uint32
 		}
 		infos = append(infos, &npool.ReadState{
 			ID:               val.ID,
+			EntID:            val.EntID,
 			AnnouncementID:   val.AnnouncementID,
 			AppID:            val.AppID,
 			UserID:           val.UserID,

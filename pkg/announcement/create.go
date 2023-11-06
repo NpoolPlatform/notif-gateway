@@ -4,44 +4,25 @@ import (
 	"context"
 	"fmt"
 
+	applangmwcli "github.com/NpoolPlatform/g11n-middleware/pkg/client/applang"
+	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
+	"github.com/NpoolPlatform/message/npool/g11n/mw/v1/applang"
 	npool "github.com/NpoolPlatform/message/npool/notif/gw/v1/announcement"
 	mwpb "github.com/NpoolPlatform/message/npool/notif/mw/v1/announcement"
 	cli "github.com/NpoolPlatform/notif-middleware/pkg/client/announcement"
 )
 
-type createHandler struct {
-	*Handler
-}
-
-func (h *createHandler) validate() error {
-	if h.Title == nil {
-		return fmt.Errorf("title is empty")
-	}
-	if h.Content == nil {
-		return fmt.Errorf("content is empty")
-	}
-	if h.Type == nil {
-		return fmt.Errorf("type is empty")
-	}
-	if h.StartAt == nil {
-		return fmt.Errorf("end at is empty")
-	}
-	if h.EndAt == nil {
-		return fmt.Errorf("end at is empty")
-	}
-	if *h.StartAt > *h.EndAt {
-		return fmt.Errorf("start at less than end at")
-	}
-	return nil
-}
-
 func (h *Handler) CreateAnnouncement(ctx context.Context) (*npool.Announcement, error) {
-	handler := &createHandler{
-		Handler: h,
-	}
-
-	if err := handler.validate(); err != nil {
+	exist, err := applangmwcli.ExistAppLangConds(ctx, &applang.Conds{
+		AppID:  &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
+		LangID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.LangID},
+	})
+	if err != nil {
 		return nil, err
+	}
+	if !exist {
+		return nil, fmt.Errorf("invalid applang")
 	}
 
 	info, err := cli.CreateAnnouncement(
@@ -62,5 +43,6 @@ func (h *Handler) CreateAnnouncement(ctx context.Context) (*npool.Announcement, 
 	}
 
 	h.ID = &info.ID
+	h.EntID = &info.EntID
 	return h.GetAnnouncement(ctx)
 }

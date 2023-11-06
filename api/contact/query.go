@@ -15,7 +15,7 @@ import (
 func (s *Server) GetContact(ctx context.Context, in *npool.GetContactRequest) (*npool.GetContactResponse, error) {
 	handler, err := contact1.NewHandler(
 		ctx,
-		contact1.WithID(&in.ID),
+		contact1.WithEntID(&in.EntID, true),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
@@ -41,10 +41,11 @@ func (s *Server) GetContact(ctx context.Context, in *npool.GetContactRequest) (*
 	}, nil
 }
 
+//nolint:dupl
 func (s *Server) GetContacts(ctx context.Context, in *npool.GetContactsRequest) (*npool.GetContactsResponse, error) {
 	handler, err := contact1.NewHandler(
 		ctx,
-		contact1.WithAppID(&in.AppID),
+		contact1.WithAppID(&in.AppID, true),
 		contact1.WithOffset(in.Offset),
 		contact1.WithLimit(in.Limit),
 	)
@@ -73,13 +74,14 @@ func (s *Server) GetContacts(ctx context.Context, in *npool.GetContactsRequest) 
 	}, nil
 }
 
+//nolint:dupl
 func (s *Server) GetAppContacts(ctx context.Context, in *npool.GetAppContactsRequest) (*npool.GetAppContactsResponse, error) {
-	resp, err := s.GetContacts(ctx, &npool.GetContactsRequest{
-		AppID:  in.TargetAppID,
-		Offset: in.Offset,
-		Limit:  in.Limit,
-	})
-
+	handler, err := contact1.NewHandler(
+		ctx,
+		contact1.WithAppID(&in.TargetAppID, true),
+		contact1.WithOffset(in.Offset),
+		contact1.WithLimit(in.Limit),
+	)
 	if err != nil {
 		logger.Sugar().Errorw(
 			"GetAppContacts",
@@ -89,8 +91,18 @@ func (s *Server) GetAppContacts(ctx context.Context, in *npool.GetAppContactsReq
 		return &npool.GetAppContactsResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
+	infos, total, err := handler.GetContacts(ctx)
+	if err != nil {
+		logger.Sugar().Errorw(
+			"GetAppContacts",
+			"In", in,
+			"Error", err,
+		)
+		return &npool.GetAppContactsResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
 	return &npool.GetAppContactsResponse{
-		Infos: resp.Infos,
-		Total: resp.Total,
+		Infos: infos,
+		Total: total,
 	}, nil
 }

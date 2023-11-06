@@ -4,26 +4,24 @@ import (
 	"context"
 	"fmt"
 
-	npool "github.com/NpoolPlatform/message/npool/notif/mw/v1/notif/channel"
-	cli "github.com/NpoolPlatform/notif-middleware/pkg/client/notif/channel"
+	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
+	mwpb "github.com/NpoolPlatform/message/npool/notif/mw/v1/notif/channel"
+	mwcli "github.com/NpoolPlatform/notif-middleware/pkg/client/notif/channel"
 )
 
-func (h *Handler) DeleteChannel(ctx context.Context) (*npool.Channel, error) {
-	info, err := h.GetChannel(ctx)
+func (h *Handler) DeleteChannel(ctx context.Context) (*mwpb.Channel, error) {
+	exist, err := mwcli.ExistChannelConds(ctx, &mwpb.Conds{
+		ID:    &basetypes.Uint32Val{Op: cruder.EQ, Value: *h.ID},
+		EntID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.EntID},
+		AppID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
+	})
 	if err != nil {
 		return nil, err
 	}
-	if info == nil {
-		return nil, nil
-	}
-	if info.AppID != *h.AppID {
-		return nil, fmt.Errorf("permission denied")
+	if !exist {
+		return nil, fmt.Errorf("notif channel not exist")
 	}
 
-	_, err = cli.DeleteChannel(ctx, *h.ID)
-	if err != nil {
-		return nil, err
-	}
-
-	return info, nil
+	return mwcli.DeleteChannel(ctx, *h.ID)
 }

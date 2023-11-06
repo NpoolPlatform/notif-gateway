@@ -15,22 +15,13 @@ import (
 
 func (h *Handler) GetNotifUsers(ctx context.Context) ([]*npool.NotifUser, uint32, error) {
 	conds := &mwpb.Conds{
-		AppID: &basetypes.StringVal{
-			Op:    cruder.EQ,
-			Value: *h.AppID,
-		},
+		AppID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
 	}
 	if h.EventType != nil {
-		conds.EventType = &basetypes.Uint32Val{
-			Op:    cruder.EQ,
-			Value: uint32(*h.EventType),
-		}
+		conds.EventType = &basetypes.Uint32Val{Op: cruder.EQ, Value: uint32(*h.EventType)}
 	}
 	if h.UserID != nil {
-		conds.UserID = &basetypes.StringVal{
-			Op:    cruder.EQ,
-			Value: *h.UserID,
-		}
+		conds.UserID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.UserID}
 	}
 
 	rows, total, err := mwcli.GetNotifUsers(ctx, conds, h.Offset, h.Limit)
@@ -73,6 +64,7 @@ func (h *Handler) GetNotifUsers(ctx context.Context) ([]*npool.NotifUser, uint32
 		}
 		infos = append(infos, &npool.NotifUser{
 			ID:           val.ID,
+			EntID:        val.EntID,
 			EventType:    val.EventType,
 			AppID:        val.AppID,
 			UserID:       val.UserID,
@@ -90,7 +82,7 @@ func (h *Handler) GetNotifUsers(ctx context.Context) ([]*npool.NotifUser, uint32
 }
 
 func (h *Handler) GetNotifUser(ctx context.Context) (*npool.NotifUser, error) {
-	row, err := mwcli.GetNotifUser(ctx, *h.ID)
+	row, err := mwcli.GetNotifUser(ctx, *h.EntID)
 	if err != nil {
 		return nil, err
 	}
@@ -105,6 +97,29 @@ func (h *Handler) GetNotifUser(ctx context.Context) (*npool.NotifUser, error) {
 
 	info := &npool.NotifUser{
 		ID:           row.ID,
+		EntID:        row.EntID,
+		EventType:    row.EventType,
+		AppID:        row.AppID,
+		UserID:       row.UserID,
+		EmailAddress: user.EmailAddress,
+		PhoneNO:      user.PhoneNO,
+		Username:     user.Username,
+		CreatedAt:    row.CreatedAt,
+		UpdatedAt:    row.UpdatedAt,
+	}
+
+	return info, nil
+}
+
+func (h *Handler) GetNotifUserExt(ctx context.Context, row *mwpb.NotifUser) (*npool.NotifUser, error) {
+	user, err := usermwcli.GetUser(ctx, row.AppID, row.UserID)
+	if err != nil {
+		return nil, err
+	}
+
+	info := &npool.NotifUser{
+		ID:           row.ID,
+		EntID:        row.EntID,
 		EventType:    row.EventType,
 		AppID:        row.AppID,
 		UserID:       row.UserID,

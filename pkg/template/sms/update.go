@@ -4,26 +4,23 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	smstemplatemwpb "github.com/NpoolPlatform/message/npool/notif/mw/v1/template/sms"
 	smstemplatemwcli "github.com/NpoolPlatform/notif-middleware/pkg/client/template/sms"
 )
 
 func (h *Handler) UpdateSMSTemplate(ctx context.Context) (*smstemplatemwpb.SMSTemplate, error) {
-	if h.ID == nil || *h.ID == "" {
-		return nil, fmt.Errorf("id invalid")
-	}
-	smsInfo, err := h.GetSMSTemplate(ctx)
+	exist, err := smstemplatemwcli.ExistSMSTemplateConds(ctx, &smstemplatemwpb.Conds{
+		ID:    &basetypes.Uint32Val{Op: cruder.EQ, Value: *h.ID},
+		EntID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.EntID},
+		AppID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
+	})
 	if err != nil {
 		return nil, err
 	}
-	if smsInfo == nil {
+	if !exist {
 		return nil, fmt.Errorf("sms template not exist")
-	}
-	if h.AppID == nil || *h.AppID == "" {
-		return nil, fmt.Errorf("appid invalid")
-	}
-	if smsInfo.AppID != *h.AppID {
-		return nil, fmt.Errorf("permission denied")
 	}
 
 	info, err := smstemplatemwcli.UpdateSMSTemplate(ctx, &smstemplatemwpb.SMSTemplateReq{
@@ -36,5 +33,7 @@ func (h *Handler) UpdateSMSTemplate(ctx context.Context) (*smstemplatemwpb.SMSTe
 		return nil, err
 	}
 
-	return info, nil
+	h.EntID = &info.EntID
+
+	return h.GetSMSTemplate(ctx)
 }

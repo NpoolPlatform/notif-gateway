@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	usermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	npool "github.com/NpoolPlatform/message/npool/notif/gw/v1/announcement/readstate"
@@ -12,19 +13,18 @@ import (
 )
 
 func (h *Handler) CreateReadState(ctx context.Context) (*npool.ReadState, error) {
+	existUser, err := usermwcli.ExistUser(ctx, *h.AppID, *h.UserID)
+	if err != nil {
+		return nil, err
+	}
+	if !existUser {
+		return nil, fmt.Errorf("invalid user")
+	}
+
 	exist, err := cli.ExistReadStateConds(ctx, &mwpb.Conds{
-		AppID: &basetypes.StringVal{
-			Op:    cruder.EQ,
-			Value: *h.AppID,
-		},
-		UserID: &basetypes.StringVal{
-			Op:    cruder.EQ,
-			Value: *h.UserID,
-		},
-		AnnouncementID: &basetypes.StringVal{
-			Op:    cruder.EQ,
-			Value: *h.AnnouncementID,
-		},
+		AppID:          &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
+		UserID:         &basetypes.StringVal{Op: cruder.EQ, Value: *h.UserID},
+		AnnouncementID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AnnouncementID},
 	})
 	if err != nil {
 		return nil, err
@@ -46,6 +46,7 @@ func (h *Handler) CreateReadState(ctx context.Context) (*npool.ReadState, error)
 	}
 
 	h.ID = &info.ID
+	h.EntID = &info.EntID
 
 	return h.GetReadState(ctx)
 }

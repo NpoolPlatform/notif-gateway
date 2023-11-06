@@ -3,6 +3,7 @@ package notif
 
 import (
 	"context"
+	"fmt"
 
 	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
 	usermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
@@ -31,12 +32,13 @@ func (h *Handler) setConds() *notifmwpb.Conds {
 	if h.Channel != nil {
 		conds.Channel = &basetypes.Uint32Val{Op: cruder.EQ, Value: uint32(*h.Channel)}
 	}
-	if len(h.IDs) > 0 {
-		conds.IDs = &basetypes.StringSliceVal{Op: cruder.IN, Value: h.IDs}
+	if len(h.EntIDs) > 0 {
+		conds.EntIDs = &basetypes.StringSliceVal{Op: cruder.IN, Value: h.EntIDs}
 	}
 	return conds
 }
 
+//nolint:funlen,gocyclo
 func (h *Handler) GetNotifs(
 	ctx context.Context,
 ) (
@@ -44,6 +46,29 @@ func (h *Handler) GetNotifs(
 	uint32,
 	error,
 ) {
+	if h.UserID != nil {
+		existUser, err := usermwcli.ExistUser(ctx, *h.AppID, *h.UserID)
+		if err != nil {
+			return nil, 0, err
+		}
+		if !existUser {
+			return nil, 0, fmt.Errorf("invalid user")
+		}
+	}
+
+	if h.LangID != nil {
+		existLang, err := applangmwcli.ExistAppLangConds(ctx, &applangmwpb.Conds{
+			AppID:  &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
+			LangID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.LangID},
+		})
+		if err != nil {
+			return nil, 0, err
+		}
+		if !existLang {
+			return nil, 0, fmt.Errorf("invalid applang")
+		}
+	}
+
 	conds := h.setConds()
 	rows, total, err := notifmwcli.GetNotifs(ctx, conds, h.Offset, h.Limit)
 	if err != nil {
@@ -111,6 +136,7 @@ func (h *Handler) GetNotifs(
 
 		infos = append(infos, &npool.Notif{
 			ID:           val.ID,
+			EntID:        val.EntID,
 			AppID:        val.AppID,
 			AppName:      app.Name,
 			UserID:       val.UserID,

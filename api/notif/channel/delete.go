@@ -1,3 +1,4 @@
+//nolint:dupl
 package channel
 
 import (
@@ -15,8 +16,9 @@ import (
 func (s *Server) DeleteChannel(ctx context.Context, in *npool.DeleteChannelRequest) (*npool.DeleteChannelResponse, error) {
 	handler, err := channel1.NewHandler(
 		ctx,
-		channel1.WithID(&in.ID),
-		channel1.WithAppID(&in.AppID),
+		channel1.WithID(&in.ID, true),
+		channel1.WithEntID(&in.EntID, true),
+		channel1.WithAppID(&in.AppID, true),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

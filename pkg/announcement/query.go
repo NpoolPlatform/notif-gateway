@@ -6,14 +6,35 @@ import (
 	"time"
 
 	usermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
+	applangmwcli "github.com/NpoolPlatform/g11n-middleware/pkg/client/applang"
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
+	"github.com/NpoolPlatform/message/npool/g11n/mw/v1/applang"
 	npool "github.com/NpoolPlatform/message/npool/notif/gw/v1/announcement"
 	mwpb "github.com/NpoolPlatform/message/npool/notif/mw/v1/announcement"
 	mwcli "github.com/NpoolPlatform/notif-middleware/pkg/client/announcement"
 )
 
 func (h *Handler) GetAnnouncements(ctx context.Context) ([]*npool.Announcement, uint32, error) {
+	existUser, err := usermwcli.ExistUser(ctx, *h.AppID, *h.UserID)
+	if err != nil {
+		return nil, 0, err
+	}
+	if !existUser {
+		return nil, 0, fmt.Errorf("invalid user")
+	}
+
+	existLang, err := applangmwcli.ExistAppLangConds(ctx, &applang.Conds{
+		AppID:  &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
+		LangID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.LangID},
+	})
+	if err != nil {
+		return nil, 0, err
+	}
+	if !existLang {
+		return nil, 0, fmt.Errorf("invalid applang")
+	}
+
 	conds := &mwpb.Conds{
 		AppID:  &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
 		UserID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.UserID},
@@ -25,7 +46,7 @@ func (h *Handler) GetAnnouncements(ctx context.Context) ([]*npool.Announcement, 
 		return nil, 0, err
 	}
 	if len(infos) == 0 {
-		return nil, total, nil
+		return nil, 0, nil
 	}
 
 	user, err := usermwcli.GetUser(ctx, *h.AppID, *h.UserID)
@@ -41,6 +62,7 @@ func (h *Handler) GetAnnouncements(ctx context.Context) ([]*npool.Announcement, 
 		}
 		announcements = append(announcements, &npool.Announcement{
 			ID:               amt.ID,
+			EntID:            amt.EntID,
 			AppID:            amt.AppID,
 			UserID:           user.ID,
 			EmailAddress:     user.EmailAddress,
@@ -76,6 +98,7 @@ func (h *Handler) GetAppAnnouncements(ctx context.Context) ([]*npool.Announcemen
 	for _, amt := range infos {
 		row := &npool.Announcement{
 			ID:               amt.ID,
+			EntID:            amt.EntID,
 			AppID:            amt.AppID,
 			LangID:           amt.LangID,
 			Title:            amt.Title,
@@ -93,7 +116,7 @@ func (h *Handler) GetAppAnnouncements(ctx context.Context) ([]*npool.Announcemen
 }
 
 func (h *Handler) GetAnnouncement(ctx context.Context) (*npool.Announcement, error) {
-	amt, err := mwcli.GetAnnouncement(ctx, *h.ID)
+	amt, err := mwcli.GetAnnouncement(ctx, *h.EntID)
 	if err != nil {
 		return nil, err
 	}
@@ -103,16 +126,36 @@ func (h *Handler) GetAnnouncement(ctx context.Context) (*npool.Announcement, err
 
 	info := &npool.Announcement{
 		ID:               amt.ID,
+		EntID:            amt.EntID,
 		AppID:            amt.AppID,
 		LangID:           amt.LangID,
 		Title:            amt.Title,
 		Content:          amt.Content,
 		StartAt:          amt.StartAt,
 		EndAt:            amt.EndAt,
-		CreatedAt:        amt.CreatedAt,
-		UpdatedAt:        amt.UpdatedAt,
 		Channel:          amt.Channel,
 		AnnouncementType: amt.AnnouncementType,
+		CreatedAt:        amt.CreatedAt,
+		UpdatedAt:        amt.UpdatedAt,
+	}
+
+	return info, nil
+}
+
+func (h *Handler) GetAnnouncementExt(amt *mwpb.Announcement) (*npool.Announcement, error) {
+	info := &npool.Announcement{
+		ID:               amt.ID,
+		EntID:            amt.EntID,
+		AppID:            amt.AppID,
+		LangID:           amt.LangID,
+		Title:            amt.Title,
+		Content:          amt.Content,
+		StartAt:          amt.StartAt,
+		EndAt:            amt.EndAt,
+		Channel:          amt.Channel,
+		AnnouncementType: amt.AnnouncementType,
+		CreatedAt:        amt.CreatedAt,
+		UpdatedAt:        amt.UpdatedAt,
 	}
 
 	return info, nil

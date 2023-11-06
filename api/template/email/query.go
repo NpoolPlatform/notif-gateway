@@ -15,7 +15,7 @@ import (
 func (s *Server) GetEmailTemplate(ctx context.Context, in *npool.GetEmailTemplateRequest) (*npool.GetEmailTemplateResponse, error) {
 	handler, err := emailtemplate1.NewHandler(
 		ctx,
-		emailtemplate1.WithID(&in.ID),
+		emailtemplate1.WithEntID(&in.EntID, true),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
@@ -44,7 +44,7 @@ func (s *Server) GetEmailTemplate(ctx context.Context, in *npool.GetEmailTemplat
 func (s *Server) GetEmailTemplates(ctx context.Context, in *npool.GetEmailTemplatesRequest) (*npool.GetEmailTemplatesResponse, error) {
 	handler, err := emailtemplate1.NewHandler(
 		ctx,
-		emailtemplate1.WithAppID(&in.AppID),
+		emailtemplate1.WithAppID(&in.AppID, true),
 		emailtemplate1.WithOffset(in.GetOffset()),
 		emailtemplate1.WithLimit(in.GetLimit()),
 	)
@@ -82,7 +82,7 @@ func (s *Server) GetAppEmailTemplates(
 ) {
 	handler, err := emailtemplate1.NewHandler(
 		ctx,
-		emailtemplate1.WithAppID(&in.TargetAppID),
+		emailtemplate1.WithAppID(&in.TargetAppID, true),
 		emailtemplate1.WithOffset(in.GetOffset()),
 		emailtemplate1.WithLimit(in.GetLimit()),
 	)

@@ -16,13 +16,13 @@ import (
 func (s *Server) SendCode(ctx context.Context, in *npool.SendCodeRequest) (*npool.SendCodeResponse, error) {
 	handler, err := usercode1.NewHandler(
 		ctx,
-		usercode1.WithAppID(&in.AppID),
-		usercode1.WithLangID(&in.AppID, &in.LangID),
-		usercode1.WithUserID(&in.AppID, in.UserID),
-		usercode1.WithAccount(in.Account),
-		usercode1.WithAccountType(&in.AccountType),
-		usercode1.WithUsedFor(&in.UsedFor),
-		usercode1.WithToUsername(in.ToUsername),
+		usercode1.WithAppID(&in.AppID, true),
+		usercode1.WithLangID(&in.LangID, true),
+		usercode1.WithUserID(in.UserID, false),
+		usercode1.WithAccount(in.Account, false),
+		usercode1.WithAccountType(&in.AccountType, true),
+		usercode1.WithUsedFor(&in.UsedFor, true),
+		usercode1.WithToUsername(in.ToUsername, true),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

@@ -6,17 +6,14 @@ import (
 	"time"
 
 	appcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
-	appusercli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
-	g11ncli "github.com/NpoolPlatform/g11n-middleware/pkg/client/applang"
-	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
-	"github.com/NpoolPlatform/message/npool/g11n/mw/v1/applang"
 	constant "github.com/NpoolPlatform/notif-middleware/pkg/const"
 	"github.com/google/uuid"
 )
 
 type Handler struct {
-	ID      *string
+	ID      *uint32
+	EntID   *string
 	AppID   *string
 	LangID  *string
 	UserID  *string
@@ -40,43 +37,61 @@ func NewHandler(ctx context.Context, options ...func(context.Context, *Handler) 
 	return handler, nil
 }
 
-func WithID(id *string) func(context.Context, *Handler) error {
+func WithID(id *uint32, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
-		_, err := uuid.Parse(*id)
-		if err != nil {
-			return err
+		if id == nil {
+			if must {
+				return fmt.Errorf("invalid id")
+			}
+			return nil
 		}
 		h.ID = id
 		return nil
 	}
 }
 
-func WithUserID(appID, userID *string) func(context.Context, *Handler) error {
+func WithEntID(id *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
-		if userID == nil {
-			return fmt.Errorf("invalid user id")
+		if id == nil {
+			if must {
+				return fmt.Errorf("invalid entid")
+			}
+			return nil
 		}
-		_, err := uuid.Parse(*userID)
+		_, err := uuid.Parse(*id)
 		if err != nil {
 			return err
 		}
-
-		exist, err := appusercli.ExistUser(ctx, *appID, *userID)
-		if err != nil {
-			return err
-		}
-		if !exist {
-			return fmt.Errorf("invalid app id or user id")
-		}
-		h.UserID = userID
+		h.EntID = id
 		return nil
 	}
 }
 
-func WithAppID(appID *string) func(context.Context, *Handler) error {
+func WithUserID(id *string, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if id == nil {
+			if must {
+				return fmt.Errorf("invalid userid")
+			}
+			return nil
+		}
+		_, err := uuid.Parse(*id)
+		if err != nil {
+			return err
+		}
+
+		h.UserID = id
+		return nil
+	}
+}
+
+func WithAppID(appID *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if appID == nil {
-			return fmt.Errorf("invalid app id")
+			if must {
+				return fmt.Errorf("invalid appid")
+			}
+			return nil
 		}
 		_, err := uuid.Parse(*appID)
 		if err != nil {
@@ -95,42 +110,30 @@ func WithAppID(appID *string) func(context.Context, *Handler) error {
 	}
 }
 
-func WithLangID(appID, langID *string) func(context.Context, *Handler) error {
+func WithLangID(id *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
-		if langID == nil {
-			return fmt.Errorf("invalid lang id")
+		if id == nil {
+			if must {
+				return fmt.Errorf("invalid lang id")
+			}
+			return nil
 		}
-		_, err := uuid.Parse(*langID)
+		_, err := uuid.Parse(*id)
 		if err != nil {
 			return err
 		}
 
-		exist, err := g11ncli.ExistAppLangConds(ctx, &applang.Conds{
-			AppID: &basetypes.StringVal{
-				Op:    cruder.EQ,
-				Value: *appID,
-			},
-			LangID: &basetypes.StringVal{
-				Op:    cruder.EQ,
-				Value: *langID,
-			},
-		})
-
-		if err != nil {
-			return err
-		}
-		if !exist {
-			return fmt.Errorf("invalid lang id")
-		}
-
-		h.LangID = langID
+		h.LangID = id
 		return nil
 	}
 }
 
-func WithTitle(title *string) func(context.Context, *Handler) error {
+func WithTitle(title *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if title == nil {
+			if must {
+				return fmt.Errorf("invalid title")
+			}
 			return nil
 		}
 		const leastTitleLen = 4
@@ -142,9 +145,12 @@ func WithTitle(title *string) func(context.Context, *Handler) error {
 	}
 }
 
-func WithContent(content *string) func(context.Context, *Handler) error {
+func WithContent(content *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if content == nil {
+			if must {
+				return fmt.Errorf("invalid content")
+			}
 			return nil
 		}
 		const leastContentLen = 4
@@ -156,8 +162,14 @@ func WithContent(content *string) func(context.Context, *Handler) error {
 	}
 }
 
-func WithChannel(channel *basetypes.NotifChannel) func(context.Context, *Handler) error {
+func WithChannel(channel *basetypes.NotifChannel, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
+		if channel == nil {
+			if must {
+				return fmt.Errorf("invalid channel")
+			}
+			return nil
+		}
 		switch *channel {
 		case basetypes.NotifChannel_ChannelEmail:
 		case basetypes.NotifChannel_ChannelSMS:
@@ -170,9 +182,12 @@ func WithChannel(channel *basetypes.NotifChannel) func(context.Context, *Handler
 	}
 }
 
-func WithAnnouncementType(_type *basetypes.NotifType) func(context.Context, *Handler) error {
+func WithAnnouncementType(_type *basetypes.NotifType, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if _type == nil {
+			if must {
+				return fmt.Errorf("invalid announcementtype")
+			}
 			return nil
 		}
 		switch *_type {
@@ -186,9 +201,12 @@ func WithAnnouncementType(_type *basetypes.NotifType) func(context.Context, *Han
 	}
 }
 
-func WithStartAt(startAt *uint32) func(context.Context, *Handler) error {
+func WithStartAt(startAt *uint32, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if startAt == nil {
+			if must {
+				return fmt.Errorf("invalid startat")
+			}
 			return nil
 		}
 		if *startAt < uint32(time.Now().Unix()) {
@@ -199,9 +217,12 @@ func WithStartAt(startAt *uint32) func(context.Context, *Handler) error {
 	}
 }
 
-func WithEndAt(endAt *uint32) func(context.Context, *Handler) error {
+func WithEndAt(endAt *uint32, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if endAt == nil {
+			if must {
+				return fmt.Errorf("invalid endat")
+			}
 			return nil
 		}
 		if *endAt < uint32(time.Now().Unix()) {

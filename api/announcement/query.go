@@ -14,9 +14,9 @@ import (
 func (s *Server) GetAnnouncements(ctx context.Context, in *npool.GetAnnouncementsRequest) (*npool.GetAnnouncementsResponse, error) {
 	handler, err := announcement1.NewHandler(
 		ctx,
-		announcement1.WithAppID(&in.AppID),
-		announcement1.WithUserID(&in.AppID, &in.UserID),
-		announcement1.WithLangID(&in.AppID, &in.LangID),
+		announcement1.WithAppID(&in.AppID, true),
+		announcement1.WithUserID(&in.UserID, true),
+		announcement1.WithLangID(&in.LangID, true),
 		announcement1.WithOffset(in.Offset),
 		announcement1.WithLimit(in.Limit),
 	)
@@ -45,6 +45,7 @@ func (s *Server) GetAnnouncements(ctx context.Context, in *npool.GetAnnouncement
 	}, nil
 }
 
+//nolint:dupl
 func (s *Server) GetAppAnnouncements(
 	ctx context.Context,
 	in *npool.GetAppAnnouncementsRequest,
@@ -54,7 +55,7 @@ func (s *Server) GetAppAnnouncements(
 ) {
 	handler, err := announcement1.NewHandler(
 		ctx,
-		announcement1.WithAppID(&in.AppID),
+		announcement1.WithAppID(&in.AppID, true),
 		announcement1.WithOffset(in.Offset),
 		announcement1.WithLimit(in.Limit),
 	)
@@ -83,6 +84,7 @@ func (s *Server) GetAppAnnouncements(
 	}, nil
 }
 
+//nolint:dupl
 func (s *Server) GetNAppAnnouncements(
 	ctx context.Context,
 	in *npool.GetNAppAnnouncementsRequest,
@@ -90,12 +92,12 @@ func (s *Server) GetNAppAnnouncements(
 	*npool.GetNAppAnnouncementsResponse,
 	error,
 ) {
-	resp, err := s.GetAppAnnouncements(ctx, &npool.GetAppAnnouncementsRequest{
-		AppID:  in.TargetAppID,
-		Offset: in.Offset,
-		Limit:  in.Limit,
-	})
-
+	handler, err := announcement1.NewHandler(
+		ctx,
+		announcement1.WithAppID(&in.TargetAppID, true),
+		announcement1.WithOffset(in.Offset),
+		announcement1.WithLimit(in.Limit),
+	)
 	if err != nil {
 		logger.Sugar().Errorw(
 			"GetNAppAnnouncements",
@@ -104,8 +106,19 @@ func (s *Server) GetNAppAnnouncements(
 		)
 		return &npool.GetNAppAnnouncementsResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
+
+	infos, total, err := handler.GetAppAnnouncements(ctx)
+	if err != nil {
+		logger.Sugar().Errorw(
+			"GetNAppAnnouncements",
+			"In", in,
+			"Error", err,
+		)
+		return &npool.GetNAppAnnouncementsResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
 	return &npool.GetNAppAnnouncementsResponse{
-		Infos: resp.Infos,
-		Total: resp.Total,
+		Infos: infos,
+		Total: total,
 	}, nil
 }

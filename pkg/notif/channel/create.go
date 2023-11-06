@@ -11,21 +11,10 @@ import (
 )
 
 func (h *Handler) CreateChannel(ctx context.Context) (*npool.Channel, error) {
-	exist, err := cli.ExistChannelConds(ctx, &npool.ExistChannelCondsRequest{
-		Conds: &npool.Conds{
-			AppID: &basetypes.StringVal{
-				Op:    cruder.EQ,
-				Value: *h.AppID,
-			},
-			EventType: &basetypes.Uint32Val{
-				Op:    cruder.EQ,
-				Value: uint32(*h.EventType),
-			},
-			Channel: &basetypes.Uint32Val{
-				Op:    cruder.EQ,
-				Value: uint32(*h.Channel),
-			},
-		},
+	exist, err := cli.ExistChannelConds(ctx, &npool.Conds{
+		AppID:     &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
+		EventType: &basetypes.Uint32Val{Op: cruder.EQ, Value: uint32(*h.EventType)},
+		Channel:   &basetypes.Uint32Val{Op: cruder.EQ, Value: uint32(*h.Channel)},
 	})
 	if err != nil {
 		return nil, err
@@ -45,5 +34,6 @@ func (h *Handler) CreateChannel(ctx context.Context) (*npool.Channel, error) {
 	}
 
 	h.ID = &info.ID
+	h.EntID = &info.EntID
 	return h.GetChannel(ctx)
 }

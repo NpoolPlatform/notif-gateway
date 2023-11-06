@@ -10,7 +10,7 @@ import (
 )
 
 func (h *Handler) GetEmailTemplate(ctx context.Context) (*emailtemplatemwpb.EmailTemplate, error) {
-	return emailtemplatemwcli.GetEmailTemplate(ctx, *h.ID)
+	return emailtemplatemwcli.GetEmailTemplate(ctx, *h.EntID)
 }
 
 func (h *Handler) GetEmailTemplates(ctx context.Context) ([]*emailtemplatemwpb.EmailTemplate, uint32, error) {

@@ -35,9 +35,12 @@ func NewHandler(ctx context.Context, options ...interface{}) (*Handler, error) {
 	return h, nil
 }
 
-func WithSubject(subject *string) func(context.Context, *Handler) error {
+func WithSubject(subject *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if subject == nil {
+			if must {
+				return fmt.Errorf("invalid subject")
+			}
 			return nil
 		}
 		if *subject == "" {
@@ -48,9 +51,12 @@ func WithSubject(subject *string) func(context.Context, *Handler) error {
 	}
 }
 
-func WithBody(body *string) func(context.Context, *Handler) error {
+func WithBody(body *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if body == nil {
+			if must {
+				return fmt.Errorf("invalid body")
+			}
 			return nil
 		}
 		if *body == "" {
@@ -61,9 +67,12 @@ func WithBody(body *string) func(context.Context, *Handler) error {
 	}
 }
 
-func WithSenderName(name *string) func(context.Context, *Handler) error {
+func WithSenderName(name *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if name == nil {
+			if must {
+				return fmt.Errorf("invalid sendername")
+			}
 			return nil
 		}
 		if *name == "" {

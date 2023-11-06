@@ -16,6 +16,10 @@ import (
 
 	usercodemwcli "github.com/NpoolPlatform/basal-middleware/pkg/client/usercode"
 	usercodemwpb "github.com/NpoolPlatform/message/npool/basal/mw/v1/usercode"
+
+	applangmwcli "github.com/NpoolPlatform/g11n-middleware/pkg/client/applang"
+	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
+	"github.com/NpoolPlatform/message/npool/g11n/mw/v1/applang"
 )
 
 func (h *Handler) validateUser(ctx context.Context) error {
@@ -41,6 +45,27 @@ func (h *Handler) validateUser(ctx context.Context) error {
 func (h *Handler) SendCode( //nolint
 	ctx context.Context,
 ) error {
+	if h.UserID != nil {
+		exist, err := usermwcli.ExistUser(ctx, *h.AppID, *h.UserID)
+		if err != nil {
+			return err
+		}
+		if !exist {
+			return fmt.Errorf("invalid user")
+		}
+	}
+
+	existLang, err := applangmwcli.ExistAppLangConds(ctx, &applang.Conds{
+		AppID:  &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
+		LangID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.LangID},
+	})
+	if err != nil {
+		return err
+	}
+	if !existLang {
+		return fmt.Errorf("invalid applang")
+	}
+
 	switch *h.UsedFor {
 	case basetypes.UsedFor_Signup:
 	case basetypes.UsedFor_Update:

@@ -4,26 +4,30 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	npool "github.com/NpoolPlatform/message/npool/notif/gw/v1/announcement/user"
-	cli "github.com/NpoolPlatform/notif-middleware/pkg/client/announcement/user"
+	mwpb "github.com/NpoolPlatform/message/npool/notif/mw/v1/announcement/user"
+	mwcli "github.com/NpoolPlatform/notif-middleware/pkg/client/announcement/user"
 )
 
 func (h *Handler) DeleteAnnouncementUser(ctx context.Context) (*npool.AnnouncementUser, error) {
-	info, err := h.GetAnnouncementUser(ctx)
+	exist, err := mwcli.ExistAnnouncementUserConds(ctx, &mwpb.Conds{
+		ID:    &basetypes.Uint32Val{Op: cruder.EQ, Value: *h.ID},
+		EntID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.EntID},
+		AppID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
+	})
 	if err != nil {
 		return nil, err
 	}
-	if info == nil {
-		return nil, fmt.Errorf(" announcement user not found")
-	}
-	if info.AppID != *h.AppID {
-		return nil, fmt.Errorf("permission denied")
+	if !exist {
+		return nil, fmt.Errorf("announcementuser not exist")
 	}
 
-	_, err = cli.DeleteAnnouncementUser(ctx, *h.ID)
+	info, err := mwcli.DeleteAnnouncementUser(ctx, *h.ID)
 	if err != nil {
 		return nil, err
 	}
 
-	return info, nil
+	return h.GetAnnouncementUserExt(ctx, info)
 }

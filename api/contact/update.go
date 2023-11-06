@@ -10,14 +10,16 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+//nolint:dupl
 func (s *Server) UpdateContact(ctx context.Context, in *npool.UpdateContactRequest) (*npool.UpdateContactResponse, error) {
 	handler, err := contact1.NewHandler(
 		ctx,
-		contact1.WithID(&in.ID),
-		contact1.WithAppID(&in.AppID),
-		contact1.WithSender(in.Sender),
-		contact1.WithAccount(in.Account),
-		contact1.WithAccountType(in.AccountType),
+		contact1.WithID(&in.ID, true),
+		contact1.WithEntID(&in.EntID, true),
+		contact1.WithAppID(&in.AppID, true),
+		contact1.WithSender(in.Sender, false),
+		contact1.WithAccount(in.Account, false),
+		contact1.WithAccountType(in.AccountType, false),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
@@ -43,15 +45,27 @@ func (s *Server) UpdateContact(ctx context.Context, in *npool.UpdateContactReque
 	}, nil
 }
 
-//nolint
+//nolint:dupl
 func (s *Server) UpdateAppContact(ctx context.Context, in *npool.UpdateAppContactRequest) (*npool.UpdateAppContactResponse, error) {
-	resp, err := s.UpdateContact(ctx, &npool.UpdateContactRequest{
-		ID:          in.ID,
-		AppID:       in.TargetAppID,
-		Account:     in.Account,
-		AccountType: in.AccountType,
-		Sender:      in.Sender,
-	})
+	handler, err := contact1.NewHandler(
+		ctx,
+		contact1.WithID(&in.ID, true),
+		contact1.WithEntID(&in.EntID, true),
+		contact1.WithAppID(&in.TargetAppID, true),
+		contact1.WithSender(in.Sender, false),
+		contact1.WithAccount(in.Account, false),
+		contact1.WithAccountType(in.AccountType, false),
+	)
+	if err != nil {
+		logger.Sugar().Errorw(
+			"UpdateAppContact",
+			"In", in,
+			"Error", err,
+		)
+		return &npool.UpdateAppContactResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	info, err := handler.UpdateContact(ctx)
 	if err != nil {
 		logger.Sugar().Errorw(
 			"UpdateAppContact",
@@ -62,6 +76,6 @@ func (s *Server) UpdateAppContact(ctx context.Context, in *npool.UpdateAppContac
 	}
 
 	return &npool.UpdateAppContactResponse{
-		Info: resp.Info,
+		Info: info,
 	}, nil
 }

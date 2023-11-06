@@ -5,11 +5,7 @@ import (
 	"fmt"
 
 	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
-	appusermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
-	g11nmwcli "github.com/NpoolPlatform/g11n-middleware/pkg/client/applang"
-	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
-	"github.com/NpoolPlatform/message/npool/g11n/mw/v1/applang"
 
 	"github.com/google/uuid"
 )
@@ -34,91 +30,84 @@ func NewHandler(ctx context.Context, options ...func(context.Context, *Handler) 
 	return handler, nil
 }
 
-func WithAppID(appID *string) func(context.Context, *Handler) error {
+func WithAppID(id *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
-		if appID == nil {
+		if id == nil {
+			if must {
+				return fmt.Errorf("invalid appid")
+			}
 			return nil
 		}
-		if _, err := uuid.Parse(*appID); err != nil {
+		_, err := uuid.Parse(*id)
+		if err != nil {
 			return err
 		}
-		exist, err := appmwcli.ExistApp(ctx, *appID)
+
+		exist, err := appmwcli.ExistApp(ctx, *id)
 		if err != nil {
 			return err
 		}
 		if !exist {
 			return fmt.Errorf("invalid app")
 		}
-		h.AppID = appID
+		h.AppID = id
 		return nil
 	}
 }
 
-func WithUserID(appID, userID *string) func(context.Context, *Handler) error {
+func WithUserID(id *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
-		if appID == nil || userID == nil {
+		if id == nil {
+			if must {
+				return fmt.Errorf("invalid userid")
+			}
 			return nil
 		}
-		_, err := uuid.Parse(*userID)
-		if err != nil {
+		if _, err := uuid.Parse(*id); err != nil {
 			return err
 		}
-		exist, err := appusermwcli.ExistUser(ctx, *appID, *userID)
-		if err != nil {
-			return err
-		}
-		if !exist {
-			return fmt.Errorf("invalid user")
-		}
-
-		h.UserID = userID
+		h.UserID = id
 		return nil
 	}
 }
 
-func WithLangID(appID, langID *string) func(context.Context, *Handler) error {
+func WithLangID(id *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
-		if langID == nil {
-			return fmt.Errorf("invalid lang id")
+		if id == nil {
+			if must {
+				return fmt.Errorf("invalid langid")
+			}
+			return nil
 		}
-		_, err := uuid.Parse(*langID)
+		_, err := uuid.Parse(*id)
 		if err != nil {
 			return err
 		}
 
-		exist, err := g11nmwcli.ExistAppLangConds(ctx, &applang.Conds{
-			AppID: &basetypes.StringVal{
-				Op:    cruder.EQ,
-				Value: *appID,
-			},
-			LangID: &basetypes.StringVal{
-				Op:    cruder.EQ,
-				Value: *langID,
-			},
-		})
-
-		if err != nil {
-			return err
-		}
-		if !exist {
-			return fmt.Errorf("invalid lang id")
-		}
-
-		h.LangID = langID
+		h.LangID = id
 		return nil
 	}
 }
 
-func WithAccount(account *string) func(context.Context, *Handler) error {
+func WithAccount(account *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
+		if account == nil {
+			if must {
+				return fmt.Errorf("invalid account")
+			}
+			return nil
+		}
 		h.Account = account
 		return nil
 	}
 }
 
-func WithAccountType(accountType *basetypes.SignMethod) func(context.Context, *Handler) error {
+func WithAccountType(accountType *basetypes.SignMethod, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if accountType == nil {
+			if must {
+				return fmt.Errorf("invalid accounttype")
+			}
 			return nil
 		}
 		switch *accountType {
@@ -132,8 +121,14 @@ func WithAccountType(accountType *basetypes.SignMethod) func(context.Context, *H
 	}
 }
 
-func WithUsedFor(usedFor *basetypes.UsedFor) func(context.Context, *Handler) error {
+func WithUsedFor(usedFor *basetypes.UsedFor, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
+		if usedFor == nil {
+			if must {
+				return fmt.Errorf("invalid usedfor")
+			}
+			return nil
+		}
 		switch *usedFor {
 		case basetypes.UsedFor_Signup:
 		case basetypes.UsedFor_Signin:
@@ -152,8 +147,14 @@ func WithUsedFor(usedFor *basetypes.UsedFor) func(context.Context, *Handler) err
 	}
 }
 
-func WithToUsername(toUsername *string) func(context.Context, *Handler) error {
+func WithToUsername(toUsername *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
+		if toUsername == nil {
+			if must {
+				return fmt.Errorf("invalid tousername")
+			}
+			return nil
+		}
 		h.ToUsername = toUsername
 		return nil
 	}

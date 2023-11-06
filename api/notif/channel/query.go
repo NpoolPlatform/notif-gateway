@@ -11,10 +11,11 @@ import (
 	channel1 "github.com/NpoolPlatform/notif-gateway/pkg/notif/channel"
 )
 
+//nolint:dupl
 func (s *Server) GetAppChannels(ctx context.Context, in *npool.GetAppChannelsRequest) (*npool.GetAppChannelsResponse, error) {
 	handler, err := channel1.NewHandler(
 		ctx,
-		channel1.WithAppID(&in.AppID),
+		channel1.WithAppID(&in.AppID, true),
 		channel1.WithOffset(in.Offset),
 		channel1.WithLimit(in.Limit),
 	)
@@ -43,24 +44,35 @@ func (s *Server) GetAppChannels(ctx context.Context, in *npool.GetAppChannelsReq
 	}, nil
 }
 
+//nolint:dupl
 func (s *Server) GetNAppChannels(ctx context.Context, in *npool.GetNAppChannelsRequest) (*npool.GetNAppChannelsResponse, error) {
-	resp, err := s.GetAppChannels(ctx, &npool.GetAppChannelsRequest{
-		AppID:  in.TargetAppID,
-		Offset: in.Offset,
-		Limit:  in.Limit,
-	})
-
+	handler, err := channel1.NewHandler(
+		ctx,
+		channel1.WithAppID(&in.TargetAppID, true),
+		channel1.WithOffset(in.Offset),
+		channel1.WithLimit(in.Limit),
+	)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"GetAppChannels",
+			"GetNAppChannels",
 			"In", in,
 			"Error", err,
 		)
 		return &npool.GetNAppChannelsResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
+	infos, total, err := handler.GetChannels(ctx)
+	if err != nil {
+		logger.Sugar().Errorw(
+			"GetNAppChannels",
+			"In", in,
+			"Error", err,
+		)
+		return &npool.GetNAppChannelsResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
 	return &npool.GetNAppChannelsResponse{
-		Infos: resp.Infos,
-		Total: resp.Total,
+		Infos: infos,
+		Total: total,
 	}, nil
 }

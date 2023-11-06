@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 
+	usermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
 	mwcli "github.com/NpoolPlatform/notif-middleware/pkg/client/notif"
 
 	npool "github.com/NpoolPlatform/message/npool/notif/gw/v1/notif"
@@ -18,22 +19,31 @@ import (
 type updateHandler struct {
 	*Handler
 	notifs   []*notifmwpb.Notif
-	reqIDMap map[string]*string
+	reqIDMap map[uint32]*uint32
 }
 
 func (h *updateHandler) validateNotifs(ctx context.Context) error {
-	idMap := make(map[string]*string)
+	exist, err := usermwcli.ExistUser(ctx, *h.AppID, *h.UserID)
+	if err != nil {
+		return err
+	}
+	if !exist {
+		return fmt.Errorf("invalid user")
+	}
+	idMap := make(map[uint32]*uint32)
 	for _, row := range h.Reqs {
 		h.IDs = append(h.IDs, *row.ID)
+		h.EntIDs = append(h.EntIDs, *row.EntID)
 		idMap[*row.ID] = row.ID
 	}
 	h.reqIDMap = idMap
 
 	limit := int32(len(h.IDs))
 	notifs, _, err := mwcli.GetNotifs(ctx, &notifmwpb.Conds{
-		IDs: &basetypes.StringSliceVal{
-			Op: cruder.IN, Value: h.IDs,
-		},
+		AppID:  &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
+		UserID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.UserID},
+		IDs:    &basetypes.Uint32SliceVal{Op: cruder.IN, Value: h.IDs},
+		EntIDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: h.EntIDs},
 	}, 0, limit)
 	if err != nil {
 		return err
@@ -63,18 +73,10 @@ func (h *updateHandler) updateNotifs(ctx context.Context) error {
 	offset := int32(0)
 	for {
 		notifs, _, err := mwcli.GetNotifs(ctx, &notifmwpb.Conds{
-			AppID: &basetypes.StringVal{
-				Op: cruder.EQ, Value: *h.AppID,
-			},
-			UserID: &basetypes.StringVal{
-				Op: cruder.EQ, Value: *h.UserID,
-			},
-			EventIDs: &basetypes.StringSliceVal{
-				Op: cruder.IN, Value: eventIDs,
-			},
-			Channel: &basetypes.Uint32Val{
-				Op: cruder.EQ, Value: uint32(basetypes.NotifChannel_ChannelFrontend),
-			},
+			AppID:    &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
+			UserID:   &basetypes.StringVal{Op: cruder.EQ, Value: *h.UserID},
+			EventIDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: eventIDs},
+			Channel:  &basetypes.Uint32Val{Op: cruder.EQ, Value: uint32(basetypes.NotifChannel_ChannelFrontend)},
 		}, offset, constant.DefaultRowLimit)
 		if err != nil {
 			return err
@@ -108,13 +110,6 @@ func (h *updateHandler) updateNotifs(ctx context.Context) error {
 
 //nolint:gocyclo
 func (h *Handler) UpdateNotifs(ctx context.Context) ([]*npool.Notif, error) {
-	if h.AppID == nil || *h.AppID == "" {
-		return nil, fmt.Errorf("invalid appid")
-	}
-	if h.UserID == nil || *h.UserID == "" {
-		return nil, fmt.Errorf("invalid userid")
-	}
-
 	handler := &updateHandler{
 		Handler: h,
 	}

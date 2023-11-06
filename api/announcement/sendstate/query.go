@@ -12,6 +12,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+//nolint:dupl
 func (s *Server) GetSendStates(
 	ctx context.Context,
 	in *npool.GetSendStatesRequest,
@@ -52,15 +53,26 @@ func (s *Server) GetSendStates(
 	}, nil
 }
 
+//nolint:dupl
 func (s *Server) GetAppUserSendStates(ctx context.Context, in *npool.GetAppUserSendStatesRequest) (*npool.GetAppUserSendStatesResponse, error) {
-	resp, err := s.GetSendStates(ctx, &npool.GetSendStatesRequest{
-		AppID:   in.TargetAppID,
-		UserID:  in.TargetUserID,
-		Channel: in.Channel,
-		Offset:  in.Offset,
-		Limit:   in.Limit,
-	})
+	handler, err := amtsend1.NewHandler(
+		ctx,
+		handler1.WithAppID(&in.TargetAppID, true),
+		handler1.WithUserID(&in.TargetUserID, true),
+		amtsend1.WithChannel(in.Channel),
+		handler1.WithOffset(in.Offset),
+		handler1.WithLimit(in.Limit),
+	)
+	if err != nil {
+		logger.Sugar().Errorw(
+			"GetAppUserSendStates",
+			"In", in,
+			"Error", err,
+		)
+		return &npool.GetAppUserSendStatesResponse{}, status.Error(codes.Internal, err.Error())
+	}
 
+	infos, total, err := handler.GetSendStates(ctx)
 	if err != nil {
 		logger.Sugar().Errorw(
 			"GetAppUserSendStates",
@@ -71,11 +83,12 @@ func (s *Server) GetAppUserSendStates(ctx context.Context, in *npool.GetAppUserS
 	}
 
 	return &npool.GetAppUserSendStatesResponse{
-		Infos: resp.Infos,
-		Total: resp.Total,
+		Infos: infos,
+		Total: total,
 	}, nil
 }
 
+//nolint:dupl
 func (s *Server) GetAppSendStates(ctx context.Context, in *npool.GetAppSendStatesRequest) (*npool.GetAppSendStatesResponse, error) {
 	handler, err := amtsend1.NewHandler(
 		ctx,
@@ -86,7 +99,7 @@ func (s *Server) GetAppSendStates(ctx context.Context, in *npool.GetAppSendState
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"GetSendStates",
+			"GetAppSendStates",
 			"In", in,
 			"Error", err,
 		)
@@ -96,7 +109,7 @@ func (s *Server) GetAppSendStates(ctx context.Context, in *npool.GetAppSendState
 	infos, total, err := handler.GetSendStates(ctx)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"GetSendStates",
+			"GetAppSendStates",
 			"In", in,
 			"Error", err,
 		)
@@ -109,13 +122,15 @@ func (s *Server) GetAppSendStates(ctx context.Context, in *npool.GetAppSendState
 	}, nil
 }
 
+//nolint:dupl
 func (s *Server) GetNAppSendStates(ctx context.Context, in *npool.GetNAppSendStatesRequest) (*npool.GetNAppSendStatesResponse, error) {
-	resp, err := s.GetAppSendStates(ctx, &npool.GetAppSendStatesRequest{
-		AppID:  in.TargetAppID,
-		Offset: in.Offset,
-		Limit:  in.Limit,
-	})
-
+	handler, err := amtsend1.NewHandler(
+		ctx,
+		handler1.WithAppID(&in.TargetAppID, true),
+		amtsend1.WithChannel(in.Channel),
+		handler1.WithOffset(in.Offset),
+		handler1.WithLimit(in.Limit),
+	)
 	if err != nil {
 		logger.Sugar().Errorw(
 			"GetNAppSendStates",
@@ -124,8 +139,19 @@ func (s *Server) GetNAppSendStates(ctx context.Context, in *npool.GetNAppSendSta
 		)
 		return &npool.GetNAppSendStatesResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
+
+	infos, total, err := handler.GetSendStates(ctx)
+	if err != nil {
+		logger.Sugar().Errorw(
+			"GetNAppSendStates",
+			"In", in,
+			"Error", err,
+		)
+		return &npool.GetNAppSendStatesResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
 	return &npool.GetNAppSendStatesResponse{
-		Infos: resp.Infos,
-		Total: resp.Total,
+		Infos: infos,
+		Total: total,
 	}, nil
 }

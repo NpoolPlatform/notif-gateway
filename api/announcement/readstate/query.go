@@ -51,6 +51,7 @@ func (s *Server) GetReadState(
 	}, nil
 }
 
+//nolint:dupl
 func (s *Server) GetReadStates(ctx context.Context, in *npool.GetReadStatesRequest) (*npool.GetReadStatesResponse, error) {
 	handler, err := amtread1.NewHandler(
 		ctx,
@@ -84,14 +85,25 @@ func (s *Server) GetReadStates(ctx context.Context, in *npool.GetReadStatesReque
 	}, nil
 }
 
+//nolint:dupl
 func (s *Server) GetAppUserReadStates(ctx context.Context, in *npool.GetAppUserReadStatesRequest) (*npool.GetAppUserReadStatesResponse, error) {
-	resp, err := s.GetReadStates(ctx, &npool.GetReadStatesRequest{
-		AppID:  in.TargetAppID,
-		UserID: in.TargetUserID,
-		Offset: in.Offset,
-		Limit:  in.Limit,
-	})
+	handler, err := amtread1.NewHandler(
+		ctx,
+		handler1.WithAppID(&in.TargetAppID, true),
+		handler1.WithUserID(&in.TargetUserID, true),
+		handler1.WithOffset(in.Offset),
+		handler1.WithLimit(in.Limit),
+	)
+	if err != nil {
+		logger.Sugar().Errorw(
+			"GetAppUserReadStates",
+			"In", in,
+			"Error", err,
+		)
+		return &npool.GetAppUserReadStatesResponse{}, status.Error(codes.Internal, err.Error())
+	}
 
+	infos, total, err := handler.GetReadStates(ctx)
 	if err != nil {
 		logger.Sugar().Errorw(
 			"GetAppUserReadStates",
@@ -102,11 +114,12 @@ func (s *Server) GetAppUserReadStates(ctx context.Context, in *npool.GetAppUserR
 	}
 
 	return &npool.GetAppUserReadStatesResponse{
-		Infos: resp.Infos,
-		Total: resp.Total,
+		Infos: infos,
+		Total: total,
 	}, nil
 }
 
+//nolint:dupl
 func (s *Server) GetAppReadStates(ctx context.Context, in *npool.GetAppReadStatesRequest) (*npool.GetAppReadStatesResponse, error) {
 	handler, err := amtread1.NewHandler(
 		ctx,
@@ -139,13 +152,14 @@ func (s *Server) GetAppReadStates(ctx context.Context, in *npool.GetAppReadState
 	}, nil
 }
 
+//nolint:dupl
 func (s *Server) GetNAppReadStates(ctx context.Context, in *npool.GetNAppReadStatesRequest) (*npool.GetNAppReadStatesResponse, error) {
-	resp, err := s.GetAppReadStates(ctx, &npool.GetAppReadStatesRequest{
-		AppID:  in.TargetAppID,
-		Offset: in.Offset,
-		Limit:  in.Limit,
-	})
-
+	handler, err := amtread1.NewHandler(
+		ctx,
+		handler1.WithAppID(&in.TargetAppID, true),
+		handler1.WithOffset(in.Offset),
+		handler1.WithLimit(in.Limit),
+	)
 	if err != nil {
 		logger.Sugar().Errorw(
 			"GetNAppReadStates",
@@ -154,8 +168,19 @@ func (s *Server) GetNAppReadStates(ctx context.Context, in *npool.GetNAppReadSta
 		)
 		return &npool.GetNAppReadStatesResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
+
+	infos, total, err := handler.GetReadStates(ctx)
+	if err != nil {
+		logger.Sugar().Errorw(
+			"GetNAppReadStates",
+			"In", in,
+			"Error", err,
+		)
+		return &npool.GetNAppReadStatesResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
 	return &npool.GetNAppReadStatesResponse{
-		Infos: resp.Infos,
-		Total: resp.Total,
+		Infos: infos,
+		Total: total,
 	}, nil
 }

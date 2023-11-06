@@ -12,6 +12,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+//nolint:dupl
 func (s *Server) GetAnnouncementUsers(
 	ctx context.Context,
 	in *npool.GetAnnouncementUsersRequest,
@@ -50,6 +51,7 @@ func (s *Server) GetAnnouncementUsers(
 	}, nil
 }
 
+//nolint:dupl
 func (s *Server) GetAppAnnouncementUsers(
 	ctx context.Context,
 	in *npool.GetAppAnnouncementUsersRequest,
@@ -57,11 +59,12 @@ func (s *Server) GetAppAnnouncementUsers(
 	*npool.GetAppAnnouncementUsersResponse,
 	error,
 ) {
-	resp, err := s.GetAnnouncementUsers(ctx, &npool.GetAnnouncementUsersRequest{
-		AppID:  in.TargetAppID,
-		Offset: in.Offset,
-		Limit:  in.Limit,
-	})
+	handler, err := amtuser1.NewHandler(
+		ctx,
+		handler1.WithAppID(&in.TargetAppID, true),
+		handler1.WithOffset(in.Offset),
+		handler1.WithLimit(in.Limit),
+	)
 	if err != nil {
 		logger.Sugar().Errorw(
 			"GetAppAnnouncementUsers",
@@ -71,8 +74,18 @@ func (s *Server) GetAppAnnouncementUsers(
 		return &npool.GetAppAnnouncementUsersResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
+	infos, total, err := handler.GetAnnouncementUsers(ctx)
+	if err != nil {
+		logger.Sugar().Errorw(
+			"GetAppAnnouncementUsers",
+			"In", in,
+			"Error", err,
+		)
+		return &npool.GetAppAnnouncementUsersResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
 	return &npool.GetAppAnnouncementUsersResponse{
-		Infos: resp.Infos,
-		Total: resp.Total,
+		Infos: infos,
+		Total: total,
 	}, nil
 }

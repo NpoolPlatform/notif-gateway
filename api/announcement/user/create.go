@@ -11,6 +11,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+//nolint:dupl
 func (s *Server) CreateAnnouncementUser(
 	ctx context.Context,
 	in *npool.CreateAnnouncementUserRequest,
@@ -56,15 +57,26 @@ func (s *Server) CreateAppAnnouncementUser(
 	*npool.CreateAppAnnouncementUserResponse,
 	error,
 ) {
-	resp, err := s.CreateAnnouncementUser(ctx, &npool.CreateAnnouncementUserRequest{
-		AppID:          in.TargetAppID,
-		TargetUserID:   in.TargetUserID,
-		AnnouncementID: in.AnnouncementID,
-	})
+	handler, err := amtuser1.NewHandler(
+		ctx,
+		handler1.WithAppID(&in.TargetAppID, true),
+		handler1.WithUserID(&in.TargetUserID, true),
+		handler1.WithAnnouncementID(&in.TargetAppID, &in.AnnouncementID, true),
+	)
 
 	if err != nil {
 		logger.Sugar().Errorw(
-			"CreateAnnouncementUser",
+			"CreateAppAnnouncementUser",
+			"In", in,
+			"Error", err,
+		)
+		return &npool.CreateAppAnnouncementUserResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	info, err := handler.CreateAnnouncementUser(ctx)
+	if err != nil {
+		logger.Sugar().Errorw(
+			"CreateAppAnnouncementUser",
 			"In", in,
 			"Error", err,
 		)
@@ -72,6 +84,6 @@ func (s *Server) CreateAppAnnouncementUser(
 	}
 
 	return &npool.CreateAppAnnouncementUserResponse{
-		Info: resp.Info,
+		Info: info,
 	}, nil
 }

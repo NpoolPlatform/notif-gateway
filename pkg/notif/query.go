@@ -87,24 +87,24 @@ func (h *Handler) GetNotifs(
 		langIDs = append(langIDs, val.LangID)
 	}
 	appInfos, _, err := appmwcli.GetApps(ctx, &appmwpb.Conds{
-		IDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: appIDs},
+		EntIDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: appIDs},
 	}, 0, int32(len(appIDs)))
 	if err != nil {
 		return nil, 0, err
 	}
 	appMap := map[string]*appmwpb.App{}
 	for _, val := range appInfos {
-		appMap[val.ID] = val
+		appMap[val.EntID] = val
 	}
 	userInfos, _, err := usermwcli.GetUsers(ctx, &usermwpb.Conds{
-		IDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: userIDs},
+		EntIDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: userIDs},
 	}, 0, int32(len(userIDs)))
 	if err != nil {
 		return nil, 0, err
 	}
 	userMap := map[string]*usermwpb.User{}
 	for _, val := range userInfos {
-		userMap[val.ID] = val
+		userMap[val.EntID] = val
 	}
 
 	langs, _, err := applangmwcli.GetLangs(ctx, &applangmwpb.Conds{

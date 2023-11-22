@@ -57,7 +57,7 @@ func (h *Handler) GetSendStates(ctx context.Context) ([]*npool.SendState, uint32
 	userMap := map[string]*usermwpb.User{}
 	if len(userIDs) > 0 {
 		userInfos, _, err := usermwcli.GetUsers(ctx, &usermwpb.Conds{
-			IDs: &basetypes.StringSliceVal{
+			EntIDs: &basetypes.StringSliceVal{
 				Op: cruder.IN, Value: userIDs,
 			},
 		}, 0, int32(len(userIDs)))
@@ -66,7 +66,7 @@ func (h *Handler) GetSendStates(ctx context.Context) ([]*npool.SendState, uint32
 		}
 
 		for _, val := range userInfos {
-			userMap[val.ID] = val
+			userMap[val.EntID] = val
 		}
 	}
 

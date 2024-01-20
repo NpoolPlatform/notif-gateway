@@ -15,7 +15,7 @@ func (s *Server) GetAnnouncements(ctx context.Context, in *npool.GetAnnouncement
 	handler, err := announcement1.NewHandler(
 		ctx,
 		announcement1.WithAppID(&in.AppID, true),
-		announcement1.WithUserID(&in.UserID, false),
+		announcement1.WithUserID(in.UserID, false),
 		announcement1.WithLangID(&in.LangID, true),
 		announcement1.WithOffset(in.Offset),
 		announcement1.WithLimit(in.Limit),

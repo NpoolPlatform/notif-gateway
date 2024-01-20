@@ -8,6 +8,7 @@ import (
 	usermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
 	applangmwcli "github.com/NpoolPlatform/g11n-middleware/pkg/client/applang"
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
+	usermwpb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/user"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	"github.com/NpoolPlatform/message/npool/g11n/mw/v1/applang"
 	npool "github.com/NpoolPlatform/message/npool/notif/gw/v1/announcement"
@@ -16,12 +17,14 @@ import (
 )
 
 func (h *Handler) GetAnnouncements(ctx context.Context) ([]*npool.Announcement, uint32, error) {
-	existUser, err := usermwcli.ExistUser(ctx, *h.AppID, *h.UserID)
-	if err != nil {
-		return nil, 0, err
-	}
-	if !existUser {
-		return nil, 0, fmt.Errorf("invalid user")
+	if h.UserID != nil {
+		existUser, err := usermwcli.ExistUser(ctx, *h.AppID, *h.UserID)
+		if err != nil {
+			return nil, 0, err
+		}
+		if !existUser {
+			return nil, 0, fmt.Errorf("invalid user")
+		}
 	}
 
 	existLang, err := applangmwcli.ExistAppLangConds(ctx, &applang.Conds{
@@ -37,8 +40,10 @@ func (h *Handler) GetAnnouncements(ctx context.Context) ([]*npool.Announcement, 
 
 	conds := &mwpb.Conds{
 		AppID:  &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
-		UserID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.UserID},
 		LangID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.LangID},
+	}
+	if h.UserID != nil {
+		conds.UserID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.UserID}
 	}
 
 	infos, total, err := mwcli.GetAnnouncements(ctx, conds, h.Offset, h.Limit)
@@ -49,9 +54,12 @@ func (h *Handler) GetAnnouncements(ctx context.Context) ([]*npool.Announcement, 
 		return nil, 0, nil
 	}
 
-	user, err := usermwcli.GetUser(ctx, *h.AppID, *h.UserID)
-	if err != nil {
-		return nil, 0, err
+	var user *usermwpb.User
+	if h.UserID != nil {
+		user, err = usermwcli.GetUser(ctx, *h.AppID, *h.UserID)
+		if err != nil {
+			return nil, 0, err
+		}
 	}
 
 	announcements := []*npool.Announcement{}
@@ -60,14 +68,10 @@ func (h *Handler) GetAnnouncements(ctx context.Context) ([]*npool.Announcement, 
 		if amt.StartAt >= now {
 			continue
 		}
-		announcements = append(announcements, &npool.Announcement{
+		announcement := &npool.Announcement{
 			ID:               amt.ID,
 			EntID:            amt.EntID,
 			AppID:            amt.AppID,
-			UserID:           user.EntID,
-			EmailAddress:     user.EmailAddress,
-			PhoneNO:          user.PhoneNO,
-			Username:         user.Username,
 			LangID:           amt.LangID,
 			Title:            amt.Title,
 			Content:          amt.Content,
@@ -78,7 +82,14 @@ func (h *Handler) GetAnnouncements(ctx context.Context) ([]*npool.Announcement, 
 			AnnouncementType: amt.AnnouncementType,
 			CreatedAt:        amt.CreatedAt,
 			UpdatedAt:        amt.UpdatedAt,
-		})
+		}
+		if user != nil {
+			announcement.UserID = user.EntID
+			announcement.EmailAddress = user.EmailAddress
+			announcement.PhoneNO = user.PhoneNO
+			announcement.Username = user.Username
+		}
+		announcements = append(announcements, announcement)
 	}
 
 	return announcements, total, nil

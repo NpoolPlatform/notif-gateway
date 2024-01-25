@@ -3,13 +3,13 @@ module github.com/NpoolPlatform/notif-gateway
 go 1.17
 
 require (
-	github.com/NpoolPlatform/appuser-middleware v0.0.0-20231130084704-4550aabac9c7
+	github.com/NpoolPlatform/appuser-middleware v0.0.0-20240125023515-2ea7b44eae0d
 	github.com/NpoolPlatform/basal-middleware v0.0.0-20231015112137-254853c60eec
 	github.com/NpoolPlatform/g11n-middleware v0.0.0-20231026021135-ec3cd368fc24
 	github.com/NpoolPlatform/go-service-framework v0.0.0-20230930023319-e48074d9472e
 	github.com/NpoolPlatform/libent-cruder v0.0.0-20231008051607-f64457cf6ab6
-	github.com/NpoolPlatform/message v0.0.0-20240120042350-7b3016b66623
-	github.com/NpoolPlatform/notif-middleware v0.0.0-20240116081947-09922379f917
+	github.com/NpoolPlatform/message v0.0.0-20240125015821-e83c4ddf2126
+	github.com/NpoolPlatform/notif-middleware v0.0.0-20240125023232-354e552cab98
 	github.com/NpoolPlatform/third-middleware v0.0.0-20231011073243-59e4e2a0a8ac
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/google/uuid v1.3.0

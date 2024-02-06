@@ -266,6 +266,8 @@ func WithEventType(eventtype *basetypes.UsedFor, must bool) func(context.Context
 		case basetypes.UsedFor_UpdateGoogleAuth:
 		case basetypes.UsedFor_NewLogin:
 		case basetypes.UsedFor_OrderCompleted:
+		case basetypes.UsedFor_OrderChildsRenewNotify:
+		case basetypes.UsedFor_OrderChildsRenew:
 		default:
 			return fmt.Errorf("invalid eventtype")
 		}

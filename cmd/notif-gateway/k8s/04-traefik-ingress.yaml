@@ -9,7 +9,6 @@ metadata:
     kubernetes.io/ingress.class: "traefik-internet"
     traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
     traefik.ingress.kubernetes.io/router.middlewares:
-      kube-system-oplog@kubernetescrd,
       kube-system-strip-notif-gateway-prefix@kubernetescrd,
       kube-system-http-redirect-https@kubernetescrd,
       kube-system-common-headers@kubernetescrd,
@@ -65,12 +64,11 @@ metadata:
   name: notif-gateway-traefik-app-user-ingress
   namespace: kube-system
   annotations:
-    k8s.kuboard.cn/displayName: notif-gateway-traefik-app-user
-    k8s.kuboard.cn/workload: notif-gateway-traefik-app-user
+    k8s.kuboard.cn/displayName: notif-gateway-traefik-app-free-user
+    k8s.kuboard.cn/workload: notif-gateway-traefik-app-free-user
     kubernetes.io/ingress.class: "traefik-internet"
     traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
     traefik.ingress.kubernetes.io/router.middlewares:
-      kube-system-oplog@kubernetescrd,
       kube-system-strip-notif-gateway-prefix@kubernetescrd,
       kube-system-http-redirect-https@kubernetescrd,
       kube-system-common-headers@kubernetescrd,

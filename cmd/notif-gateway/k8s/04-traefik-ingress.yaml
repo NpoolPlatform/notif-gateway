@@ -57,6 +57,10 @@ spec:
       http: *http_rules
     - host: api.epool.tech
       http: *http_rules
+    - host: api.xhash.ai
+      http: *http_rules
+    - host: api.tokyo-xhash-production.npool.top
+      http: *http_rules
 
 ---
 
@@ -127,6 +131,10 @@ spec:
       http: *http_rules
     - host: api.epool.tech
       http: *http_rules
+    - host: api.xhash.ai
+      http: *http_rules
+    - host: api.tokyo-xhash-production.npool.top
+      http: *http_rules
 
 ---
 
@@ -189,4 +197,8 @@ spec:
     - host: api.cryptomore.io
       http: *http_rules
     - host: api.epool.tech
+      http: *http_rules
+    - host: api.xhash.ai
+      http: *http_rules
+    - host: api.tokyo-xhash-production.npool.top
       http: *http_rules
